@@ -19,6 +19,10 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          sparse-checkout: |
+            /*
+            !/.repos/
+          sparse-checkout-cone-mode: false
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
