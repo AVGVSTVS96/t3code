@@ -1,6 +1,6 @@
 ---
 summary: The window title shows the active thread
-baseline: 9503155da67add4fbd7fbc51c99ec19a0c8c4a2c
+baseline: 9afde1c6dbe00d2b87829732c88789c10f3429c0
 ---
 
 ## Intent
