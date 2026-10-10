@@ -1,0 +1,8 @@
+{
+  "branch": "main",
+  "patches": [
+    "window-title"
+  ],
+  "upstream": "pingdotgg/t3code",
+  "verify": "pnpm install --frozen-lockfile --ignore-scripts && pnpm --filter @t3tools/web typecheck"
+}

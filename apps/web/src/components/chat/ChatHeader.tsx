@@ -77,6 +77,15 @@ export const ChatHeader = memo(function ChatHeader({
 }: ChatHeaderProps) {
   const activeProjectName = activeProject?.title;
   const activeProjectCwd = activeProject?.workspaceRoot ?? null;
+  useEffect(() => {
+    const appTitle = document.title;
+    document.title = activeProjectName
+      ? `${activeThreadTitle} · ${activeProjectName}`
+      : activeThreadTitle;
+    return () => {
+      document.title = appTitle;
+    };
+  }, [activeProjectName, activeThreadTitle]);
   const activeThreadRef = useMemo(
     () => scopeThreadRef(activeThreadEnvironmentId, activeThreadId),
     [activeThreadEnvironmentId, activeThreadId],

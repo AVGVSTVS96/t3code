@@ -1,0 +1,20 @@
+diff --git a/apps/web/src/components/chat/ChatHeader.tsx b/apps/web/src/components/chat/ChatHeader.tsx
+index 2b5e7da4952c6b3a8a97eecf16e01e3583215814..b1417549185ddfdfce1805ae3c1aaa9ec1c159aa 100644
+--- a/apps/web/src/components/chat/ChatHeader.tsx
++++ b/apps/web/src/components/chat/ChatHeader.tsx
+@@ -77,6 +77,15 @@ export const ChatHeader = memo(function ChatHeader({
+ }: ChatHeaderProps) {
+   const activeProjectName = activeProject?.title;
+   const activeProjectCwd = activeProject?.workspaceRoot ?? null;
++  useEffect(() => {
++    const appTitle = document.title;
++    document.title = activeProjectName
++      ? `${activeThreadTitle} · ${activeProjectName}`
++      : activeThreadTitle;
++    return () => {
++      document.title = appTitle;
++    };
++  }, [activeProjectName, activeThreadTitle]);
+   const activeThreadRef = useMemo(
+     () => scopeThreadRef(activeThreadEnvironmentId, activeThreadId),
+     [activeThreadEnvironmentId, activeThreadId],
