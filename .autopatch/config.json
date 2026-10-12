@@ -2,7 +2,8 @@
   "branch": "main",
   "patches": [
     "window-title",
-    "fork-readme"
+    "fork-readme",
+    "context-usage"
   ],
   "upstream": "pingdotgg/t3code",
   "verify": "pnpm install --frozen-lockfile --ignore-scripts && pnpm --filter @t3tools/web typecheck"

@@ -1,4 +1,9 @@
-import type { ModelSelection, ProviderDriverKind, ProviderInstanceId } from "@t3tools/contracts";
+import type {
+  ModelSelection,
+  OrchestrationV2ProviderTurnTokenUsage,
+  ProviderDriverKind,
+  ProviderInstanceId,
+} from "@t3tools/contracts";
 import {
   CLAUDE_RESUME_COMPACTION_NEVER_ANSWER,
   isClaudeResumeCompactionQuestion,
@@ -7,6 +12,7 @@ import {
   resolveSelectableProviderInstanceEntry,
   type ProviderInstanceEntry,
 } from "../../providerInstances";
+import { formatRelativeTimeLabel, formatRelativeTimeUntilLabel } from "../../timestampFormat";
 import { getTriggerDisplayModelName, type ModelEsque } from "./providerIconUtils";
 
 // Used when the provider did not report its cache TTL: Claude's 1h cache plus slack.
@@ -84,6 +90,18 @@ export function shouldOfferResumeCompaction(input: {
     Number.isFinite(now) &&
     now - updatedAt >= (input.promptCacheTtlMs ?? CLAUDE_RESUME_COMPACTION_FALLBACK_MS)
   );
+}
+
+export function describePromptCache(
+  usage: Pick<OrchestrationV2ProviderTurnTokenUsage, "promptCacheTtlMs" | "updatedAt"> | null,
+): string | null {
+  if (usage?.promptCacheTtlMs === undefined) return null;
+  const expiresAtMs = Date.parse(usage.updatedAt) + usage.promptCacheTtlMs;
+  if (!Number.isFinite(expiresAtMs)) return null;
+  const expiresAt = new Date(expiresAtMs).toISOString();
+  return expiresAtMs > Date.now()
+    ? `Prompt cache warm, ${formatRelativeTimeUntilLabel(expiresAt)}`
+    : `Prompt cache expired ${formatRelativeTimeLabel(expiresAt)}`;
 }
 
 export function resolveContextWindowModelDisplayName(

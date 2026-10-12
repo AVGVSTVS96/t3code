@@ -496,6 +496,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
 import { resolveThreadSyncPhase } from "../threadSync";
 import {
   hasAvailableCompactionProvider,
+  describePromptCache,
   hasDismissedResumeCompaction,
   shouldOfferResumeCompaction,
 } from "./chat/ContextWindowMeter.logic";
@@ -7746,17 +7747,15 @@ export default function ChatView(props: ChatViewProps) {
           ? "Compaction is unavailable for this provider"
           : "Compacting is unavailable right now"
     : null;
-  // Tokens a stale Claude session would re-read on its next turn. While set,
-  // the composer shows a Compact chip and Enter compacts first; turning the
-  // chip off sends the next message with full history. Held queues and
-  // multi-model sends never compact first, so the offer hides for them.
-  const resumeCompactionTokens =
-    activeContextWindow &&
-    !resumeCompactionPermanentlyDismissed &&
-    !nativeResumeCompactionDismissed &&
+  const compactBeforeSendAvailable =
+    activeContextWindow !== null &&
     !compactDisabled &&
     !hasHeldQueuedRuns &&
-    multipleModelSelections === null &&
+    multipleModelSelections === null;
+  const resumeCompactionOffered =
+    compactBeforeSendAvailable &&
+    !resumeCompactionPermanentlyDismissed &&
+    !nativeResumeCompactionDismissed &&
     shouldOfferResumeCompaction({
       provider: selectedProvider,
       usedTokens: activeContextWindow.usedTokens,
@@ -7764,27 +7763,26 @@ export default function ChatView(props: ChatViewProps) {
       // Only the live report carries a TTL, and only when it is the window's source.
       promptCacheTtlMs: activeThreadLiveTokenUsage?.promptCacheTtlMs,
       now: `${nowMinute}:00.000Z`,
-    })
-      ? activeContextWindow.usedTokens
-      : null;
-  // Threads whose Compact chip is turned off. A send that starts its turn
-  // clears its thread's entry; a failed send keeps it for the retry.
-  const [fullHistoryThreadKeys, setFullHistoryThreadKeys] = useState<ReadonlySet<string>>(
-    () => new Set(),
+    });
+  const [compactChoices, setCompactChoices] = useState<ReadonlyMap<string, boolean>>(
+    () => new Map(),
   );
-  const keepFullHistory = fullHistoryThreadKeys.has(routeThreadKey);
-  const setKeepFullHistory = useCallback((threadKey: string, keep: boolean) => {
-    setFullHistoryThreadKeys((current) => {
-      if (current.has(threadKey) === keep) return current;
-      const next = new Set(current);
-      if (keep) next.add(threadKey);
-      else next.delete(threadKey);
+  const keepFullHistory = !(
+    compactBeforeSendAvailable &&
+    (compactChoices.get(routeThreadKey) ?? resumeCompactionOffered)
+  );
+  const setCompactChoice = useCallback((threadKey: string, compact: boolean | undefined) => {
+    setCompactChoices((current) => {
+      if (current.get(threadKey) === compact) return current;
+      const next = new Map(current);
+      if (compact === undefined) next.delete(threadKey);
+      else next.set(threadKey, compact);
       return next;
     });
   }, []);
   const toggleKeepFullHistory = useCallback(
-    () => setKeepFullHistory(routeThreadKey, !keepFullHistory),
-    [keepFullHistory, routeThreadKey, setKeepFullHistory],
+    () => setCompactChoice(routeThreadKey, keepFullHistory),
+    [keepFullHistory, routeThreadKey, setCompactChoice],
   );
   const handleRestoreThreadBranch = useCallback(() => {
     if (!canWriteSourceControl) return;
@@ -9324,13 +9322,8 @@ export default function ChatView(props: ChatViewProps) {
     );
     const messageIdForSend = newMessageId();
     const messageCreatedAt = new Date().toISOString();
-    // A stale Claude session compacts before this message so the turn does not re-read the
-    // old history. The message queues behind the /compact run, since steering into it is
-    // rejected.
-    const compactBeforeSend =
-      resumeCompactionTokens !== null &&
-      !keepFullHistory &&
-      messageTextForSend.toLowerCase() !== "/compact";
+    // The message queues behind the /compact run, since steering into it is rejected.
+    const compactBeforeSend = !keepFullHistory && messageTextForSend.toLowerCase() !== "/compact";
     const turnDispatchMode = compactBeforeSend || sendQueuesBehindSetup ? "queue" : dispatchMode;
     const shouldQueueBehindActiveRun =
       compactBeforeSend ||
@@ -10052,7 +10045,7 @@ export default function ChatView(props: ChatViewProps) {
         failure = startResult;
       } else {
         turnStartSucceeded = true;
-        setKeepFullHistory(routeThreadKey, false);
+        setCompactChoice(routeThreadKey, undefined);
         // The turn is under way and will spend quota, so that thread's limits
         // snapshot is stale. Uploads may have outlasted a navigation, so only
         // the sending thread's panel clears.
@@ -11760,9 +11753,12 @@ export default function ChatView(props: ChatViewProps) {
                               isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
                               queuedRunsControl={queuedRunsControl}
                               bannerItems={composerBannerItems}
-                              resumeCompactionTokens={resumeCompactionTokens}
+                              resumeCompactionTokens={activeContextWindow?.usedTokens ?? null}
                               keepFullHistory={keepFullHistory}
-                              onToggleKeepFullHistory={toggleKeepFullHistory}
+                              onToggleKeepFullHistory={
+                                compactBeforeSendAvailable ? toggleKeepFullHistory : undefined
+                              }
+                              promptCacheStatus={describePromptCache(activeThreadLiveTokenUsage)}
                               // With attachments or contexts aboard the pick just inserts the
                               // text, so it sends as a prompt like the typed path would.
                               onUsageLimitsCommand={

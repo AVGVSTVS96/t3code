@@ -1391,7 +1391,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
   compactDisabledReason: string | null;
   compactBeforeSendTokens: number | null;
   keepFullHistory: boolean;
-  onToggleKeepFullHistory: () => void;
+  onToggleKeepFullHistory?: (() => void) | undefined;
+  promptCacheStatus: string | null;
 }) {
   return (
     <>
@@ -1433,6 +1434,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
         compactBeforeSendTokens={props.compactBeforeSendTokens}
         keepFullHistory={props.keepFullHistory}
         onToggleKeepFullHistory={props.onToggleKeepFullHistory}
+        promptCacheStatus={props.promptCacheStatus}
       />
     </>
   );
@@ -1553,12 +1555,13 @@ export interface ChatComposerProps {
   sendDisabledReason: string | null;
   isPreparingWorktree: boolean;
   bannerItems: readonly ComposerBannerStackItem[];
-  /** Tokens a stale session would re-read; null when the thread is not offered compaction. */
+  /** Tokens in the thread's context window; null before the provider reports usage. */
   resumeCompactionTokens: number | null;
   /** The Compact chip is off, so the next send keeps full history. */
   keepFullHistory: boolean;
   /** Flips the Compact chip for the active thread. */
-  onToggleKeepFullHistory: () => void;
+  onToggleKeepFullHistory?: (() => void) | undefined;
+  promptCacheStatus: string | null;
   /** Picking /usage-limits from the menu is the action itself; the draft keeps nothing of it. */
   onUsageLimitsCommand?: (() => void) | undefined;
   environmentUnavailable: {
@@ -7717,6 +7720,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                     compactBeforeSendTokens={props.resumeCompactionTokens}
                     keepFullHistory={props.keepFullHistory}
                     onToggleKeepFullHistory={props.onToggleKeepFullHistory}
+                    promptCacheStatus={props.promptCacheStatus}
                     compactDisabled={
                       compactDisabled || noProviderAvailable || isSendBusy || isConnecting
                     }
