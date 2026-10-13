@@ -1,0 +1,186 @@
+diff --git a/apps/desktop/package.json b/apps/desktop/package.json
+index 8e736a7d54105a46abdcbc6ffe6dafaee2e9a271..4b2e878640c5b996fdf87d5d822fb4cb7fdc7975 100644
+--- a/apps/desktop/package.json
++++ b/apps/desktop/package.json
+@@ -42,5 +42,5 @@
+     "tailwindcss": "^4.0.0",
+     "vite-plus": "catalog:"
+   },
+-  "productName": "T3 Code (Alpha)"
++  "productName": "T3 Code (Bassim's autofork)"
+ }
+diff --git a/apps/desktop/src/app/DesktopAppIdentity.test.ts b/apps/desktop/src/app/DesktopAppIdentity.test.ts
+index cc0277d3ed104feb0b19a08d10056743ff94ebe6..6566fbcb9299e4ce280a8ee81ffb59a2b1556321 100644
+--- a/apps/desktop/src/app/DesktopAppIdentity.test.ts
++++ b/apps/desktop/src/app/DesktopAppIdentity.test.ts
+@@ -218,7 +218,7 @@ describe("DesktopAppIdentity", () => {
+         yield* identity.configure;
+ 
+         assert.deepEqual(calls.setName, ["T3 Code Alpha"]);
+-        assert.equal(calls.setAboutPanelOptions[0]?.applicationName, "T3 Code (Alpha)");
++        assert.equal(calls.setAboutPanelOptions[0]?.applicationName, "T3 Code (Bassim's autofork)");
+         assert.equal(calls.setAboutPanelOptions[0]?.applicationVersion, "1.2.3");
+         assert.equal(calls.setAboutPanelOptions[0]?.version, "0123456789ab");
+         // Packaged: the bundle's own icon stands, so a custom one the user
+@@ -264,7 +264,10 @@ describe("DesktopAppIdentity", () => {
+         assert.equal(runtimeName, `T3 Code ${stage}`);
+         // RFC 9110's token grammar, after Electron removes ASCII spaces.
+         assert.match(runtimeName.replaceAll(" ", ""), /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/);
+-        assert.equal(calls.setAboutPanelOptions[0]?.applicationName, `T3 Code (${stage})`);
++        assert.equal(
++          calls.setAboutPanelOptions[0]?.applicationName,
++          stage === "Dev" ? "T3 Code (Dev)" : "T3 Code (Bassim's autofork)",
++        );
+       }),
+       { calls, environment },
+     );
+diff --git a/apps/desktop/src/app/DesktopEnvironment.ts b/apps/desktop/src/app/DesktopEnvironment.ts
+index 6a8bc8e0ea4955a0313349f0ffbe1bc41e1b1abb..d1fcf94f7f30352382149cd13691c2383938f8ee 100644
+--- a/apps/desktop/src/app/DesktopEnvironment.ts
++++ b/apps/desktop/src/app/DesktopEnvironment.ts
+@@ -114,7 +114,7 @@ export function resolveDesktopAppBranding(input: {
+   return {
+     baseName: APP_BASE_NAME,
+     stageLabel,
+-    displayName: `${APP_BASE_NAME} (${stageLabel})`,
++    displayName: `${APP_BASE_NAME} (${input.isDevelopment ? stageLabel : "Bassim's autofork"})`,
+   };
+ }
+ 
+diff --git a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
+index ecdc94d8254e519958ce55a86249704422f4004c..f1a7ba3719bdbdf1b91ccef3f2b0268363f28be7 100644
+--- a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
++++ b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
+@@ -117,7 +117,7 @@ describe("DesktopPreReadyPlatform", () => {
+         const identity = yield* Effect.promise(() => portalIdentity);
+         assert.equal(identity.desktopName, "com.t3tools.T3Code.desktop");
+         assert.include(identity.desktopEntry ?? "", 'Exec="/Applications/current.AppImage" %U');
+-        assert.include(identity.desktopEntry ?? "", "Name=T3 Code (Alpha)");
++        assert.include(identity.desktopEntry ?? "", "Name=T3 Code (Bassim's autofork)");
+         assert.include(identity.desktopEntry ?? "", "MimeType=x-scheme-handler/t3code;");
+         assert.include(
+           identity.desktopEntry ?? "",
+diff --git a/apps/desktop/src/window/DesktopApplicationMenu.test.ts b/apps/desktop/src/window/DesktopApplicationMenu.test.ts
+index f111dac25db8df757b337dd6367e5083442843d6..3f4d680681143904a1b49cdf0d1efce37132ae83 100644
+--- a/apps/desktop/src/window/DesktopApplicationMenu.test.ts
++++ b/apps/desktop/src/window/DesktopApplicationMenu.test.ts
+@@ -142,21 +142,21 @@ describe("DesktopApplicationMenu", () => {
+       const template = yield* Deferred.await(applicationMenuTemplate);
+       const applicationMenu = template[0];
+       assert.isDefined(applicationMenu);
+-      assert.equal(applicationMenu.label, "T3 Code (Nightly)");
++      assert.equal(applicationMenu.label, "T3 Code (Bassim's autofork)");
+       if (!Array.isArray(applicationMenu.submenu)) {
+         throw new Error("Expected application menu submenu to be an array.");
+       }
+       assert.equal(
+         applicationMenu.submenu.find((item) => item.role === "about")?.label,
+-        "About T3 Code (Nightly)",
++        "About T3 Code (Bassim's autofork)",
+       );
+       assert.equal(
+         applicationMenu.submenu.find((item) => item.role === "hide")?.label,
+-        "Hide T3 Code (Nightly)",
++        "Hide T3 Code (Bassim's autofork)",
+       );
+       assert.equal(
+         applicationMenu.submenu.find((item) => item.role === "quit")?.label,
+-        "Quit T3 Code (Nightly)",
++        "Quit T3 Code (Bassim's autofork)",
+       );
+     }),
+   );
+diff --git a/apps/web/src/branding.ts b/apps/web/src/branding.ts
+index 7fc57cf0d03fea12b1dbb1c8838fcfe790ba65bf..329be82c1d736bde827eeb01b2c705cfc99485de 100644
+--- a/apps/web/src/branding.ts
++++ b/apps/web/src/branding.ts
+@@ -20,7 +20,7 @@ export const APP_BASE_NAME = injectedDesktopAppBranding?.baseName ?? "T3 Code";
+ export const APP_STAGE_LABEL =
+   injectedDesktopAppBranding?.stageLabel ??
+   HOSTED_APP_CHANNEL_LABEL ??
+-  (import.meta.env.DEV ? "Dev" : "Alpha");
++  (import.meta.env.DEV ? "Dev" : "Bassim's autofork");
+ export const APP_DISPLAY_NAME =
+   injectedDesktopAppBranding?.displayName ??
+   formatAppDisplayName({ baseName: APP_BASE_NAME, stageLabel: APP_STAGE_LABEL });
+diff --git a/apps/web/src/routes/__root.tsx b/apps/web/src/routes/__root.tsx
+index 91a0a15800785c49fb802479803270ef46375c4f..757a400ceba54c3d209621c331d57a11fc9d9c45 100644
+--- a/apps/web/src/routes/__root.tsx
++++ b/apps/web/src/routes/__root.tsx
+@@ -14,8 +14,7 @@ import {
+ import { Check, Copy } from "lucide";
+ import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
+ 
+-import { APP_BASE_NAME, APP_DISPLAY_NAME, APP_STAGE_LABEL, APP_VERSION } from "../branding";
+-import { resolveServerBackedAppDisplayName } from "../branding.logic";
++import { APP_DISPLAY_NAME, APP_VERSION } from "../branding";
+ import { AppSidebarLayout } from "../components/AppSidebarLayout";
+ import { CommandPalette } from "../components/CommandPalette";
+ import { CustomSnoozeDialogHost } from "../components/CustomSnoozeDialog";
+@@ -355,18 +354,9 @@ function FontAppearanceSync() {
+ }
+ 
+ function DocumentTitleSync() {
+-  const primaryServerVersion =
+-    useAtomValue(primaryServerConfigAtom)?.environment.serverVersion ?? null;
+-  const title = resolveServerBackedAppDisplayName({
+-    baseName: APP_BASE_NAME,
+-    fallbackDisplayName: APP_DISPLAY_NAME,
+-    fallbackStageLabel: APP_STAGE_LABEL,
+-    primaryServerVersion,
+-  });
+-
+   useEffect(() => {
+-    document.title = title;
+-  }, [title]);
++    document.title = APP_DISPLAY_NAME;
++  }, []);
+ 
+   return null;
+ }
+diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
+index 434f7a886a3d6a36e69b9e3fc33cb48c4e7e38c5..15752e1dee9ca5e1a4035ae4dca71b4fcd6a2b43 100644
+--- a/scripts/build-desktop-artifact.test.ts
++++ b/scripts/build-desktop-artifact.test.ts
+@@ -271,9 +271,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+     assert.equal(resolveDesktopUpdateChannel("0.0.17"), "latest");
+   });
+ 
+-  it("switches desktop packaging product names to nightly for nightly builds", () => {
+-    assert.equal(resolveDesktopProductName("0.0.17"), "T3 Code (Alpha)");
+-    assert.equal(resolveDesktopProductName("0.0.17-nightly.20260413.42"), "T3 Code (Nightly)");
++  it("names every desktop build after the fork", () => {
++    assert.equal(resolveDesktopProductName("0.0.17"), "T3 Code (Bassim's autofork)");
++    assert.equal(
++      resolveDesktopProductName("0.0.17-nightly.20260413.42"),
++      "T3 Code (Bassim's autofork)",
++    );
+   });
+ 
+   it("switches desktop packaging icons to the nightly artwork for nightly versions", () => {
+@@ -682,7 +685,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+         "**/*.map",
+       ]);
+       assert.deepStrictEqual(mac.dmg, {
+-        title: "T3 Code (Alpha) 1.2.3 Installer",
++        title: "T3 Code (Bassim's autofork) 1.2.3 Installer",
+         background: "dmg/dmg-background-latest.png",
+         window: { width: 640, height: 432 },
+         contents: [
+diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
+index c4ca2e6dd7dc35e125dddfe666bef534bc70ddba..5270d7323d01140b29fe0f0ee223f4881c3c2b7f 100644
+--- a/scripts/build-desktop-artifact.ts
++++ b/scripts/build-desktop-artifact.ts
+@@ -2741,10 +2741,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
+   return `${trimmed.slice(0, versionSeparator)}/${trimmed.slice(versionSeparator + 1)}`;
+ }
+ 
+-export function resolveDesktopProductName(version: string): string {
+-  return resolveDesktopUpdateChannel(version) === "nightly"
+-    ? "T3 Code (Nightly)"
+-    : (desktopPackageJson.productName ?? "T3 Code");
++export function resolveDesktopProductName(_version: string): string {
++  return desktopPackageJson.productName ?? "T3 Code";
+ }
+ 
+ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
