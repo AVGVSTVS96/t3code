@@ -48,10 +48,10 @@ index 6a8bc8e0ea4955a0313349f0ffbe1bc41e1b1abb..d1fcf94f7f30352382149cd13691c238
  }
  
 diff --git a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
-index ecdc94d8254e519958ce55a86249704422f4004c..f1a7ba3719bdbdf1b91ccef3f2b0268363f28be7 100644
+index 29fa706698e0191eb7920e073e12af00fd5f908c..58f93db145169234bd701774f382f99432286b54 100644
 --- a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
 +++ b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
-@@ -117,7 +117,7 @@ describe("DesktopPreReadyPlatform", () => {
+@@ -175,7 +175,7 @@ describe("DesktopPreReadyPlatform", () => {
          const identity = yield* Effect.promise(() => portalIdentity);
          assert.equal(identity.desktopName, "com.t3tools.T3Code.desktop");
          assert.include(identity.desktopEntry ?? "", 'Exec="/Applications/current.AppImage" %U');
@@ -139,10 +139,10 @@ index 91a0a15800785c49fb802479803270ef46375c4f..757a400ceba54c3d209621c331d57a11
    return null;
  }
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index 434f7a886a3d6a36e69b9e3fc33cb48c4e7e38c5..15752e1dee9ca5e1a4035ae4dca71b4fcd6a2b43 100644
+index 0ec6f72eb56ebfd4c1e8550b557416ccbf48aed5..e80df11a3657236793b80919bbd40cfcf5957abd 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
-@@ -271,9 +271,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -272,9 +272,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
      assert.equal(resolveDesktopUpdateChannel("0.0.17"), "latest");
    });
  
@@ -158,7 +158,7 @@ index 434f7a886a3d6a36e69b9e3fc33cb48c4e7e38c5..15752e1dee9ca5e1a4035ae4dca71b4f
    });
  
    it("switches desktop packaging icons to the nightly artwork for nightly versions", () => {
-@@ -682,7 +685,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -702,7 +705,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
          "**/*.map",
        ]);
        assert.deepStrictEqual(mac.dmg, {
@@ -168,10 +168,10 @@ index 434f7a886a3d6a36e69b9e3fc33cb48c4e7e38c5..15752e1dee9ca5e1a4035ae4dca71b4f
          window: { width: 640, height: 432 },
          contents: [
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index c4ca2e6dd7dc35e125dddfe666bef534bc70ddba..5270d7323d01140b29fe0f0ee223f4881c3c2b7f 100644
+index 5dd431bc4d9e625f01cee386a492a83abbe4d6a5..a68ed174533040914219b135a6d541ef6676d97c 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
-@@ -2741,10 +2741,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
+@@ -2743,10 +2743,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
    return `${trimmed.slice(0, versionSeparator)}/${trimmed.slice(versionSeparator + 1)}`;
  }
  
