@@ -1,11 +1,11 @@
 diff --git a/README.md b/README.md
-index 8aa78f81b9ad72753cde7a8d3106ef8c7a8f0697..87d48483a2bfa935c6732f002284e426208fc41f 100644
+index 8aa78f81b9ad72753cde7a8d3106ef8c7a8f0697..31611923c140743a5340f8cb8d238eea301e4bb6 100644
 --- a/README.md
 +++ b/README.md
 @@ -1,5 +1,7 @@
  # T3 Code
  
-+> This is a fork of [T3 Code](https://github.com/pingdotgg/t3code), kept current with [autofork](https://github.com/AVGVSTVS96/autofork). It is rebuilt on upstream's releases, and its changes are described in the [`.autofork/`](.autofork) folder.
++> A personal fork of [T3 Code](https://github.com/pingdotgg/t3code) that updates itself with [autofork](https://autofork.com). Its changes, each described in plain words, are in [`.autofork/`](.autofork).
 +
  T3 Code is an "agent harness control surface". It enables control of the agents on your machine with a best-in-class mobile app ([iOS](https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824), [Android](https://play.google.com/store/apps/details?id=com.t3tools.t3code)), [web app](https://app.t3.codes) and [Electron-based desktop app](https://t3.codes).
  

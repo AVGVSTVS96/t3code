@@ -1,6 +1,6 @@
 Anyone landing on this repo should see right away that it's a fork, what keeps
-it current, and where its changes are. A short note sits right under the
-README's title, linking upstream T3 Code, autofork
-(https://github.com/AVGVSTVS96/autofork), and the `.autofork/` folder, and
-saying the fork is rebuilt on upstream's releases. Everything else in
+it current, and where its changes are. One line sits right under the README's
+title: a personal fork of T3 Code (linked upstream) that updates itself with
+autofork (linked to https://autofork.com), with its changes, each described in
+plain words, in the `.autofork/` folder (linked). Everything else in
 upstream's README stays as upstream wrote it.
