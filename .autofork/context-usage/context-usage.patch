@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index acd68260b9ad5bcc41c382f38c22e29a60bafdc0..77085d04462ae930ef2189d2083eac4b278fba49 100644
+index b0d1804feffaa0dca180608709a6a598d1aa3c1f..c21051de1a5460c8c0bdd9161eb4c0a208ec9431 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -500,6 +500,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
+@@ -502,6 +502,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
  import { resolveThreadSyncPhase } from "../threadSync";
  import {
    hasAvailableCompactionProvider,
@@ -10,7 +10,7 @@ index acd68260b9ad5bcc41c382f38c22e29a60bafdc0..77085d04462ae930ef2189d2083eac4b
    hasDismissedResumeCompaction,
    shouldOfferResumeCompaction,
  } from "./chat/ContextWindowMeter.logic";
-@@ -7779,17 +7780,15 @@ export default function ChatView(props: ChatViewProps) {
+@@ -7788,17 +7789,15 @@ export default function ChatView(props: ChatViewProps) {
            ? "Compaction is unavailable for this provider"
            : "Compacting is unavailable right now"
      : null;
@@ -35,7 +35,7 @@ index acd68260b9ad5bcc41c382f38c22e29a60bafdc0..77085d04462ae930ef2189d2083eac4b
      shouldOfferResumeCompaction({
        provider: selectedProvider,
        usedTokens: activeContextWindow.usedTokens,
-@@ -7797,27 +7796,26 @@ export default function ChatView(props: ChatViewProps) {
+@@ -7806,27 +7805,26 @@ export default function ChatView(props: ChatViewProps) {
        // Only the live report carries a TTL, and only when it is the window's source.
        promptCacheTtlMs: activeThreadLiveTokenUsage?.promptCacheTtlMs,
        now: `${nowMinute}:00.000Z`,
@@ -79,7 +79,7 @@ index acd68260b9ad5bcc41c382f38c22e29a60bafdc0..77085d04462ae930ef2189d2083eac4b
    );
    const handleRestoreThreadBranch = useCallback(() => {
      if (!canWriteSourceControl) return;
-@@ -9359,13 +9357,8 @@ export default function ChatView(props: ChatViewProps) {
+@@ -9368,13 +9366,8 @@ export default function ChatView(props: ChatViewProps) {
      );
      const messageIdForSend = newMessageId();
      const messageCreatedAt = new Date().toISOString();
@@ -95,7 +95,7 @@ index acd68260b9ad5bcc41c382f38c22e29a60bafdc0..77085d04462ae930ef2189d2083eac4b
      const turnDispatchMode = compactBeforeSend || sendQueuesBehindSetup ? "queue" : dispatchMode;
      const shouldQueueBehindActiveRun =
        compactBeforeSend ||
-@@ -10087,7 +10080,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -10096,7 +10089,7 @@ export default function ChatView(props: ChatViewProps) {
          failure = startResult;
        } else {
          turnStartSucceeded = true;
@@ -104,7 +104,7 @@ index acd68260b9ad5bcc41c382f38c22e29a60bafdc0..77085d04462ae930ef2189d2083eac4b
          // The turn is under way and will spend quota, so that thread's limits
          // snapshot is stale. Uploads may have outlasted a navigation, so only
          // the sending thread's panel clears.
-@@ -11819,9 +11812,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -11828,9 +11821,12 @@ export default function ChatView(props: ChatViewProps) {
                                isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
                                queuedRunsControl={queuedRunsControl}
                                bannerItems={composerBannerItems}
@@ -120,7 +120,7 @@ index acd68260b9ad5bcc41c382f38c22e29a60bafdc0..77085d04462ae930ef2189d2083eac4b
                                // text, so it sends as a prompt like the typed path would.
                                onUsageLimitsCommand={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 80ef5ecd054b585046faf93678566a2e89b004b4..0e487eecb13b31571f24a8e74acf8c755754c0db 100644
+index f2245e0146d3d74828c62e9bdf454b63f8c16177..2d6cfb8e7c83691013962f41c9807a1b4a5b0963 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
 @@ -1403,7 +1403,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
@@ -157,7 +157,7 @@ index 80ef5ecd054b585046faf93678566a2e89b004b4..0e487eecb13b31571f24a8e74acf8c75
    /** Picking /usage-limits from the menu is the action itself; the draft keeps nothing of it. */
    onUsageLimitsCommand?: (() => void) | undefined;
    environmentUnavailable: {
-@@ -7813,6 +7816,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -7814,6 +7817,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
