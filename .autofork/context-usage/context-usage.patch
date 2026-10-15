@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index b0d1804feffaa0dca180608709a6a598d1aa3c1f..c21051de1a5460c8c0bdd9161eb4c0a208ec9431 100644
+index f87663989a8f1bfdac02f2e70f69fcc45e4e3539..a821d8b5bc66d9fe78337ee261e9f56ffe54497a 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -502,6 +502,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
+@@ -504,6 +504,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
  import { resolveThreadSyncPhase } from "../threadSync";
  import {
    hasAvailableCompactionProvider,
@@ -10,7 +10,7 @@ index b0d1804feffaa0dca180608709a6a598d1aa3c1f..c21051de1a5460c8c0bdd9161eb4c0a2
    hasDismissedResumeCompaction,
    shouldOfferResumeCompaction,
  } from "./chat/ContextWindowMeter.logic";
-@@ -7788,17 +7789,15 @@ export default function ChatView(props: ChatViewProps) {
+@@ -7601,17 +7602,15 @@ export default function ChatView(props: ChatViewProps) {
            ? "Compaction is unavailable for this provider"
            : "Compacting is unavailable right now"
      : null;
@@ -35,7 +35,7 @@ index b0d1804feffaa0dca180608709a6a598d1aa3c1f..c21051de1a5460c8c0bdd9161eb4c0a2
      shouldOfferResumeCompaction({
        provider: selectedProvider,
        usedTokens: activeContextWindow.usedTokens,
-@@ -7806,27 +7805,26 @@ export default function ChatView(props: ChatViewProps) {
+@@ -7619,25 +7618,26 @@ export default function ChatView(props: ChatViewProps) {
        // Only the live report carries a TTL, and only when it is the window's source.
        promptCacheTtlMs: activeThreadLiveTokenUsage?.promptCacheTtlMs,
        now: `${nowMinute}:00.000Z`,
@@ -48,13 +48,15 @@ index b0d1804feffaa0dca180608709a6a598d1aa3c1f..c21051de1a5460c8c0bdd9161eb4c0a2
 -    () => new Set(),
 -  );
 -  const keepFullHistory = fullHistoryThreadKeys.has(routeThreadKey);
--  const setKeepFullHistory = useCallback((threadKey: string, keep: boolean) => {
+-  const setKeepFullHistory = (threadKey: string, keep: boolean) => {
 -    setFullHistoryThreadKeys((current) => {
 -      if (current.has(threadKey) === keep) return current;
 -      const next = new Set(current);
 -      if (keep) next.add(threadKey);
 -      else next.delete(threadKey);
 +    });
++  // Per-thread override of the default; a send that starts its turn clears its
++  // thread's entry, a failed send keeps it for the retry.
 +  const [compactChoices, setCompactChoices] = useState<ReadonlyMap<string, boolean>>(
 +    () => new Map(),
 +  );
@@ -62,7 +64,7 @@ index b0d1804feffaa0dca180608709a6a598d1aa3c1f..c21051de1a5460c8c0bdd9161eb4c0a2
 +    compactBeforeSendAvailable &&
 +    (compactChoices.get(routeThreadKey) ?? resumeCompactionOffered)
 +  );
-+  const setCompactChoice = useCallback((threadKey: string, compact: boolean | undefined) => {
++  const setCompactChoice = (threadKey: string, compact: boolean | undefined) => {
 +    setCompactChoices((current) => {
 +      if (current.get(threadKey) === compact) return current;
 +      const next = new Map(current);
@@ -70,16 +72,13 @@ index b0d1804feffaa0dca180608709a6a598d1aa3c1f..c21051de1a5460c8c0bdd9161eb4c0a2
 +      else next.set(threadKey, compact);
        return next;
      });
-   }, []);
-   const toggleKeepFullHistory = useCallback(
--    () => setKeepFullHistory(routeThreadKey, !keepFullHistory),
--    [keepFullHistory, routeThreadKey, setKeepFullHistory],
-+    () => setCompactChoice(routeThreadKey, keepFullHistory),
-+    [keepFullHistory, routeThreadKey, setCompactChoice],
-   );
-   const handleRestoreThreadBranch = useCallback(() => {
+   };
+-  const toggleKeepFullHistory = () => setKeepFullHistory(routeThreadKey, !keepFullHistory);
++  const toggleKeepFullHistory = () => setCompactChoice(routeThreadKey, keepFullHistory);
+   const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
+   const handleRestoreThreadBranch = () => {
      if (!canWriteSourceControl) return;
-@@ -9368,13 +9366,8 @@ export default function ChatView(props: ChatViewProps) {
+@@ -9143,13 +9143,8 @@ export default function ChatView(props: ChatViewProps) {
      );
      const messageIdForSend = newMessageId();
      const messageCreatedAt = new Date().toISOString();
@@ -95,7 +94,7 @@ index b0d1804feffaa0dca180608709a6a598d1aa3c1f..c21051de1a5460c8c0bdd9161eb4c0a2
      const turnDispatchMode = compactBeforeSend || sendQueuesBehindSetup ? "queue" : dispatchMode;
      const shouldQueueBehindActiveRun =
        compactBeforeSend ||
-@@ -10096,7 +10089,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -9871,7 +9866,7 @@ export default function ChatView(props: ChatViewProps) {
          failure = startResult;
        } else {
          turnStartSucceeded = true;
@@ -104,26 +103,26 @@ index b0d1804feffaa0dca180608709a6a598d1aa3c1f..c21051de1a5460c8c0bdd9161eb4c0a2
          // The turn is under way and will spend quota, so that thread's limits
          // snapshot is stale. Uploads may have outlasted a navigation, so only
          // the sending thread's panel clears.
-@@ -11828,9 +11821,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -11541,9 +11536,12 @@ export default function ChatView(props: ChatViewProps) {
                                isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
                                queuedRunsControl={queuedRunsControl}
                                bannerItems={composerBannerItems}
 -                              resumeCompactionTokens={resumeCompactionTokens}
 +                              resumeCompactionTokens={activeContextWindow?.usedTokens ?? null}
                                keepFullHistory={keepFullHistory}
--                              onToggleKeepFullHistory={toggleKeepFullHistory}
+-                              onToggleKeepFullHistory={toggleKeepFullHistoryStable}
 +                              onToggleKeepFullHistory={
-+                                compactBeforeSendAvailable ? toggleKeepFullHistory : undefined
++                                compactBeforeSendAvailable ? toggleKeepFullHistoryStable : undefined
 +                              }
 +                              promptCacheStatus={describePromptCache(activeThreadLiveTokenUsage)}
                                // With attachments or contexts aboard the pick just inserts the
                                // text, so it sends as a prompt like the typed path would.
                                onUsageLimitsCommand={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 05a5e6702092f9a61aded46fb99db4c73b97d632..4c3562bc717559d91d62f0e8e737e0318954cf10 100644
+index 5f775123d49e768a1cecd2d8bd3b35c5f6ad5f0a..73040799b8526a6486ca92c49c1c0654abb88cbb 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -1414,7 +1414,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
+@@ -1415,7 +1415,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
    compactDisabledReason: string | null;
    compactBeforeSendTokens: number | null;
    keepFullHistory: boolean;
@@ -133,7 +132,7 @@ index 05a5e6702092f9a61aded46fb99db4c73b97d632..4c3562bc717559d91d62f0e8e737e031
  }) {
    return (
      <>
-@@ -1456,6 +1457,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
+@@ -1457,6 +1458,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
          compactBeforeSendTokens={props.compactBeforeSendTokens}
          keepFullHistory={props.keepFullHistory}
          onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -141,7 +140,7 @@ index 05a5e6702092f9a61aded46fb99db4c73b97d632..4c3562bc717559d91d62f0e8e737e031
        />
      </>
    );
-@@ -1576,12 +1578,13 @@ export interface ChatComposerProps {
+@@ -1577,12 +1579,13 @@ export interface ChatComposerProps {
    sendDisabledReason: string | null;
    isPreparingWorktree: boolean;
    bannerItems: readonly ComposerBannerStackItem[];
@@ -157,7 +156,7 @@ index 05a5e6702092f9a61aded46fb99db4c73b97d632..4c3562bc717559d91d62f0e8e737e031
    /** Picking /usage-limits from the menu is the action itself; the draft keeps nothing of it. */
    onUsageLimitsCommand?: (() => void) | undefined;
    environmentUnavailable: {
-@@ -7892,6 +7895,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -7640,6 +7643,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
