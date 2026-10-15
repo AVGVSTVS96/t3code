@@ -119,10 +119,10 @@ index f87663989a8f1bfdac02f2e70f69fcc45e4e3539..a821d8b5bc66d9fe78337ee261e9f56f
                                // text, so it sends as a prompt like the typed path would.
                                onUsageLimitsCommand={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 5f775123d49e768a1cecd2d8bd3b35c5f6ad5f0a..73040799b8526a6486ca92c49c1c0654abb88cbb 100644
+index 822e79da8dbd7e9aa630f7fd1a370e0474686143..1bb3db8c364d76043ef88d4e7ef0001986d7dffe 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -1415,7 +1415,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
+@@ -1417,7 +1417,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
    compactDisabledReason: string | null;
    compactBeforeSendTokens: number | null;
    keepFullHistory: boolean;
@@ -132,7 +132,7 @@ index 5f775123d49e768a1cecd2d8bd3b35c5f6ad5f0a..73040799b8526a6486ca92c49c1c0654
  }) {
    return (
      <>
-@@ -1457,6 +1458,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
+@@ -1459,6 +1460,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
          compactBeforeSendTokens={props.compactBeforeSendTokens}
          keepFullHistory={props.keepFullHistory}
          onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -140,7 +140,7 @@ index 5f775123d49e768a1cecd2d8bd3b35c5f6ad5f0a..73040799b8526a6486ca92c49c1c0654
        />
      </>
    );
-@@ -1577,12 +1579,13 @@ export interface ChatComposerProps {
+@@ -1579,12 +1581,13 @@ export interface ChatComposerProps {
    sendDisabledReason: string | null;
    isPreparingWorktree: boolean;
    bannerItems: readonly ComposerBannerStackItem[];
@@ -156,7 +156,7 @@ index 5f775123d49e768a1cecd2d8bd3b35c5f6ad5f0a..73040799b8526a6486ca92c49c1c0654
    /** Picking /usage-limits from the menu is the action itself; the draft keeps nothing of it. */
    onUsageLimitsCommand?: (() => void) | undefined;
    environmentUnavailable: {
-@@ -7640,6 +7643,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -7642,6 +7645,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}

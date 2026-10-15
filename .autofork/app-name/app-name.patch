@@ -1,23 +1,23 @@
 diff --git a/apps/desktop/package.json b/apps/desktop/package.json
-index 8e736a7d54105a46abdcbc6ffe6dafaee2e9a271..4b2e878640c5b996fdf87d5d822fb4cb7fdc7975 100644
+index 6e9e584d7e431367e535dcf824780db0018727e5..4b2e878640c5b996fdf87d5d822fb4cb7fdc7975 100644
 --- a/apps/desktop/package.json
 +++ b/apps/desktop/package.json
 @@ -42,5 +42,5 @@
      "tailwindcss": "^4.0.0",
      "vite-plus": "catalog:"
    },
--  "productName": "T3 Code (Alpha)"
+-  "productName": "T3 Code (Beta)"
 +  "productName": "T3 Code (Bassim's autofork)"
  }
 diff --git a/apps/desktop/src/app/DesktopAppIdentity.test.ts b/apps/desktop/src/app/DesktopAppIdentity.test.ts
-index cc0277d3ed104feb0b19a08d10056743ff94ebe6..6566fbcb9299e4ce280a8ee81ffb59a2b1556321 100644
+index 10ab907965f2ed834649d2c1c36edd0db4c1fe4f..68cdf33aad15e0254ed687e136ded4ac58b95049 100644
 --- a/apps/desktop/src/app/DesktopAppIdentity.test.ts
 +++ b/apps/desktop/src/app/DesktopAppIdentity.test.ts
 @@ -218,7 +218,7 @@ describe("DesktopAppIdentity", () => {
          yield* identity.configure;
  
-         assert.deepEqual(calls.setName, ["T3 Code Alpha"]);
--        assert.equal(calls.setAboutPanelOptions[0]?.applicationName, "T3 Code (Alpha)");
+         assert.deepEqual(calls.setName, ["T3 Code Beta"]);
+-        assert.equal(calls.setAboutPanelOptions[0]?.applicationName, "T3 Code (Beta)");
 +        assert.equal(calls.setAboutPanelOptions[0]?.applicationName, "T3 Code (Bassim's autofork)");
          assert.equal(calls.setAboutPanelOptions[0]?.applicationVersion, "1.2.3");
          assert.equal(calls.setAboutPanelOptions[0]?.version, "0123456789ab");
@@ -35,7 +35,7 @@ index cc0277d3ed104feb0b19a08d10056743ff94ebe6..6566fbcb9299e4ce280a8ee81ffb59a2
        { calls, environment },
      );
 diff --git a/apps/desktop/src/app/DesktopEnvironment.ts b/apps/desktop/src/app/DesktopEnvironment.ts
-index 6a8bc8e0ea4955a0313349f0ffbe1bc41e1b1abb..d1fcf94f7f30352382149cd13691c2383938f8ee 100644
+index f697e0456db97a9be4e2cc49beba48278ace18f3..b8949c3a1aeb2cf67e9f92c5c74cefe17caf15c3 100644
 --- a/apps/desktop/src/app/DesktopEnvironment.ts
 +++ b/apps/desktop/src/app/DesktopEnvironment.ts
 @@ -114,7 +114,7 @@ export function resolveDesktopAppBranding(input: {
@@ -48,14 +48,14 @@ index 6a8bc8e0ea4955a0313349f0ffbe1bc41e1b1abb..d1fcf94f7f30352382149cd13691c238
  }
  
 diff --git a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
-index 29fa706698e0191eb7920e073e12af00fd5f908c..58f93db145169234bd701774f382f99432286b54 100644
+index dd15f879fd8ee8c397134002af13688b15c24068..58f93db145169234bd701774f382f99432286b54 100644
 --- a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
 +++ b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
 @@ -175,7 +175,7 @@ describe("DesktopPreReadyPlatform", () => {
          const identity = yield* Effect.promise(() => portalIdentity);
          assert.equal(identity.desktopName, "com.t3tools.T3Code.desktop");
          assert.include(identity.desktopEntry ?? "", 'Exec="/Applications/current.AppImage" %U');
--        assert.include(identity.desktopEntry ?? "", "Name=T3 Code (Alpha)");
+-        assert.include(identity.desktopEntry ?? "", "Name=T3 Code (Beta)");
 +        assert.include(identity.desktopEntry ?? "", "Name=T3 Code (Bassim's autofork)");
          assert.include(identity.desktopEntry ?? "", "MimeType=x-scheme-handler/t3code;");
          assert.include(
@@ -91,14 +91,14 @@ index f111dac25db8df757b337dd6367e5083442843d6..3f4d680681143904a1b49cdf0d1efce3
      }),
    );
 diff --git a/apps/web/src/branding.ts b/apps/web/src/branding.ts
-index 7fc57cf0d03fea12b1dbb1c8838fcfe790ba65bf..329be82c1d736bde827eeb01b2c705cfc99485de 100644
+index 528609d36e608c9e2bb21493af1011bf651103c0..329be82c1d736bde827eeb01b2c705cfc99485de 100644
 --- a/apps/web/src/branding.ts
 +++ b/apps/web/src/branding.ts
 @@ -20,7 +20,7 @@ export const APP_BASE_NAME = injectedDesktopAppBranding?.baseName ?? "T3 Code";
  export const APP_STAGE_LABEL =
    injectedDesktopAppBranding?.stageLabel ??
    HOSTED_APP_CHANNEL_LABEL ??
--  (import.meta.env.DEV ? "Dev" : "Alpha");
+-  (import.meta.env.DEV ? "Dev" : "Beta");
 +  (import.meta.env.DEV ? "Dev" : "Bassim's autofork");
  export const APP_DISPLAY_NAME =
    injectedDesktopAppBranding?.displayName ??
@@ -139,7 +139,7 @@ index cc81cd233b0e6e9731141af2bee5de0e261b08e0..f2ed07ac01ca36b3a574a155db4900e3
    return null;
  }
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index 0ec6f72eb56ebfd4c1e8550b557416ccbf48aed5..e80df11a3657236793b80919bbd40cfcf5957abd 100644
+index 4b7443aa09bcb545f18f18bbd2eba5bb63039bcf..e80df11a3657236793b80919bbd40cfcf5957abd 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
 @@ -272,9 +272,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
@@ -147,7 +147,7 @@ index 0ec6f72eb56ebfd4c1e8550b557416ccbf48aed5..e80df11a3657236793b80919bbd40cfc
    });
  
 -  it("switches desktop packaging product names to nightly for nightly builds", () => {
--    assert.equal(resolveDesktopProductName("0.0.17"), "T3 Code (Alpha)");
+-    assert.equal(resolveDesktopProductName("0.1.0"), "T3 Code (Beta)");
 -    assert.equal(resolveDesktopProductName("0.0.17-nightly.20260413.42"), "T3 Code (Nightly)");
 +  it("names every desktop build after the fork", () => {
 +    assert.equal(resolveDesktopProductName("0.0.17"), "T3 Code (Bassim's autofork)");
@@ -162,7 +162,7 @@ index 0ec6f72eb56ebfd4c1e8550b557416ccbf48aed5..e80df11a3657236793b80919bbd40cfc
          "**/*.map",
        ]);
        assert.deepStrictEqual(mac.dmg, {
--        title: "T3 Code (Alpha) 1.2.3 Installer",
+-        title: "T3 Code (Beta) 1.2.3 Installer",
 +        title: "T3 Code (Bassim's autofork) 1.2.3 Installer",
          background: "dmg/dmg-background-latest.png",
          window: { width: 640, height: 432 },
