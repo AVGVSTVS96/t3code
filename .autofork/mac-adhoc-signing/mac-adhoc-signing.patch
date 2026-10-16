@@ -1,0 +1,114 @@
+diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
+index 065429ccff922e27a251023a7080975bc8ce152f..c24ab924f9c30e496465de9386fb46c84bdacf50 100644
+--- a/scripts/build-desktop-artifact.test.ts
++++ b/scripts/build-desktop-artifact.test.ts
+@@ -720,7 +720,6 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+       assert.deepStrictEqual(linux.files, [...DESKTOP_FILE_EXCLUSIONS, ...LINUX_FILE_EXCLUSIONS]);
+       assert.deepStrictEqual(win.files, DESKTOP_FILE_EXCLUSIONS);
+       assert.deepStrictEqual(winWithoutWslRuntime.files, win.files);
+-      assert.notProperty(mac.mac as Record<string, unknown>, "sign");
+       assert.propertyVal(
+         (mac.mac as Record<string, unknown>).extendInfo as Record<string, unknown>,
+         "NSLocalNetworkUsageDescription",
+@@ -2115,6 +2114,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+     }).pipe(Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv({ env: {} })))),
+   );
+ 
++  it.effect("signs unsigned macOS builds ad hoc, without the hardened runtime", () =>
++    Effect.gen(function* () {
++      const config = yield* createBuildConfig(
++        "mac",
++        "dmg",
++        "1.2.3",
++        false,
++        false,
++        undefined,
++        undefined,
++      );
++
++      const mac = config.mac as Record<string, unknown>;
++      assert.equal(mac.identity, "-");
++      assert.equal(mac.hardenedRuntime, false);
++      assert.match(String(mac.sign), /[\\/]scripts[\\/]sign-macos\.ts$/);
++    }).pipe(Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv({ env: {} })))),
++  );
++
+   it.effect("uses the nightly DMG background for nightly macOS builds", () =>
+     Effect.gen(function* () {
+       const config = yield* createBuildConfig(
+diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
+index dd9a2c2683f75d3594c1376564f2d7587bf7c53d..10f5999b78be97e14ead1b9d932d2129c05910da 100644
+--- a/scripts/build-desktop-artifact.ts
++++ b/scripts/build-desktop-artifact.ts
+@@ -2770,7 +2770,8 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
+           role: "Viewer",
+         },
+       ],
+-      ...(signed ? { sign: path.join(repoRoot, "scripts/sign-macos.ts") } : {}),
++      sign: path.join(repoRoot, "scripts/sign-macos.ts"),
++      ...(signed ? {} : { identity: "-", hardenedRuntime: false }),
+       ...(macPasskeySigning
+         ? {
+             entitlements: macPasskeySigning.entitlementsPath,
+diff --git a/scripts/sign-macos.test.ts b/scripts/sign-macos.test.ts
+index fd8d365c90dba89df72396c8dd46e48645df2ec9..47892b051732264ed6b7fb7baf1e40489b02de8a 100644
+--- a/scripts/sign-macos.test.ts
++++ b/scripts/sign-macos.test.ts
+@@ -24,3 +24,24 @@ it("batches codesign calls without changing existing signing options", async ()
+     batchCodesignCalls: true,
+   });
+ });
++
++it("pins ad-hoc builds to their bundle id so later builds can update them", async () => {
++  const options = {
++    app: "/tmp/T3 Code.app",
++    identity: "-",
++    optionsForFile: () => ({ entitlements: "/tmp/t3code.entitlements.plist" }),
++  } satisfies SignOptions;
++
++  await sign(options, { appInfo: { id: "com.t3tools.t3code" } });
++
++  const { optionsForFile } = vi.mocked(signApplication).mock.lastCall![0];
++  const context = { platform: "darwin" } as const;
++  expect(optionsForFile!("/tmp/T3 Code.app", context)).toEqual({
++    entitlements: "/tmp/t3code.entitlements.plist",
++    timestamp: "none",
++    requirements: '=designated => identifier "com.t3tools.t3code"',
++  });
++  expect(
++    optionsForFile!("/tmp/T3 Code.app/Contents/Frameworks/T3 Code Helper.app", context),
++  ).toEqual({ entitlements: "/tmp/t3code.entitlements.plist", timestamp: "none" });
++});
+diff --git a/scripts/sign-macos.ts b/scripts/sign-macos.ts
+index 6d00d13f13b9a600ff773ff3d52f11f64eea1841..d3b08466dfcacefd318c4f75239e304a2f69e05d 100644
+--- a/scripts/sign-macos.ts
++++ b/scripts/sign-macos.ts
+@@ -1,5 +1,26 @@
+ import { sign as signApplication, type SignOptions } from "@electron/osx-sign";
+ 
+-export default async function sign(options: SignOptions): Promise<void> {
+-  await signApplication({ ...options, batchCodesignCalls: true });
++interface Packager {
++  readonly appInfo: { readonly id: string };
++}
++
++export default async function sign(options: SignOptions, packager?: Packager): Promise<void> {
++  await signApplication({
++    ...options,
++    ...(options.identity === "-" && packager ? adHoc(options, packager.appInfo.id) : {}),
++    batchCodesignCalls: true,
++  });
++}
++
++// Squirrel.Mac installs an update only if it satisfies the running app's
++// designated requirement. An ad-hoc signature's default requirement is its own
++// cdhash, which no later build can match, so the app pins it to its bundle id.
++function adHoc(options: SignOptions, appId: string): Pick<SignOptions, "optionsForFile"> {
++  return {
++    optionsForFile: (filePath, context) => ({
++      ...options.optionsForFile?.(filePath, context),
++      timestamp: "none",
++      ...(filePath === options.app ? { requirements: `=designated => identifier "${appId}"` } : {}),
++    }),
++  };
+ }

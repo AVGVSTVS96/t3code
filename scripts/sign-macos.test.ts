@@ -24,3 +24,24 @@ it("batches codesign calls without changing existing signing options", async () 
     batchCodesignCalls: true,
   });
 });
+
+it("pins ad-hoc builds to their bundle id so later builds can update them", async () => {
+  const options = {
+    app: "/tmp/T3 Code.app",
+    identity: "-",
+    optionsForFile: () => ({ entitlements: "/tmp/t3code.entitlements.plist" }),
+  } satisfies SignOptions;
+
+  await sign(options, { appInfo: { id: "com.t3tools.t3code" } });
+
+  const { optionsForFile } = vi.mocked(signApplication).mock.lastCall![0];
+  const context = { platform: "darwin" } as const;
+  expect(optionsForFile!("/tmp/T3 Code.app", context)).toEqual({
+    entitlements: "/tmp/t3code.entitlements.plist",
+    timestamp: "none",
+    requirements: '=designated => identifier "com.t3tools.t3code"',
+  });
+  expect(
+    optionsForFile!("/tmp/T3 Code.app/Contents/Frameworks/T3 Code Helper.app", context),
+  ).toEqual({ entitlements: "/tmp/t3code.entitlements.plist", timestamp: "none" });
+});
