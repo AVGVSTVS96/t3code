@@ -59,10 +59,7 @@ import type * as EffectAcpSchema from "effect-acp/compat";
 import { formatReadToolLabel, formatSearchToolLabel } from "@t3tools/shared/toolActivity";
 import * as ProviderHost from "@t3tools/provider-core/server/ProviderHost";
 import { makeAcpMcpOverAcpBridge, type AcpMcpOverAcpBridge } from "./mcpOverAcpBridge.ts";
-import {
-  cuaCallContext,
-  mcpToolPresentation,
-} from "@t3tools/provider-core/server/mcpToolPresentation";
+import { mcpToolPresentation } from "@t3tools/provider-core/server/mcpToolPresentation";
 import * as McpProviderSessions from "@t3tools/provider-core/server/McpProviderSessions";
 import * as McpProviderSession from "@t3tools/provider-core/server/mcpSession";
 import {
@@ -550,10 +547,7 @@ function acpMcpContext(
   // Agents that advertise optional http support still routinely fail to wire
   // injected http servers through to their backend (codex-acp 1.2.0 and pi-acp
   // both drop them), so every ACP session gets the `t3 acp-mcp-bridge` stdio
-  // server, which forwards JSON-RPC to T3's authenticated MCP endpoint. Cua
-  // Driver and browser tabs are already stdio servers, so they are listed in
-  // both forms: an agent with MCP-over-ACP receives only `acpServers`.
-  const local = McpProviderSession.localAcpMcpServers(session);
+  // server, which forwards JSON-RPC to T3's authenticated MCP endpoint.
   return {
     servers: [
       {
@@ -566,9 +560,8 @@ function acpMcpContext(
           { name: "T3_ACP_MCP_AUTHORIZATION", value: session.authorizationHeader },
         ],
       },
-      ...local,
     ],
-    acpServers: [{ type: "acp", name: "t3-code", serverId: "t3-code" }, ...local],
+    acpServers: [{ type: "acp", name: "t3-code", serverId: "t3-code" }],
     endpoint: session.endpoint,
     authorization: session.authorizationHeader,
     processEnvironment: {
@@ -3077,14 +3070,6 @@ export const makeAcpAdapterV2 = Effect.fn("makeAcpAdapterV2")(function* (
                 source: unknownRecord(
                   (unknownRecord(rawOutputRecord?.result) ?? rawOutputRecord)?._meta,
                 )?.source,
-                ...cuaCallContext({
-                  serverName: mcpIdentity.server,
-                  toolName: mcpIdentity.tool,
-                  threadId: base.threadId,
-                  status: base.status,
-                  args: mcpIdentity.input ?? unknownRecord(rawInputRecord?.arguments),
-                  result: rawOutput,
-                }),
               }),
               type: "dynamic_tool",
               toolName: `${mcpIdentity.server}.${mcpIdentity.tool}`,
@@ -6380,14 +6365,11 @@ export const makeAcpAdapterV2 = Effect.fn("makeAcpAdapterV2")(function* (
               detail: "ACP turn requires non-empty text or attachments",
             });
           }
-          const mcpSession = yield* mcpSessions.read(turnInput.threadId);
           prompt.push({
             type: "text",
             text: buildRuntimeInstructions({
               harness: flavor.runtimeHarness ?? driver,
               model: turnInput.modelSelection.model,
-              computerUse: mcpSession?.cuaDriver !== undefined,
-              browserTabs: mcpSession?.browserTabs?.browserName,
             }),
           });
           return { prompt, instructionState: text === messageText ? undefined : instructionState };

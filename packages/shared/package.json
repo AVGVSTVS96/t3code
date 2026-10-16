@@ -490,14 +490,6 @@
     "./PtyAdapter": {
       "types": "./src/PtyAdapter.ts",
       "import": "./src/PtyAdapter.ts"
-    },
-    "./cuaDriverHostOptions": {
-      "types": "./src/cuaDriverHostOptions.ts",
-      "import": "./src/cuaDriverHostOptions.ts"
-    },
-    "./cuaDriverRelease": {
-      "types": "./src/cuaDriverRelease.ts",
-      "import": "./src/cuaDriverRelease.ts"
     }
   },
   "scripts": {

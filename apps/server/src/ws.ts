@@ -184,9 +184,6 @@ import { withTerminalOutputWindow } from "./terminal/OutputProtocol.ts";
 import * as PreviewAutomationBroker from "./mcp/PreviewAutomationBroker.ts";
 import * as ServerBrowser from "./preview/ServerBrowser.ts";
 import * as DeviceService from "./device/DeviceService.ts";
-import * as CuaDriver from "./cua/CuaDriver.ts";
-import * as BrowserTabs from "./mcp/BrowserTabs.ts";
-import * as CuaWindowPreview from "./cua/CuaWindowPreview.ts";
 import { remoteSshDeviceHosts } from "./device/localSshDeviceHost.ts";
 import * as PreviewManager from "./preview/Manager.ts";
 import { issueAssetUrl } from "./assets/AssetAccess.ts";
@@ -2062,27 +2059,6 @@ const layerWsRpc = (
             Effect.andThen(scheduledTasks.getWebhookDelivery(input)),
           ),
         [WS_METHODS.serverProbe]: (_input) => Effect.succeed({}),
-        [WS_METHODS.serverCheckComputerUse]: (_input) =>
-          Effect.gen(function* () {
-            const driver = yield* Effect.serviceOption(CuaDriver.CuaDriver);
-            return Option.isSome(driver)
-              ? yield* driver.value.status
-              : ({ platform: "other", running: false } as const);
-          }),
-        [WS_METHODS.serverCheckBrowserTabs]: (_input) =>
-          Effect.gen(function* () {
-            const tabs = yield* Effect.serviceOption(BrowserTabs.BrowserTabs);
-            return Option.isSome(tabs)
-              ? yield* tabs.value.status
-              : { browsers: [], toolInstalled: false };
-          }),
-        [WS_METHODS.serverRunBrowserTabsAction]: (input) =>
-          Effect.gen(function* () {
-            const tabs = yield* Effect.serviceOption(BrowserTabs.BrowserTabs);
-            return Option.isSome(tabs)
-              ? yield* tabs.value.runAction(input.action)
-              : { browsers: [], toolInstalled: false };
-          }),
         [WS_METHODS.serverGetConfig]: (_input) => loadServerConfig({ usageLimitsCommand: false }),
         [WS_METHODS.serverSearchAcpRegistry]: (input) =>
           acpRegistryCatalog
@@ -2928,16 +2904,6 @@ const layerWsRpc = (
         [WS_METHODS.deviceDetail]: (input) => deviceService.detail(input),
         [WS_METHODS.deviceAction]: (input) => deviceService.action(input),
         [WS_METHODS.subscribeDeviceState]: (_input) => DeviceService.stateStream(deviceService),
-        [WS_METHODS.subscribeCuaWindowPreview]: (input) =>
-          Stream.unwrap(
-            Effect.serviceOption(CuaWindowPreview.CuaWindowPreview).pipe(
-              Effect.map((preview) =>
-                Option.isSome(preview)
-                  ? preview.value.stream(input.threadId)
-                  : Stream.make({ status: "idle" as const }),
-              ),
-            ),
-          ),
         [WS_METHODS.subscribeDiscoveredLocalServers]: (input) =>
           Stream.callback<DiscoveredLocalServerList>((queue) =>
             Effect.gen(function* () {
