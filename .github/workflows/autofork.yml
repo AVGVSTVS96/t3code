@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   issues: write
 
@@ -23,9 +24,17 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-      - uses: AVGVSTVS96/autofork@v1
+      - id: autofork
+        uses: AVGVSTVS96/autofork@v1
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+      # Pushes made with GITHUB_TOKEN start no workflows, but dispatches do.
+      - name: Release the synced build
+        if: steps.autofork.outputs.result == 'synced'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run release.yml --repo "$GITHUB_REPOSITORY"
 
       - name: Capture Claude accounting
         if: always()

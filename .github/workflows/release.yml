@@ -1,0 +1,336 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  preflight:
+    name: Resolve release version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+      upstream: ${{ steps.meta.outputs.upstream }}
+      prerelease: ${{ steps.meta.outputs.prerelease }}
+      ref: ${{ github.sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: .autofork
+
+      - id: meta
+        name: Find the upstream tag this fork is synced to
+        shell: bash
+        run: |
+          set -euo pipefail
+          upstream="$(jq -r .upstream .autofork/config.json)"
+          subject="$(git log -1 --grep='^autofork: sync ' --format=%s)"
+          sha="${subject##* to }"
+          if [[ ! "$sha" =~ ^[0-9a-f]{7,40}$ ]]; then
+            echo "No autofork sync commit found in this branch's history." >&2
+            exit 1
+          fi
+
+          tags="$(git ls-remote --tags "https://github.com/$upstream" \
+            | awk -v sha="$sha" 'index($1, sha) == 1 { sub("refs/tags/", "", $2); sub(/\^\{\}$/, "", $2); print $2 }' \
+            | sort -uV)"
+          tag="$(grep -vm1 -- - <<<"$tags" || tail -n1 <<<"$tags")"
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "No release tag on $upstream points at $sha (found: ${tags:-none})." >&2
+            exit 1
+          fi
+
+          version="${tag#v}"
+          echo "Releasing $tag: $upstream@$sha plus this fork's patches, built from $GITHUB_SHA."
+          {
+            echo "version=$version"
+            echo "tag=$tag"
+            echo "upstream=$upstream"
+            echo "prerelease=$([[ "$version" == *-* ]] && echo true || echo false)"
+          } >> "$GITHUB_OUTPUT"
+
+  build_bundle:
+    name: Build JS bundle
+    needs: [preflight]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.preflight.outputs.ref }}
+          sparse-checkout: |
+            /*
+            !/.repos/
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: package.json
+          cache: true
+          run-install: false
+
+      - name: Install bundle dependencies
+        run: vp install --filter=t3... --filter=@t3tools/web... --filter=@t3tools/desktop... --filter=@t3tools/scripts...
+
+      - name: Load public T3 Connect config
+        run: grep -E '^T3CODE_[A-Z_]+=' .env.example >> "$GITHUB_ENV"
+
+      - name: Align package versions to release version
+        run: node scripts/update-release-package-versions.ts "${{ needs.preflight.outputs.version }}"
+
+      - name: Install browser secret helper build libraries
+        run: sudo apt-get update && sudo apt-get install -y libsecret-1-dev pkg-config
+
+      - name: Build JS bundle
+        run: vp run build:desktop
+
+      - name: Upload JS bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: js-bundle
+          path: |
+            apps/server/dist
+            apps/desktop/dist-electron
+          if-no-files-found: error
+          retention-days: 1
+
+  desktop_mac_arm64:
+    name: Desktop macOS arm64
+    needs: [preflight, build_bundle]
+    uses: ./.github/workflows/release-desktop.yml
+    with:
+      version: ${{ needs.preflight.outputs.version }}
+      ref: ${{ needs.preflight.outputs.ref }}
+      label: macOS arm64
+      runner: macos-26
+      platform: mac
+      target: dmg
+      arch: arm64
+      rust_target: aarch64-apple-darwin
+      resource_key: darwin-arm64
+      cli_archive: true
+
+  desktop_mac_x64:
+    name: Desktop macOS x64
+    needs: [preflight, build_bundle]
+    uses: ./.github/workflows/release-desktop.yml
+    with:
+      version: ${{ needs.preflight.outputs.version }}
+      ref: ${{ needs.preflight.outputs.ref }}
+      label: macOS x64
+      runner: macos-26
+      platform: mac
+      target: dmg
+      arch: x64
+      rust_target: x86_64-apple-darwin
+      resource_key: darwin-x64
+      cli_archive: false
+
+  desktop_linux_x64:
+    name: Desktop Linux x64
+    needs: [preflight, build_bundle]
+    uses: ./.github/workflows/release-desktop.yml
+    with:
+      version: ${{ needs.preflight.outputs.version }}
+      ref: ${{ needs.preflight.outputs.ref }}
+      label: Linux x64
+      runner: ubuntu-24.04
+      platform: linux
+      target: AppImage
+      arch: x64
+      rust_target: x86_64-unknown-linux-gnu
+      resource_key: linux-x64
+      cli_archive: true
+
+  desktop_linux_arm64:
+    name: Desktop Linux arm64
+    needs: [preflight, build_bundle]
+    uses: ./.github/workflows/release-desktop.yml
+    with:
+      version: ${{ needs.preflight.outputs.version }}
+      ref: ${{ needs.preflight.outputs.ref }}
+      label: Linux arm64
+      runner: ubuntu-24.04-arm
+      platform: linux
+      target: AppImage
+      arch: arm64
+      rust_target: aarch64-unknown-linux-gnu
+      resource_key: linux-arm64
+      cli_archive: true
+
+  desktop_win_x64:
+    name: Desktop Windows x64
+    needs: [preflight, build_bundle]
+    uses: ./.github/workflows/release-desktop.yml
+    with:
+      version: ${{ needs.preflight.outputs.version }}
+      ref: ${{ needs.preflight.outputs.ref }}
+      label: Windows x64
+      runner: windows-2025
+      platform: win
+      target: nsis
+      arch: x64
+      rust_target: x86_64-pc-windows-msvc
+      resource_key: win32-x64
+      cli_archive: true
+
+  desktop_win_arm64:
+    name: Desktop Windows arm64
+    needs: [preflight, build_bundle]
+    uses: ./.github/workflows/release-desktop.yml
+    with:
+      version: ${{ needs.preflight.outputs.version }}
+      ref: ${{ needs.preflight.outputs.ref }}
+      label: Windows arm64
+      runner: windows-11-arm
+      platform: win
+      target: nsis
+      arch: arm64
+      rust_target: aarch64-pc-windows-msvc
+      resource_key: win32-arm64
+      cli_archive: true
+
+  # macOS arm64 and Linux must ship; macOS x64 and Windows join when they build.
+  release:
+    name: Publish GitHub Release
+    needs:
+      [
+        preflight,
+        desktop_mac_arm64,
+        desktop_mac_x64,
+        desktop_linux_x64,
+        desktop_linux_arm64,
+        desktop_win_x64,
+        desktop_win_arm64,
+      ]
+    if: ${{ !cancelled() && needs.desktop_mac_arm64.result == 'success' && needs.desktop_linux_x64.result == 'success' && needs.desktop_linux_arm64.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.preflight.outputs.ref }}
+          sparse-checkout: |
+            /*
+            !/.repos/
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: package.json
+          cache: true
+          run-install: |
+            args:
+              - --filter=@t3tools/scripts...
+
+      - name: Download desktop artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: desktop-*
+          merge-multiple: true
+          path: release-assets
+
+      - name: Download CLI archives
+        uses: actions/download-artifact@v8
+        with:
+          pattern: cli-*
+          merge-multiple: true
+          path: release-assets
+
+      - name: Write CLI archive checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd release-assets
+          shopt -s nullglob
+          archives=(t3-*.tar.gz t3-*.zip)
+          if [[ ${#archives[@]} -eq 0 ]]; then
+            echo "No CLI archives were produced." >&2
+            exit 1
+          fi
+          sha256sum "${archives[@]}" > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Merge macOS updater manifests
+        run: |
+          shopt -s nullglob
+          for x64_manifest in release-assets/*-mac-x64.yml; do
+            arm64_manifest="${x64_manifest%-x64.yml}.yml"
+            if [[ -f "$arm64_manifest" ]]; then
+              node scripts/merge-update-manifests.ts --platform mac "$arm64_manifest" "$x64_manifest"
+            fi
+            rm -f "$x64_manifest"
+          done
+
+      - name: Merge Windows updater manifests
+        run: |
+          shopt -s nullglob
+          for x64_manifest in release-assets/*-win-x64.yml; do
+            arm64_manifest="${x64_manifest%-x64.yml}-arm64.yml"
+            merged_manifest="${x64_manifest%-win-x64.yml}.yml"
+            if [[ -f "$arm64_manifest" ]]; then
+              node scripts/merge-update-manifests.ts --platform win "$x64_manifest" "$arm64_manifest" "$merged_manifest"
+              rm -f "$x64_manifest" "$arm64_manifest"
+            else
+              mv "$x64_manifest" "$merged_manifest"
+            fi
+          done
+          for arm64_manifest in release-assets/*-win-arm64.yml; do
+            mv "$arm64_manifest" "${arm64_manifest%-win-arm64.yml}.yml"
+          done
+
+      - id: release_files
+        name: List release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f release-assets/builder-debug.yml
+          {
+            echo 'files<<EOF'
+            find release-assets -maxdepth 1 -type f | sort
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Write release notes
+        shell: bash
+        env:
+          TAG: ${{ needs.preflight.outputs.tag }}
+          UPSTREAM: ${{ needs.preflight.outputs.upstream }}
+          REF: ${{ needs.preflight.outputs.ref }}
+        run: |
+          cat > release-notes.md <<EOF
+          T3 Code [\`$TAG\`](https://github.com/$UPSTREAM/releases/tag/$TAG) from $UPSTREAM, with this fork's changes in [\`.autofork/\`](https://github.com/$GITHUB_REPOSITORY/tree/$REF/.autofork), built from $GITHUB_REPOSITORY@$REF.
+
+          The macOS app is signed ad hoc, not notarized. On first install, right-click the app and choose Open (or run \`xattr -dr com.apple.quarantine\` on it); later updates install themselves.
+          EOF
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.preflight.outputs.tag }}
+          target_commitish: ${{ needs.preflight.outputs.ref }}
+          name: T3 Code ${{ needs.preflight.outputs.version }}
+          body_path: release-notes.md
+          prerelease: ${{ needs.preflight.outputs.prerelease }}
+          make_latest: ${{ needs.preflight.outputs.prerelease == 'true' && 'false' || 'true' }}
+          files: ${{ steps.release_files.outputs.files }}
+          fail_on_unmatched_files: true
+          token: ${{ github.token }}
