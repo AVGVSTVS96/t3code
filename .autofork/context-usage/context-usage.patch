@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 3347cae76a3116acecef17ec2f8b5feb12f33159..0bbc422da7ec25d6387806d7ec5834e28b90f870 100644
+index d5599f8c46a331ed155b60e7bb4c3115b51b3a0d..16a6b09a3e1050e514ca9c79090a7c094f722c7a 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -504,6 +504,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
@@ -10,14 +10,10 @@ index 3347cae76a3116acecef17ec2f8b5feb12f33159..0bbc422da7ec25d6387806d7ec5834e2
    hasDismissedResumeCompaction,
    shouldOfferResumeCompaction,
  } from "./chat/ContextWindowMeter.logic";
-@@ -7601,17 +7602,15 @@ export default function ChatView(props: ChatViewProps) {
+@@ -7365,36 +7366,39 @@ export default function ChatView(props: ChatViewProps) {
            ? "Compaction is unavailable for this provider"
            : "Compacting is unavailable right now"
      : null;
--  // Tokens a stale Claude session would re-read on its next turn. While set,
--  // the composer shows a Compact chip and Enter compacts first; turning the
--  // chip off sends the next message with full history. Held queues and
--  // multi-model sends never compact first, so the offer hides for them.
 -  const resumeCompactionTokens =
 -    activeContextWindow &&
 -    !resumeCompactionPermanentlyDismissed &&
@@ -35,15 +31,12 @@ index 3347cae76a3116acecef17ec2f8b5feb12f33159..0bbc422da7ec25d6387806d7ec5834e2
      shouldOfferResumeCompaction({
        provider: selectedProvider,
        usedTokens: activeContextWindow.usedTokens,
-@@ -7619,25 +7618,26 @@ export default function ChatView(props: ChatViewProps) {
-       // Only the live report carries a TTL, and only when it is the window's source.
+       updatedAt: activeContextWindow.updatedAt,
        promptCacheTtlMs: activeThreadLiveTokenUsage?.promptCacheTtlMs,
        now: `${nowMinute}:00.000Z`,
 -    })
 -      ? activeContextWindow.usedTokens
 -      : null;
--  // Threads whose Compact chip is turned off. A send that starts its turn
--  // clears its thread's entry; a failed send keeps it for the retry.
 -  const [fullHistoryThreadKeys, setFullHistoryThreadKeys] = useState<ReadonlySet<string>>(
 -    () => new Set(),
 -  );
@@ -55,8 +48,6 @@ index 3347cae76a3116acecef17ec2f8b5feb12f33159..0bbc422da7ec25d6387806d7ec5834e2
 -      if (keep) next.add(threadKey);
 -      else next.delete(threadKey);
 +    });
-+  // Per-thread override of the default; a send that starts its turn clears its
-+  // thread's entry, a failed send keeps it for the retry.
 +  const [compactChoices, setCompactChoices] = useState<ReadonlyMap<string, boolean>>(
 +    () => new Map(),
 +  );
@@ -78,7 +69,7 @@ index 3347cae76a3116acecef17ec2f8b5feb12f33159..0bbc422da7ec25d6387806d7ec5834e2
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const handleRestoreThreadBranch = () => {
      if (!canWriteSourceControl) return;
-@@ -9143,13 +9143,8 @@ export default function ChatView(props: ChatViewProps) {
+@@ -8870,13 +8874,8 @@ export default function ChatView(props: ChatViewProps) {
      );
      const messageIdForSend = newMessageId();
      const messageCreatedAt = new Date().toISOString();
@@ -94,16 +85,16 @@ index 3347cae76a3116acecef17ec2f8b5feb12f33159..0bbc422da7ec25d6387806d7ec5834e2
      const turnDispatchMode = compactBeforeSend || sendQueuesBehindSetup ? "queue" : dispatchMode;
      const shouldQueueBehindActiveRun =
        compactBeforeSend ||
-@@ -9871,7 +9866,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -9591,7 +9590,7 @@ export default function ChatView(props: ChatViewProps) {
          failure = startResult;
        } else {
          turnStartSucceeded = true;
 -        setKeepFullHistory(routeThreadKey, false);
 +        setCompactChoice(routeThreadKey, undefined);
-         // The turn is under way and will spend quota, so that thread's limits
-         // snapshot is stale. Uploads may have outlasted a navigation, so only
-         // the sending thread's panel clears.
-@@ -11553,9 +11548,12 @@ export default function ChatView(props: ChatViewProps) {
+         clearUsageLimitsFor(routeThreadKey);
+         if (turnUsesAttachmentUploads) {
+           releaseDraftAttachments(composerAttachmentsSnapshot);
+@@ -11221,9 +11220,12 @@ export default function ChatView(props: ChatViewProps) {
                                isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
                                queuedRunsControl={queuedRunsControl}
                                bannerItems={composerBannerItems}
@@ -115,14 +106,14 @@ index 3347cae76a3116acecef17ec2f8b5feb12f33159..0bbc422da7ec25d6387806d7ec5834e2
 +                                compactBeforeSendAvailable ? toggleKeepFullHistoryStable : undefined
 +                              }
 +                              promptCacheStatus={describePromptCache(activeThreadLiveTokenUsage)}
-                               // With attachments or contexts aboard the pick just inserts the
-                               // text, so it sends as a prompt like the typed path would.
                                onUsageLimitsCommand={
+                                 usageLimitsOffered &&
+                                 usageLimitsKey !== null &&
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 323efb3db1b30c9b53f2bdce69aa52e7a2313f03..e93ed7a0e113ac530de82baa6fd8758c04f701ba 100644
+index 017705a864bc53041431cd6525aad28424000e2d..1922a9d641ad6376d7f802741d76fd24343838fa 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -1417,7 +1417,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
+@@ -1375,7 +1375,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
    compactDisabledReason: string | null;
    compactBeforeSendTokens: number | null;
    keepFullHistory: boolean;
@@ -132,7 +123,7 @@ index 323efb3db1b30c9b53f2bdce69aa52e7a2313f03..e93ed7a0e113ac530de82baa6fd8758c
  }) {
    return (
      <>
-@@ -1459,6 +1460,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
+@@ -1417,6 +1418,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
          compactBeforeSendTokens={props.compactBeforeSendTokens}
          keepFullHistory={props.keepFullHistory}
          onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -140,23 +131,20 @@ index 323efb3db1b30c9b53f2bdce69aa52e7a2313f03..e93ed7a0e113ac530de82baa6fd8758c
        />
      </>
    );
-@@ -1579,12 +1581,13 @@ export interface ChatComposerProps {
+@@ -1517,9 +1519,11 @@ export interface ChatComposerProps {
    sendDisabledReason: string | null;
    isPreparingWorktree: boolean;
    bannerItems: readonly ComposerBannerStackItem[];
--  /** Tokens a stale session would re-read; null when the thread is not offered compaction. */
 +  /** Tokens in the thread's context window; null before the provider reports usage. */
    resumeCompactionTokens: number | null;
-   /** The Compact chip is off, so the next send keeps full history. */
    keepFullHistory: boolean;
-   /** Flips the Compact chip for the active thread. */
 -  onToggleKeepFullHistory: () => void;
 +  onToggleKeepFullHistory?: (() => void) | undefined;
 +  promptCacheStatus: string | null;
-   /** Picking /usage-limits from the menu is the action itself; the draft keeps nothing of it. */
    onUsageLimitsCommand?: (() => void) | undefined;
    environmentUnavailable: {
-@@ -7653,6 +7656,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+     readonly label: string;
+@@ -7318,6 +7322,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -165,7 +153,7 @@ index 323efb3db1b30c9b53f2bdce69aa52e7a2313f03..e93ed7a0e113ac530de82baa6fd8758c
                        compactDisabled || noProviderAvailable || isSendBusy || isConnecting
                      }
 diff --git a/apps/web/src/components/chat/ComposerPrimaryActions.tsx b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
-index fc811118aa1248abf6eb3f35c8b87dc5a06fe919..4bc8c439c80e21c2f3cbad158393a534b2d639b1 100644
+index 6317a090dce93bbeed099ba1a85fd1e97b1fc2da..62c19b711acb975300286f70f77f05b686c5a722 100644
 --- a/apps/web/src/components/chat/ComposerPrimaryActions.tsx
 +++ b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
 @@ -1,4 +1,4 @@
@@ -174,14 +162,12 @@ index fc811118aa1248abf6eb3f35c8b87dc5a06fe919..4bc8c439c80e21c2f3cbad158393a534
  import { CheckIcon, ChevronDownIcon, ChevronLeftIcon, Minimize2Icon, PlayIcon } from "lucide-react";
  import { CornerUpRight, ListPlus } from "lucide";
  import { MorphIcon } from "~/components/MorphIcon";
-@@ -51,11 +51,12 @@ interface ComposerPrimaryActionsProps {
+@@ -49,9 +49,11 @@ interface ComposerPrimaryActionsProps {
    onPreviousPendingQuestion: () => void;
    onInterrupt: () => void;
    onImplementPlanInNewThread: () => void;
--  /** Tokens a stale session would re-read. When set, a Compact chip shows the count and Enter compacts first. */
 +  /** Tokens in the thread's context window. When set, a Compact chip shows the count. */
    compactBeforeSendTokens?: number | null;
-   /** The Compact chip is turned off, so the next send keeps full history. */
    keepFullHistory?: boolean;
 -  onToggleKeepFullHistory?: () => void;
 +  onToggleKeepFullHistory?: (() => void) | undefined;
@@ -189,7 +175,7 @@ index fc811118aa1248abf6eb3f35c8b87dc5a06fe919..4bc8c439c80e21c2f3cbad158393a534
  }
  
  const formatPendingPrimaryActionLabel = (input: {
-@@ -112,6 +113,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -106,6 +108,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
    compactBeforeSendTokens = null,
    keepFullHistory = false,
    onToggleKeepFullHistory,
@@ -197,7 +183,7 @@ index fc811118aa1248abf6eb3f35c8b87dc5a06fe919..4bc8c439c80e21c2f3cbad158393a534
  }: ComposerPrimaryActionsProps) {
    const pointerFocusProps = preserveComposerFocusOnPointerDown
      ? { onPointerDown: preventPointerFocus }
-@@ -131,6 +133,60 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -125,6 +128,60 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
      environmentIdentificationMode === "artwork",
    );
  
@@ -258,7 +244,7 @@ index fc811118aa1248abf6eb3f35c8b87dc5a06fe919..4bc8c439c80e21c2f3cbad158393a534
    const renderStopGenerationButton = (insidePendingAction: boolean) => (
      <Tooltip key="interrupt">
        <TooltipTrigger
-@@ -159,7 +215,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -153,7 +210,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
    );
  
    if (pendingAction) {
@@ -267,7 +253,7 @@ index fc811118aa1248abf6eb3f35c8b87dc5a06fe919..4bc8c439c80e21c2f3cbad158393a534
        <div className={cn("flex items-center justify-end", compact ? "gap-1.5" : "gap-2")}>
          {canInterrupt ? renderStopGenerationButton(true) : null}
          {pendingAction.questionIndex > 0 ? (
-@@ -204,13 +260,13 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -198,13 +255,13 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
              questionIndex: pendingAction.questionIndex,
            })}
          </button>
@@ -283,7 +269,7 @@ index fc811118aa1248abf6eb3f35c8b87dc5a06fe919..4bc8c439c80e21c2f3cbad158393a534
          <button
            type="submit"
            className={cn(messageActionPillClassName, "h-9 sm:h-8", compact ? "px-3" : "px-4")}
-@@ -218,11 +274,11 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -212,11 +269,11 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
            disabled={isSendBusy || isSendDisabled || isConnecting || isEnvironmentUnavailable}
          >
            {isConnecting || isSendBusy ? "Sending..." : "Refine"}
@@ -297,7 +283,7 @@ index fc811118aa1248abf6eb3f35c8b87dc5a06fe919..4bc8c439c80e21c2f3cbad158393a534
        <div data-chat-composer-implement-actions="true" className="flex items-center justify-end">
          <button
            type="submit"
-@@ -260,22 +316,14 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -254,22 +311,14 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
              </MenuItem>
            </MenuPopup>
          </Menu>
@@ -322,7 +308,7 @@ index fc811118aa1248abf6eb3f35c8b87dc5a06fe919..4bc8c439c80e21c2f3cbad158393a534
    const submitLabel = showResume
      ? "Resume thread"
      : isEditingQueuedMessage
-@@ -360,40 +408,5 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -354,40 +403,5 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
        <TooltipPopup>{submitTooltip}</TooltipPopup>
      </Tooltip>
    );
@@ -365,7 +351,7 @@ index fc811118aa1248abf6eb3f35c8b87dc5a06fe919..4bc8c439c80e21c2f3cbad158393a534
 +  return withCompactChip(submit);
  });
 diff --git a/apps/web/src/components/chat/ContextWindowMeter.logic.ts b/apps/web/src/components/chat/ContextWindowMeter.logic.ts
-index 78ee72c9b8708825b217f406b13494f1a7c8170f..3ea26d1b718049514fe9761efcb371166e26aaeb 100644
+index 7ffc0562219e8a69e66ee6b59b040bd0ff2d5cab..24c0207234925b3eb01848b5a8ce519d531d9260 100644
 --- a/apps/web/src/components/chat/ContextWindowMeter.logic.ts
 +++ b/apps/web/src/components/chat/ContextWindowMeter.logic.ts
 @@ -1,4 +1,9 @@
@@ -387,7 +373,7 @@ index 78ee72c9b8708825b217f406b13494f1a7c8170f..3ea26d1b718049514fe9761efcb37116
  import { getTriggerDisplayModelName, type ModelEsque } from "./providerIconUtils";
  
  // Used when the provider did not report its cache TTL: Claude's 1h cache plus slack.
-@@ -86,6 +92,18 @@ export function shouldOfferResumeCompaction(input: {
+@@ -84,6 +90,18 @@ export function shouldOfferResumeCompaction(input: {
    );
  }
  

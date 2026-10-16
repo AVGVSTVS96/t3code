@@ -10,7 +10,7 @@ index d78ac0fd286a369d0fe5d7f2ac59aa00e022f0b0..a357ed831f0a5f2e406ad86856ed81f9
 +  "productName": "T3 Code (Bassim's autofork)"
  }
 diff --git a/apps/desktop/src/app/DesktopAppIdentity.test.ts b/apps/desktop/src/app/DesktopAppIdentity.test.ts
-index 10ab907965f2ed834649d2c1c36edd0db4c1fe4f..68cdf33aad15e0254ed687e136ded4ac58b95049 100644
+index eecea6ad926151c9d20384288cdce5c7144589be..80ebcd4b95e733adb0f5495ef4978a8d82449eb5 100644
 --- a/apps/desktop/src/app/DesktopAppIdentity.test.ts
 +++ b/apps/desktop/src/app/DesktopAppIdentity.test.ts
 @@ -218,7 +218,7 @@ describe("DesktopAppIdentity", () => {
@@ -21,10 +21,10 @@ index 10ab907965f2ed834649d2c1c36edd0db4c1fe4f..68cdf33aad15e0254ed687e136ded4ac
 +        assert.equal(calls.setAboutPanelOptions[0]?.applicationName, "T3 Code (Bassim's autofork)");
          assert.equal(calls.setAboutPanelOptions[0]?.applicationVersion, "1.2.3");
          assert.equal(calls.setAboutPanelOptions[0]?.version, "0123456789ab");
-         // Packaged: the bundle's own icon stands, so a custom one the user
-@@ -264,7 +264,10 @@ describe("DesktopAppIdentity", () => {
+         assert.deepEqual(calls.setDockIcon, []);
+@@ -261,7 +261,10 @@ describe("DesktopAppIdentity", () => {
+         assert.isDefined(runtimeName);
          assert.equal(runtimeName, `T3 Code ${stage}`);
-         // RFC 9110's token grammar, after Electron removes ASCII spaces.
          assert.match(runtimeName.replaceAll(" ", ""), /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/);
 -        assert.equal(calls.setAboutPanelOptions[0]?.applicationName, `T3 Code (${stage})`);
 +        assert.equal(
@@ -35,10 +35,10 @@ index 10ab907965f2ed834649d2c1c36edd0db4c1fe4f..68cdf33aad15e0254ed687e136ded4ac
        { calls, environment },
      );
 diff --git a/apps/desktop/src/app/DesktopEnvironment.ts b/apps/desktop/src/app/DesktopEnvironment.ts
-index f697e0456db97a9be4e2cc49beba48278ace18f3..b8949c3a1aeb2cf67e9f92c5c74cefe17caf15c3 100644
+index ecf08255feb3f758bd2f785b07e2f57f4a9f4e67..e1b93c59bf174e2ffbc21d1f00527da0beb7b515 100644
 --- a/apps/desktop/src/app/DesktopEnvironment.ts
 +++ b/apps/desktop/src/app/DesktopEnvironment.ts
-@@ -114,7 +114,7 @@ export function resolveDesktopAppBranding(input: {
+@@ -106,7 +106,7 @@ export function resolveDesktopAppBranding(input: {
    return {
      baseName: APP_BASE_NAME,
      stageLabel,
@@ -61,7 +61,7 @@ index dd15f879fd8ee8c397134002af13688b15c24068..58f93db145169234bd701774f382f994
          assert.include(
            identity.desktopEntry ?? "",
 diff --git a/apps/desktop/src/window/DesktopApplicationMenu.test.ts b/apps/desktop/src/window/DesktopApplicationMenu.test.ts
-index f111dac25db8df757b337dd6367e5083442843d6..3f4d680681143904a1b49cdf0d1efce37132ae83 100644
+index cb0e5fa7c4109e68d8ec67f1004c75767b1c44da..81fb34e347d02468a9912b5a89e148f59d8d7b71 100644
 --- a/apps/desktop/src/window/DesktopApplicationMenu.test.ts
 +++ b/apps/desktop/src/window/DesktopApplicationMenu.test.ts
 @@ -142,21 +142,21 @@ describe("DesktopApplicationMenu", () => {
@@ -104,7 +104,7 @@ index 528609d36e608c9e2bb21493af1011bf651103c0..329be82c1d736bde827eeb01b2c705cf
    injectedDesktopAppBranding?.displayName ??
    formatAppDisplayName({ baseName: APP_BASE_NAME, stageLabel: APP_STAGE_LABEL });
 diff --git a/apps/web/src/routes/__root.tsx b/apps/web/src/routes/__root.tsx
-index cd2a49a3fdf0356769eb2e13480d8e616b922af7..ad88aec3b17ee5f77c2e7dd36498c822320ff6fa 100644
+index 7bde1ecfd198c3498ec06f777a795132313fb8e3..881c3b5d650f2ea4a244b561ea238bc369bcbb52 100644
 --- a/apps/web/src/routes/__root.tsx
 +++ b/apps/web/src/routes/__root.tsx
 @@ -14,8 +14,7 @@ import {
@@ -117,7 +117,7 @@ index cd2a49a3fdf0356769eb2e13480d8e616b922af7..ad88aec3b17ee5f77c2e7dd36498c822
  import { AppSidebarLayout } from "../components/AppSidebarLayout";
  import { CommandPalette } from "../components/CommandPalette";
  import { CustomSnoozeDialogHost } from "../components/CustomSnoozeDialog";
-@@ -354,18 +353,9 @@ function FontAppearanceSync() {
+@@ -347,18 +346,9 @@ function FontAppearanceSync() {
  }
  
  function DocumentTitleSync() {
@@ -139,10 +139,10 @@ index cd2a49a3fdf0356769eb2e13480d8e616b922af7..ad88aec3b17ee5f77c2e7dd36498c822
    return null;
  }
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index 4b7443aa09bcb545f18f18bbd2eba5bb63039bcf..e80df11a3657236793b80919bbd40cfcf5957abd 100644
+index 1edd8f0551bec2565d15e088f79d48b1c2b90779..065429ccff922e27a251023a7080975bc8ce152f 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
-@@ -272,9 +272,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -267,9 +267,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
      assert.equal(resolveDesktopUpdateChannel("0.0.17"), "latest");
    });
  
@@ -158,7 +158,7 @@ index 4b7443aa09bcb545f18f18bbd2eba5bb63039bcf..e80df11a3657236793b80919bbd40cfc
    });
  
    it("switches desktop packaging icons to the nightly artwork for nightly versions", () => {
-@@ -702,7 +705,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -682,7 +685,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
          "**/*.map",
        ]);
        assert.deepStrictEqual(mac.dmg, {
@@ -168,10 +168,10 @@ index 4b7443aa09bcb545f18f18bbd2eba5bb63039bcf..e80df11a3657236793b80919bbd40cfc
          window: { width: 640, height: 432 },
          contents: [
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index 5dd431bc4d9e625f01cee386a492a83abbe4d6a5..a68ed174533040914219b135a6d541ef6676d97c 100644
+index 1c4d80f88822e42eb2b323f08a223ffac4283cb0..dd9a2c2683f75d3594c1376564f2d7587bf7c53d 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
-@@ -2743,10 +2743,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
+@@ -2669,10 +2669,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
    return `${trimmed.slice(0, versionSeparator)}/${trimmed.slice(versionSeparator + 1)}`;
  }
  
