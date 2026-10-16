@@ -100,15 +100,6 @@ export type ThreadCurrentPullRequest =
       readonly top: ThreadPullRequestLink;
     };
 
-function layersFromTop(chain: ThreadPullRequestChain): Array<ThreadPullRequestLink> {
-  // `.sort()` on a fresh array, not `.toSorted()`: this runs on Hermes, which has no ES2023
-  // array methods, and a TypeError here is fatal on every mobile launch that renders a stack.
-  return chain.layers
-    .map((link, index) => ({ link, index, depth: chain.depths[index]! }))
-    .sort((left, right) => right.depth - left.depth || right.index - left.index)
-    .map((entry) => entry.link);
-}
-
 export function resolveThreadCurrentPullRequest(
   links: ReadonlyArray<ThreadPullRequestLink>,
 ): ThreadCurrentPullRequest | null {
@@ -118,8 +109,10 @@ export function resolveThreadCurrentPullRequest(
   if (open.length === 1) return { kind: "single", link: open[0]! };
   const chains = resolveThreadPullRequestChains(visible);
   if (open.length > 1) {
+    // `.reverse()` on a copy, not `.toReversed()`: this runs on Hermes, which has no ES2023
+    // array methods, and a TypeError here is fatal on every mobile launch that renders a stack.
     const openChains = chains
-      .map((chain) => layersFromTop(chain).filter(isOpen))
+      .map((chain) => [...chain.layers].reverse().filter(isOpen))
       .filter((layers) => layers.length > 0)
       .sort(
         (left, right) =>
@@ -130,7 +123,7 @@ export function resolveThreadCurrentPullRequest(
     return { kind: "stack", open: ordered, top: ordered[0]! };
   }
   if (chains.length === 1) {
-    return { kind: "single", link: layersFromTop(chains[0]!)[0]! };
+    return { kind: "single", link: chains[0]!.layers.at(-1)! };
   }
   const terminal = [...visible].sort(
     (left, right) => latestUpdatedAt(right) - latestUpdatedAt(left),
@@ -196,8 +189,6 @@ export function legacyLinkedPullRequestOf(
 export interface ThreadPullRequestChain {
   readonly kind: "native" | "derived";
   readonly layers: ReadonlyArray<ThreadPullRequestLink>;
-  /** One per layer: 0 for the base, parent's depth + 1 above it. Siblings share a depth. */
-  readonly depths: ReadonlyArray<number>;
 }
 
 export function resolveThreadPullRequestChains(
@@ -220,7 +211,7 @@ export function resolveThreadPullRequestChains(
     const order = new Map(members[0]!.stack!.layers.map((layer, index) => [layer.number, index]));
     members.sort((left, right) => (order.get(left.number) ?? 0) - (order.get(right.number) ?? 0));
     for (const member of members) placed.add(threadPullRequestKeyOf(member));
-    chains.push({ kind: "native", layers: members, depths: members.map((_, index) => index) });
+    chains.push({ kind: "native", layers: members });
   }
 
   const remaining = visible.filter((link) => !placed.has(threadPullRequestKeyOf(link)));
@@ -234,44 +225,29 @@ export function resolveThreadPullRequestChains(
     const key = branchKey(link, link.snapshot.headBranch);
     byHead.set(key, byHead.has(key) ? null : link);
   }
-  const parentOf = (link: ThreadPullRequestLink) => {
-    if (link.snapshot === null) return undefined;
-    const parent = byHead.get(branchKey(link, link.snapshot.baseBranch));
-    return parent == null || parent === link ? undefined : parent;
-  };
-  const children = new Map<string, Array<ThreadPullRequestLink>>();
+  const hasChild = new Set<string>();
   for (const link of remaining) {
-    const parent = parentOf(link);
-    if (parent === undefined) continue;
-    const key = threadPullRequestKeyOf(parent);
-    const siblings = children.get(key) ?? [];
-    siblings.push(link);
-    children.set(key, siblings);
+    if (link.snapshot === null) continue;
+    const parent = byHead.get(branchKey(link, link.snapshot.baseBranch));
+    if (parent != null && parent !== link) hasChild.add(threadPullRequestKeyOf(parent));
   }
-  for (const base of remaining) {
-    if (parentOf(base) !== undefined) continue;
+  for (const top of remaining) {
+    if (hasChild.has(threadPullRequestKeyOf(top))) continue;
     const layers: Array<ThreadPullRequestLink> = [];
-    const depths: Array<number> = [];
-    const pending: Array<{ readonly link: ThreadPullRequestLink; readonly depth: number }> = [
-      { link: base, depth: 0 },
-    ];
-    for (let next = pending.pop(); next !== undefined; next = pending.pop()) {
-      const key = threadPullRequestKeyOf(next.link);
-      // Two links with one identity would otherwise share a child list and expand forever.
-      if (placed.has(key)) continue;
-      placed.add(key);
-      layers.push(next.link);
-      depths.push(next.depth);
-      const below = children.get(key) ?? [];
-      for (let index = below.length - 1; index >= 0; index -= 1) {
-        pending.push({ link: below[index]!, depth: next.depth + 1 });
-      }
+    let cursor: ThreadPullRequestLink | undefined = top;
+    while (cursor !== undefined && !placed.has(threadPullRequestKeyOf(cursor))) {
+      placed.add(threadPullRequestKeyOf(cursor));
+      layers.unshift(cursor);
+      cursor =
+        cursor.snapshot === null
+          ? undefined
+          : (byHead.get(branchKey(cursor, cursor.snapshot.baseBranch)) ?? undefined);
     }
-    if (layers.length > 0) chains.push({ kind: "derived", layers, depths });
+    if (layers.length > 0) chains.push({ kind: "derived", layers });
   }
   for (const link of remaining) {
     if (!placed.has(threadPullRequestKeyOf(link))) {
-      chains.push({ kind: "derived", layers: [link], depths: [0] });
+      chains.push({ kind: "derived", layers: [link] });
     }
   }
   return chains;
