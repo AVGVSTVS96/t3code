@@ -1,0 +1,45 @@
+diff --git a/packages/shared/src/cliRelease.test.ts b/packages/shared/src/cliRelease.test.ts
+index 953d8999d750ac00c86a74ccffc17844885c3098..6e1d17bd8eaa8939cda08863b04ed90ceed1b9ff 100644
+--- a/packages/shared/src/cliRelease.test.ts
++++ b/packages/shared/src/cliRelease.test.ts
+@@ -32,7 +32,7 @@ describe("cliRelease", () => {
+ 
+   it("resolves download URLs under the tagged release, honoring a mirror", () => {
+     expect(cliReleaseDownloadBaseUrl("1.2.3")).toBe(
+-      "https://github.com/pingdotgg/t3code/releases/download/v1.2.3",
++      "https://github.com/AVGVSTVS96/t3code/releases/download/v1.2.3",
+     );
+     expect(cliReleaseDownloadBaseUrl("1.2.3", "https://mirror.example/t3/")).toBe(
+       "https://mirror.example/t3/v1.2.3",
+@@ -85,7 +85,7 @@ describe("cliRelease", () => {
+ 
+   it("pages through the release index at the largest page GitHub allows", () => {
+     expect(cliReleaseIndexPageUrl(1)).toBe(
+-      "https://api.github.com/repos/pingdotgg/t3code/releases?per_page=100&page=1",
++      "https://api.github.com/repos/AVGVSTVS96/t3code/releases?per_page=100&page=1",
+     );
+     expect(cliReleaseIndexPageUrl(3)).toContain("page=3");
+   });
+diff --git a/packages/shared/src/cliRelease.ts b/packages/shared/src/cliRelease.ts
+index c029592bee283030dbfc0320df6d2c4d95926406..14f489e8067a8b113ee569f83d9a52e5de6cf1a2 100644
+--- a/packages/shared/src/cliRelease.ts
++++ b/packages/shared/src/cliRelease.ts
+@@ -1,4 +1,4 @@
+-const CLI_RELEASE_REPOSITORY = "pingdotgg/t3code";
++const CLI_RELEASE_REPOSITORY = "AVGVSTVS96/t3code";
+ export const CLI_RELEASE_CHECKSUMS_FILE = "SHA256SUMS";
+ export const CLI_RELEASE_BASE_URL_ENV = "T3CODE_RELEASE_BASE_URL";
+ 
+diff --git a/packages/ssh/src/tunnel.test.ts b/packages/ssh/src/tunnel.test.ts
+index ebdf12696ed8cf04568d43f55f5fe27db4d46d8d..02ace5df6ee80017c4287c6dd258e14b8c1aa318 100644
+--- a/packages/ssh/src/tunnel.test.ts
++++ b/packages/ssh/src/tunnel.test.ts
+@@ -108,7 +108,7 @@ describe("ssh tunnel scripts", () => {
+     assert.include(script, "T3_NODE_SCRIPT_PATH=''");
+     assert.include(
+       script,
+-      "T3_RELEASE_BASE_URL='https://github.com/pingdotgg/t3code/releases/download'",
++      "T3_RELEASE_BASE_URL='https://github.com/AVGVSTVS96/t3code/releases/download'",
+     );
+     assert.include(script, 'T3_RUNTIME_DIR="$HOME/.t3/runtime/versions/$T3_ARCHIVE_VERSION"');
+     assert.include(script, 'T3_ARCHIVE="t3-$T3_ARCHIVE_VERSION-$T3_PLATFORM-$T3_ARCH.tar.gz"');
