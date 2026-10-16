@@ -276,6 +276,7 @@ import { previewRuntimeTabId } from "../browser/previewRuntimeTabId";
 import { addBrowserSurface } from "./preview/addBrowserSurface";
 import { closePreviewSession } from "./preview/closePreviewSession";
 import { ThreadPreviewMiniPlayer } from "./preview/ThreadPreviewMiniPlayer";
+import { isRunUsingComputer, selectLatestComputerUse } from "./preview/computerUsePreview";
 import { usePreviewSession } from "./preview/usePreviewSession";
 import { subscribePreviewAction } from "./preview/previewActionBus";
 import { getConfiguredPreviewUrls } from "./preview/previewEmptyStateLogic";
@@ -283,6 +284,7 @@ import { getConfiguredPreviewUrls } from "./preview/previewEmptyStateLogic";
 import {
   browserMiniPlayerSource,
   previewMiniPlayerSourceKey,
+  COMPUTER_MINI_PLAYER_SOURCE,
   selectThreadPreviewMiniPlayer,
   usePreviewMiniPlayerStore,
 } from "../previewMiniPlayerStore";
@@ -310,6 +312,7 @@ import {
   AlarmClockIcon,
   CheckCircle2Icon,
   MessageCircleIcon,
+  MonitorIcon,
   PaperclipIcon,
   ChevronDownIcon,
   DownloadIcon,
@@ -5311,6 +5314,38 @@ export default function ChatView(props: ChatViewProps) {
     deviceState.sessions,
     deviceState.devices,
   ]);
+  // A computer use call floats the driven window over chat the way an
+  // agent-opened device does. Each new call reopens a card the user closed;
+  // a browser or device the agent already floats keeps its place.
+  const computerUse = useMemo(
+    () => selectLatestComputerUse(serverProjection?.turnItems ?? []),
+    [serverProjection?.turnItems],
+  );
+  const lastShownComputerUseItemId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!activeThreadRef) return;
+    const current =
+      usePreviewMiniPlayerStore.getState().byThreadKey[scopedThreadKey(activeThreadRef)];
+    if (latestRunSettled) {
+      if (current?.source.kind === "computer") {
+        usePreviewMiniPlayerStore.getState().close(activeThreadRef);
+      }
+      return;
+    }
+    if (!computerUse?.inProgress || shouldUsePlanSidebarSheet) return;
+    if (lastShownComputerUseItemId.current === computerUse.itemId) return;
+    lastShownComputerUseItemId.current = computerUse.itemId;
+    if (!autoShowFloatingPreview) return;
+    if (current && current.source.kind !== "computer") return;
+    usePreviewMiniPlayerStore.getState().open(activeThreadRef, COMPUTER_MINI_PLAYER_SOURCE);
+  }, [
+    activeThreadRef,
+    activePreviewMiniPlayer,
+    autoShowFloatingPreview,
+    computerUse,
+    latestRunSettled,
+    shouldUsePlanSidebarSheet,
+  ]);
   const previousServerPreviewTabs = useRef(new Map<string, Map<string, string | undefined>>());
   useEffect(() => {
     if (!activeThreadRef || !activeEnvironmentServerBrowser || !activePreviewState.listLoaded)
@@ -7443,6 +7478,30 @@ export default function ChatView(props: ChatViewProps) {
           },
         })
       : null;
+  const usingComputer = useMemo(
+    () => isRunUsingComputer(serverProjection?.turnItems ?? [], activeRunningTurnId),
+    [activeRunningTurnId, serverProjection?.turnItems],
+  );
+  const computerUseBannerItems = useMemo<ComposerBannerStackItem[]>(
+    () =>
+      usingComputer
+        ? [
+            {
+              id: "computer-use",
+              variant: "info",
+              priority: "activity",
+              icon: <MonitorIcon />,
+              title: "Using your computer",
+              actions: (
+                <Button size="xs" variant="ghost" onClick={() => void onInterrupt()}>
+                  Stop
+                </Button>
+              ),
+            },
+          ]
+        : [],
+    [onInterrupt, usingComputer],
+  );
   const composerBannerItems = useMemo<ComposerBannerStackItem[]>(() => {
     const limitRecoveryItems = limitRecoveryBanner === null ? [] : [limitRecoveryBanner];
     const backgroundWorkItems = [
@@ -7454,6 +7513,7 @@ export default function ChatView(props: ChatViewProps) {
     const projectCloneItems = projectCloneBannerItem === null ? [] : [projectCloneBannerItem];
     if (!localCheckoutBranchMismatch || !showBranchMismatchBanner || !activeBranchMismatchKey) {
       return [
+        ...computerUseBannerItems,
         ...feedbackBannerItems,
         ...limitRecoveryItems,
         ...usageLimitsItems,
@@ -7463,6 +7523,7 @@ export default function ChatView(props: ChatViewProps) {
       ];
     }
     return [
+      ...computerUseBannerItems,
       ...feedbackBannerItems,
       ...limitRecoveryItems,
       ...usageLimitsItems,
@@ -7514,6 +7575,7 @@ export default function ChatView(props: ChatViewProps) {
     activeThreadShell,
     serverRuntime?.usageLimitResetAt,
     canWriteSourceControl,
+    computerUseBannerItems,
     feedbackBannerItems,
     limitRecoveryBanner,
     handleRestoreThreadBranchStable,
@@ -11418,6 +11480,7 @@ export default function ChatView(props: ChatViewProps) {
                 key={`${activeThreadKey}:${previewMiniPlayerSourceKey(activePreviewMiniPlayer.source)}`}
                 threadRef={activeThreadRef}
                 miniPlayer={activePreviewMiniPlayer}
+                computerUse={computerUse}
               />
             ) : null}
 
