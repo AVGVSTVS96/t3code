@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index f87663989a8f1bfdac02f2e70f69fcc45e4e3539..a821d8b5bc66d9fe78337ee261e9f56ffe54497a 100644
+index 3347cae76a3116acecef17ec2f8b5feb12f33159..0bbc422da7ec25d6387806d7ec5834e28b90f870 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -504,6 +504,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
@@ -103,7 +103,7 @@ index f87663989a8f1bfdac02f2e70f69fcc45e4e3539..a821d8b5bc66d9fe78337ee261e9f56f
          // The turn is under way and will spend quota, so that thread's limits
          // snapshot is stale. Uploads may have outlasted a navigation, so only
          // the sending thread's panel clears.
-@@ -11541,9 +11536,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -11553,9 +11548,12 @@ export default function ChatView(props: ChatViewProps) {
                                isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
                                queuedRunsControl={queuedRunsControl}
                                bannerItems={composerBannerItems}
@@ -119,7 +119,7 @@ index f87663989a8f1bfdac02f2e70f69fcc45e4e3539..a821d8b5bc66d9fe78337ee261e9f56f
                                // text, so it sends as a prompt like the typed path would.
                                onUsageLimitsCommand={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 822e79da8dbd7e9aa630f7fd1a370e0474686143..1bb3db8c364d76043ef88d4e7ef0001986d7dffe 100644
+index 323efb3db1b30c9b53f2bdce69aa52e7a2313f03..e93ed7a0e113ac530de82baa6fd8758c04f701ba 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
 @@ -1417,7 +1417,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
@@ -156,7 +156,7 @@ index 822e79da8dbd7e9aa630f7fd1a370e0474686143..1bb3db8c364d76043ef88d4e7ef00019
    /** Picking /usage-limits from the menu is the action itself; the draft keeps nothing of it. */
    onUsageLimitsCommand?: (() => void) | undefined;
    environmentUnavailable: {
-@@ -7642,6 +7645,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -7653,6 +7656,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
