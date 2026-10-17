@@ -3,6 +3,10 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./nativeAppMentions": {
+      "types": "./src/nativeAppMentions.ts",
+      "import": "./src/nativeAppMentions.ts"
+    },
     "./githubMarkdownLinks": {
       "types": "./src/githubMarkdownLinks.ts",
       "import": "./src/githubMarkdownLinks.ts"
@@ -490,6 +494,14 @@
     "./PtyAdapter": {
       "types": "./src/PtyAdapter.ts",
       "import": "./src/PtyAdapter.ts"
+    },
+    "./cuaDriverHostOptions": {
+      "types": "./src/cuaDriverHostOptions.ts",
+      "import": "./src/cuaDriverHostOptions.ts"
+    },
+    "./cuaDriverRelease": {
+      "types": "./src/cuaDriverRelease.ts",
+      "import": "./src/cuaDriverRelease.ts"
     }
   },
   "scripts": {

@@ -457,11 +457,8 @@ it.effect(
         [threadId],
       );
       assert.isTrue(queries.every(([query]) => !query.includes("COUNT(")));
-      // The pending-work read, not the candidate query's waiting-link-card check.
-      const pendingQuery = queries.find(
-        ([query]) =>
-          query.includes("FROM orchestration_v2_projection_turn_items") &&
-          query.includes("'command_execution'"),
+      const pendingQuery = queries.find(([query]) =>
+        query.includes("FROM orchestration_v2_projection_turn_items"),
       );
       assert.isDefined(pendingQuery);
       const metadata = yield* store.getThread(threadId);

@@ -1,12 +1,6 @@
 import {
-  OrchestratorMcpCapabilitiesInput,
   OrchestratorMcpCapabilitiesResult,
   OrchestrationV2StopWorkflowInput,
-  OrchestratorMcpEnvironmentLinkInput,
-  OrchestratorMcpEnvironmentLinkResult,
-  OrchestratorMcpEnvironmentLinksResult,
-  OrchestratorMcpEnvironmentUnlinkInput,
-  OrchestratorMcpEnvironmentUnlinkResult,
   OrchestratorMcpCreateThreadsInput,
   OrchestratorMcpCreateThreadsResult,
   OrchestratorMcpDelegateTaskInput,
@@ -41,9 +35,6 @@ import { Tool, Toolkit } from "effect/ai";
 import * as Schema from "effect/Schema";
 
 import * as ThreadManagementService from "../../../orchestration-v2/ThreadManagementService.ts";
-import * as PeerForwarding from "../../../peer/PeerForwarding.ts";
-import * as PeerLinkRequests from "../../../peer/PeerLinkRequests.ts";
-import * as PeerLinks from "../../../peer/PeerLinks.ts";
 import * as McpInvocationContext from "../../McpInvocationContext.ts";
 import * as OrchestratorMcpService from "../../OrchestratorMcpService.ts";
 import * as ThreadMetadataMcpService from "../../ThreadMetadataMcpService.ts";
@@ -53,14 +44,6 @@ const dependencies = [
   ThreadManagementService.ThreadManagementService,
   OrchestratorMcpService.OrchestratorMcpService,
 ];
-/** Tools that also run in a linked environment, when `environmentId` names one. */
-const forwardingDependencies = [...dependencies, PeerForwarding.PeerForwarding];
-/** Making and forgetting links. */
-const linkingDependencies = [
-  ...dependencies,
-  PeerLinkRequests.PeerLinkRequests,
-  PeerLinks.PeerLinks,
-];
 const threadMetadataDependencies = [
   McpInvocationContext.McpInvocationContext,
   ThreadManagementService.ThreadManagementService,
@@ -69,12 +52,11 @@ const threadMetadataDependencies = [
 
 const OrchestratorCapabilitiesTool = Tool.make("orchestrator_capabilities", {
   description:
-    "List the V2 provider instances and their current models from the same live catalog as the composer, including configured custom models, inherited runtime settings, and app-owned orchestration features available to this caller. For a separate top-level thread in a new or existing worktree, use t3_thread_launch with workspaceStrategy. Pass environmentId to list a linked environment's providers instead.",
-  parameters: OrchestratorMcpCapabilitiesInput,
+    "List the V2 provider instances and their current models from the same live catalog as the composer, including configured custom models, inherited runtime settings, and app-owned orchestration features available to this caller. For a separate top-level thread in a new or existing worktree, use t3_thread_launch with workspaceStrategy.",
   success: OrchestratorMcpCapabilitiesResult,
   failure: OrchestratorMcpFailure,
   failureMode: "return",
-  dependencies: forwardingDependencies,
+  dependencies,
 })
   .annotate(Tool.Title, "Get orchestration capabilities")
   .annotate(Tool.Readonly, true)
@@ -83,7 +65,7 @@ const OrchestratorCapabilitiesTool = Tool.make("orchestrator_capabilities", {
 
 export const DelegateTaskTool = Tool.make("delegate_task", {
   description:
-    "Needs an agent running inside a T3 thread. Delegate one task to a T3-owned child agent/subagent of THIS thread and run it with only the supplied task prompt, without copying parent conversation history. Set target.environmentId to run it in a linked environment (t3_environment_links): it runs there as an ordinary thread, in the project with this thread's repository unless target.projectId names one, with this thread's provider and model unless target names others from orchestrator_capabilities with the same environmentId, and omitted modes capped by the link's access. It wakes this thread when it ends like any other task. Choose providers and models from orchestrator_capabilities, which uses the same live catalog as the composer. Prefer native subagent tools for same-provider work only when they support the chosen model. Use this for any model missing from the native tool, including same-provider work, for cross-provider work, or for explicitly T3-owned child tasks. For every T3 delegated review round, call delegate_task again with the original brief, prior findings, responses, and unresolved objections in the task prompt. Track each round by its own taskId and use a distinct clientRequestId per round, stable across retries of that round. The childThreadId is backing storage, not the target for starting another delegated review round through t3_thread_send. Set isolation to worktree for a separate checkout based on the parent local commit, with project setup completed before the child starts. Uncommitted edits are not copied; omitted isolation shares the parent checkout. Provider, model, model options (see orchestrator_capabilities), runtime mode, and interaction mode inherit unless target overrides them. A requested runtimeMode must be one the target provider lists in orchestrator_capabilities runtimeModes; an inherited one steps down to the broadest mode it offers. Leave runtimeMode unset unless the user asks for a supervised child: approval-required and auto-accept-edits usually make the child wait for a person at each action that needs approval. Prefer mode='async' for long work; mode='wait' blocks until completion, a blocking question, or timeout. If hasPendingQuestion, pass threadId=childThreadId to t3_pending_request_list, t3_pending_request_read (with requestId) and t3_pending_request_respond, or ask the user; the task's completion still wakes this thread. timeoutMs on mode=wait is only the parent's wait budget and does not cancel the child. waitTimedOut on that wait call means the timeout fired; keep that taskId and read status on later task_status. An async child's completion wakes this thread through a notification, steered into active turns where supported or queued otherwise, so end the turn instead of polling or spawning watchers; use task_status only when the result is needed mid-turn.",
+    "Needs an agent running inside a T3 thread. Delegate one task to a T3-owned child agent/subagent of THIS thread and run it with only the supplied task prompt, without copying parent conversation history. Choose providers and models from orchestrator_capabilities, which uses the same live catalog as the composer. Prefer native subagent tools for same-provider work only when they support the chosen model. Use this for any model missing from the native tool, including same-provider work, for cross-provider work, or for explicitly T3-owned child tasks. For every T3 delegated review round, call delegate_task again with the original brief, prior findings, responses, and unresolved objections in the task prompt. Track each round by its own taskId and use a distinct clientRequestId per round, stable across retries of that round. The childThreadId is backing storage, not the target for starting another delegated review round through t3_thread_send. Set isolation to worktree for a separate checkout based on the parent local commit, with project setup completed before the child starts. Uncommitted edits are not copied; omitted isolation shares the parent checkout. Provider, model, model options (see orchestrator_capabilities), runtime mode, and interaction mode inherit unless target overrides them. A requested runtimeMode must be one the target provider lists in orchestrator_capabilities runtimeModes; an inherited one steps down to the broadest mode it offers. Leave runtimeMode unset unless the user asks for a supervised child: approval-required and auto-accept-edits usually make the child wait for a person at each action that needs approval. Prefer mode='async' for long work; mode='wait' blocks until completion, a blocking question, or timeout. If hasPendingQuestion, pass threadId=childThreadId to t3_pending_request_list, t3_pending_request_read (with requestId) and t3_pending_request_respond, or ask the user; the task's completion still wakes this thread. timeoutMs on mode=wait is only the parent's wait budget and does not cancel the child. waitTimedOut on that wait call means the timeout fired; keep that taskId and read status on later task_status. An async child's completion wakes this thread through a notification, steered into active turns where supported or queued otherwise, so end the turn instead of polling or spawning watchers; use task_status only when the result is needed mid-turn.",
   parameters: OrchestratorMcpDelegateTaskInput,
   success: OrchestratorMcpDelegateTaskResult,
   failure: OrchestratorMcpFailure,
@@ -210,12 +192,12 @@ export const CreateThreadsTool = Tool.make("create_threads", {
 
 const ThreadListTool = Tool.make("t3_thread_list", {
   description:
-    "List T3 threads in a project, newest first. Omit projectId for the calling thread's project. Pass environmentId to list a linked environment's threads; projectId is then required. Filter by durable run status, title, or settled state (settled=true lists threads the user or auto-settlement moved out of the active list), or snoozed state, and paginate with the returned cursor. A snoozed thread wakes early when it asks for something, fails, or completes. To link a thread in this environment for the user, write `[title](t3-thread://v1/<threadId>)` with the threadId exactly as returned, not URL-encoded; T3 Code shows the thread's current title. Name a thread in a linked environment by title instead: its link would open here.",
+    "List T3 threads in a project, newest first. Omit projectId for the calling thread's project. Filter by durable run status, title, or settled state (settled=true lists threads the user or auto-settlement moved out of the active list), or snoozed state, and paginate with the returned cursor. A snoozed thread wakes early when it asks for something, fails, or completes. To link a thread for the user, write `[title](t3-thread://v1/<threadId>)` with the threadId exactly as returned, not URL-encoded; T3 Code shows the thread's current title.",
   parameters: OrchestratorMcpThreadListInput,
   success: OrchestratorMcpThreadListResult,
   failure: OrchestratorMcpFailure,
   failureMode: "return",
-  dependencies: forwardingDependencies,
+  dependencies,
 })
   .annotate(Tool.Title, "List T3 threads")
   .annotate(Tool.Readonly, true)
@@ -224,12 +206,12 @@ const ThreadListTool = Tool.make("t3_thread_list", {
 
 const ThreadReadTool = Tool.make("t3_thread_read", {
   description:
-    "Read durable state and a paginated timeline from any T3 thread in this environment, or in a linked one with environmentId. The default messages view returns user messages, assistant messages, and proposed plans; activity returns all summarized timeline items. Reading an untruncated terminal assistant result from this parent thread's direct app-owned child acknowledges that child's automatic completion delivery. Continue with afterPosition=nextPosition. Recover long item text with itemId and textOffset=nextTextOffset until nextTextOffset is null; offsets count UTF-16 code units. The thread also reports its snooze state. To link a thread in this environment for the user, write `[title](t3-thread://v1/<threadId>)` with the threadId exactly as returned, not URL-encoded; T3 Code shows the thread's current title. Name a thread in a linked environment by title instead: its link would open here.",
+    "Read durable state and a paginated timeline from any T3 thread in this environment. The default messages view returns user messages, assistant messages, and proposed plans; activity returns all summarized timeline items. Reading an untruncated terminal assistant result from this parent thread's direct app-owned child acknowledges that child's automatic completion delivery. Continue with afterPosition=nextPosition. Recover long item text with itemId and textOffset=nextTextOffset until nextTextOffset is null; offsets count UTF-16 code units. The thread also reports its snooze state. To link a thread for the user, write `[title](t3-thread://v1/<threadId>)` with the threadId exactly as returned, not URL-encoded; T3 Code shows the thread's current title.",
   parameters: OrchestratorMcpThreadReadInput,
   success: OrchestratorMcpThreadReadResult,
   failure: OrchestratorMcpFailure,
   failureMode: "return",
-  dependencies: forwardingDependencies,
+  dependencies,
 })
   .annotate(Tool.Title, "Read a T3 thread")
   .annotate(Tool.Strict, true)
@@ -252,12 +234,12 @@ export const ThreadUpdateTool = Tool.make("t3_thread_update", {
 
 const ThreadSendTool = Tool.make("t3_thread_send", {
   description:
-    "Send a message to any T3 thread in this environment, or in a linked one with environmentId. The target cannot have broader permission modes than the caller. Use delegate_task with the full review context and a new clientRequestId for independent review rounds. For a follow-up that needs the same child's conversation, send to its childThreadId. After the original task completes, a requested follow-up creates a fresh task in that child thread and returns taskId; its completion notifies the parent, and the original result stays unchanged. mode='auto' starts an idle thread, steers a fully active turn, or queues behind a turn that is not yet steerable. Use queue for a separate follow-up turn, steer for an in-flight update, or restart to interrupt-and-restart the active turn. clientRequestId makes retries idempotent.",
+    "Send a message to any T3 thread in this environment. The target cannot have broader permission modes than the caller. Use delegate_task with the full review context and a new clientRequestId for independent review rounds. For a follow-up that needs the same child's conversation, send to its childThreadId. After the original task completes, a requested follow-up creates a fresh task in that child thread and returns taskId; its completion notifies the parent, and the original result stays unchanged. mode='auto' starts an idle thread, steers a fully active turn, or queues behind a turn that is not yet steerable. Use queue for a separate follow-up turn, steer for an in-flight update, or restart to interrupt-and-restart the active turn. clientRequestId makes retries idempotent.",
   parameters: OrchestratorMcpThreadSendInput,
   success: OrchestratorMcpThreadSendResult,
   failure: OrchestratorMcpFailure,
   failureMode: "return",
-  dependencies: forwardingDependencies,
+  dependencies,
 })
   .annotate(Tool.Title, "Send to a T3 thread")
   .annotate(Tool.Destructive, true)
@@ -265,12 +247,12 @@ const ThreadSendTool = Tool.make("t3_thread_send", {
 
 const ThreadWaitTool = Tool.make("t3_thread_wait", {
   description:
-    "Wait for a T3 thread run to reach a terminal durable state, here or in a linked environment with environmentId. Without runId, the latest run at call time is selected; an idle thread returns immediately. Timeout does not interrupt work, so call again or use t3_thread_read/list after timedOut=true. Waiting reports status only and does not acknowledge a delegated result.",
+    "Wait for a T3 thread run to reach a terminal durable state. Without runId, the latest run at call time is selected; an idle thread returns immediately. Timeout does not interrupt work, so call again or use t3_thread_read/list after timedOut=true. Waiting reports status only and does not acknowledge a delegated result.",
   parameters: OrchestratorMcpThreadWaitInput,
   success: OrchestratorMcpThreadWaitResult,
   failure: OrchestratorMcpFailure,
   failureMode: "return",
-  dependencies: forwardingDependencies,
+  dependencies,
 })
   .annotate(Tool.Title, "Wait for a T3 thread")
   .annotate(Tool.Readonly, true)
@@ -279,54 +261,15 @@ const ThreadWaitTool = Tool.make("t3_thread_wait", {
 
 const ThreadInterruptTool = Tool.make("t3_thread_interrupt", {
   description:
-    "Request interruption of a running turn in any T3 thread in this environment, or in a linked one with environmentId. Without runId, the newest interruptible run is selected. Terminal runs and threads without an active turn return without another side effect. stop=true stops the thread as its Stop button does instead: it also holds queued messages, ends pull request watches and stops the tasks it delegated. clientRequestId makes retries idempotent.",
+    "Request interruption of a running turn in any T3 thread in this environment. Without runId, the newest interruptible run is selected. Terminal runs and threads without an active turn return without another side effect. clientRequestId makes retries idempotent.",
   parameters: OrchestratorMcpThreadInterruptInput,
   success: OrchestratorMcpThreadInterruptResult,
   failure: OrchestratorMcpFailure,
   failureMode: "return",
-  dependencies: forwardingDependencies,
+  dependencies,
 })
   .annotate(Tool.Title, "Interrupt a T3 thread")
   .annotate(Tool.Destructive, true);
-
-const EnvironmentLinksTool = Tool.make("t3_environment_links", {
-  description:
-    "List the other T3 Code environments this one is linked to, such as the user's other machines, and whether each answers now. A machine the user names that is not listed is not linked yet: call t3_environment_link for it rather than looking elsewhere. Pass one's environmentId to t3_project_list, t3_thread_launch, t3_thread_list, t3_thread_read, t3_thread_send, t3_thread_wait, t3_thread_interrupt, or orchestrator_capabilities to act there. A linked environment lets this one's agents do at most its access there, and never more than the calling agent may do here. An expired link has to be linked again from a new pairing code.",
-  success: OrchestratorMcpEnvironmentLinksResult,
-  failure: OrchestratorMcpFailure,
-  failureMode: "return",
-  dependencies: forwardingDependencies,
-})
-  .annotate(Tool.Title, "List linked environments")
-  .annotate(Tool.Readonly, true)
-  .annotate(Tool.Destructive, false)
-  .annotate(Tool.Idempotent, true);
-
-const EnvironmentLinkTool = Tool.make("t3_environment_link", {
-  description:
-    'Ask the user to link another T3 Code environment, such as their VPS or another machine, so agents here can work there (t3_environment_links). Call it when the user asks to link, connect, or delegate to another machine. You usually do not know where it answers, so pass no address: pass a hint from their words ("vps") and the card lets the user pick the machine. Pass environmentId when a machine the user mentioned names it; if it is already linked, this returns linked at once. Pass url only when the user gave an address. The card lets the user pick the access agents here get there and approve it; their app signs in there with their own session, or they paste a pairing code from there into the card. It returns pending at once: the user answers in the card whenever they get to it, and the outcome (linked with the environmentId to pass to other tools, declined, or failed with the reason) arrives as a message in this thread. End your turn or keep working; do not poll or call it again to check. Never ask for a pairing code in chat.',
-  parameters: OrchestratorMcpEnvironmentLinkInput,
-  success: OrchestratorMcpEnvironmentLinkResult,
-  failure: OrchestratorMcpFailure,
-  failureMode: "return",
-  dependencies: linkingDependencies,
-})
-  .annotate(Tool.Title, "Link another environment")
-  .annotate(Tool.Destructive, false)
-  .annotate(Tool.OpenWorld, true);
-
-const EnvironmentUnlinkTool = Tool.make("t3_environment_unlink", {
-  description:
-    "Forget a linked environment, so agents here stop working there. The session there stays listed in that environment's Connections until it is revoked there.",
-  parameters: OrchestratorMcpEnvironmentUnlinkInput,
-  success: OrchestratorMcpEnvironmentUnlinkResult,
-  failure: OrchestratorMcpFailure,
-  failureMode: "return",
-  dependencies: linkingDependencies,
-})
-  .annotate(Tool.Title, "Forget a linked environment")
-  .annotate(Tool.Destructive, true)
-  .annotate(Tool.Idempotent, true);
 
 export const OrchestratorToolkit = Toolkit.make(
   OrchestratorCapabilitiesTool,
@@ -346,7 +289,4 @@ export const OrchestratorToolkit = Toolkit.make(
   ThreadSendTool,
   ThreadWaitTool,
   ThreadInterruptTool,
-  EnvironmentLinksTool,
-  EnvironmentLinkTool,
-  EnvironmentUnlinkTool,
 );

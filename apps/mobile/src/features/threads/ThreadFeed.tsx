@@ -1,11 +1,11 @@
 import * as Dialog from "../../components/ui/Dialog";
+import { parseNativeAppMention } from "@t3tools/shared/nativeAppMentions";
 import { useOpenPullRequest } from "../../native/useOpenPullRequest";
 import { ThreadMarkdownVideo, ThreadMediaVisibleContext } from "./ThreadMarkdownVideo";
 import { useMarkdownImageSource } from "../../native/useMarkdownImageSource";
 import { enrichedContextLinkPresentation } from "../../lib/enrichedLinkPresentation";
 import { ThreadContextDivider } from "./thread-context-divider";
 import { ThreadHandoffDivider, ThreadHandoffRow } from "./thread-handoff-row";
-import { LinkRequestCard } from "./LinkRequestCard";
 import { SecretRequestCard } from "./SecretRequestCard";
 import { AppActivityIndicator } from "../../components/ui/AppActivityIndicator";
 import {
@@ -176,7 +176,6 @@ import {
   threadFeedRunIsUnsettled,
   isContextCompactionActivityGroup,
   isContextHandoffActivityGroup,
-  isLinkRequestActivityGroup,
   isSecretRequestActivityGroup,
   type ThreadFeedEntry,
   type ThreadFeedLatestRun,
@@ -1111,16 +1110,6 @@ function renderFeedEntry(
     );
   }
 
-  if (entry.type === "activity-group" && isLinkRequestActivityGroup(entry)) {
-    return (
-      <LinkRequestCard
-        environmentId={props.environmentId}
-        projectedItem={entry.activities[0]!.projectedItem}
-        iconColor={iconSubtleColor}
-      />
-    );
-  }
-
   if (entry.type === "activity-group" && isContextCompactionActivityGroup(entry)) {
     const label = entry.activities[0]!.summary;
     const active =
@@ -1491,6 +1480,7 @@ function UserMessageContent(props: UserMessageContentProps) {
     return `[${ref.label}${available ? "" : " (unavailable)"}](t3-context://v1/${ref.kind}/${ref.contextId})`;
   });
   const onLinkPress = (href: string) => {
+    if (parseNativeAppMention(href)) return;
     const reference = parseComposerContextHref(href);
     if (!reference) return props.linkHandlers.onLinkPress?.(href);
     const record = props.context?.records.find(

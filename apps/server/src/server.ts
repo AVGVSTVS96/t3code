@@ -63,11 +63,6 @@ import * as ProviderInstanceRegistryHydration from "./provider/ProviderInstanceR
 import * as ProjectSettingsOverrideSweep from "./provider/ProjectSettingsOverrideSweep.ts";
 import * as TerminalManager from "./terminal/Manager.ts";
 import * as McpHttpServer from "./mcp/McpHttpServer.ts";
-import * as PeerForwarding from "./peer/PeerForwarding.ts";
-import * as RemoteDelegation from "./peer/RemoteDelegation.ts";
-import * as PeerLinkRequests from "./peer/PeerLinkRequests.ts";
-import * as PeerLinks from "./peer/PeerLinks.ts";
-import * as PeerMcpClient from "./peer/PeerMcpClient.ts";
 import * as McpSessionRegistry from "./mcp/McpSessionRegistry.ts";
 import * as PreviewAutomationBroker from "./mcp/PreviewAutomationBroker.ts";
 import * as DeviceService from "./device/DeviceService.ts";
@@ -161,6 +156,10 @@ import * as HostResources from "./resourceTelemetry/HostResources.ts";
 import * as ProcessResourceMonitor from "./diagnostics/ProcessResourceMonitor.ts";
 import * as TraceDiagnostics from "./diagnostics/TraceDiagnostics.ts";
 import * as DesktopTelemetryReceiver from "./resourceTelemetry/DesktopTelemetryReceiver.ts";
+import * as CuaDriver from "./cua/CuaDriver.ts";
+import * as CuaApplications from "./cua/CuaApplications.ts";
+import * as BrowserTabs from "./mcp/BrowserTabs.ts";
+import * as CuaWindowPreview from "./cua/CuaWindowPreview.ts";
 import * as NativeTelemetryClient from "./resourceTelemetry/NativeTelemetryClient.ts";
 import * as ResourceAttribution from "./resourceTelemetry/ResourceAttribution.ts";
 import * as ResourceMonitorBinary from "./resourceTelemetry/ResourceMonitorBinary.ts";
@@ -253,6 +252,13 @@ const layerHostPowerMonitor = HostPowerMonitor.layer.pipe(
 // Reuses DesktopTelemetryReceiverLayerLive: a fresh receiver layer here
 // would open a second reader on the desktop telemetry fd.
 const layerDesktopAppUpdate = DesktopAppUpdate.layer.pipe(
+  Layer.provide(layerDesktopTelemetryReceiver),
+);
+
+// The environment's one Cua Driver host. It shares the receiver because the
+// desktop backend asks its Electron parent for the driver over that fd.
+const layerCuaDriver = CuaDriver.layer.pipe(
+  Layer.provide(layerServerSettings),
   Layer.provide(layerDesktopTelemetryReceiver),
 );
 
@@ -542,6 +548,8 @@ const layerProviderInstallationRefresh = Layer.effectDiscard(
 
 const layerRuntimeCoreDependenciesBase = Layer.mergeAll(
   AgentAwarenessRelay.layer,
+  CuaWindowPreview.layer,
+  CuaApplications.layer,
   HeldHooksWaker.layer,
   layerThreadSettlementWorker,
   StorageCleanup.layer.pipe(Layer.provide(ProjectionStoreV2.layer)),
@@ -601,6 +609,8 @@ const layerRuntimeCoreDependenciesBase = Layer.mergeAll(
     Layer.mergeAll(
       AntigravityInstallation.AntigravityInstallation.layer,
       CodexInstallation.CodexInstallation.layer,
+      layerCuaDriver,
+      BrowserTabs.layer.pipe(Layer.provide(layerServerSettings)),
     ),
   ),
 );
@@ -693,30 +703,15 @@ const layerMakeRoutes = Layer.mergeAll(
     Layer.provide(ProviderAdapterRegistry.layerFromProviderInstanceRegistry),
     Layer.provide(McpOAuth.layerMcpClientAuthenticator),
   ),
-  // Follows delegated tasks running in linked environments, including after a restart.
-  Layer.effectDiscard(
-    RemoteDelegation.RemoteDelegation.pipe(Effect.flatMap((remote) => remote.start())),
-  ),
 ).pipe(
   Layer.provide(
     PullRequestReviewGuideService.layer.pipe(Layer.provide(PullRequestReviewGuides.layer)),
   ),
-  // delegate_task to a linked environment, from /mcp and the follower above.
-  Layer.provide(RemoteDelegation.layer.pipe(Layer.provide(ProjectionStoreV2.layer))),
-  // Links agents ask for: shown in a thread from /mcp, answered over WebSocket.
-  Layer.provide(PeerLinkRequests.layer),
   // Both transports consume the same service instance, so caches single-flight across clients
   // and mutations observed on WebSocket invalidate patches subsequently read over HTTP.
   Layer.provide(layerPullRequestService),
   Layer.provide(ServerBrowser.layer.pipe(Layer.provide(DesktopBrowserChannel.layer))),
   Layer.provide(PreviewBrowser.layer),
-  // Links to other environments, shared by Settings (WebSocket) and agents (/mcp).
-  Layer.provide(
-    PeerForwarding.layer.pipe(
-      Layer.provideMerge(PeerMcpClient.layer),
-      Layer.provideMerge(PeerLinks.layer),
-    ),
-  ),
   Layer.provide(PreviewAutomationBroker.layer),
   Layer.provide(ServerSelfUpdate.layer.pipe(Layer.provide(layerDesktopAppUpdate))),
   Layer.provide(layerCommandReadiness),

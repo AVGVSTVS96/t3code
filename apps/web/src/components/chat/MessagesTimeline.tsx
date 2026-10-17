@@ -120,7 +120,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Root, RootContent } from "mdast";
 import { T3Wordmark } from "../T3Wordmark";
-import { EnvironmentContextChip } from "../EnvironmentContextChip";
 import { ThreadContextChip } from "../ThreadContextChip";
 import {
   BotIcon,
@@ -293,7 +292,6 @@ import {
   V2LifecycleRow,
   type HandoffTimelineRun,
 } from "./V2LifecycleRow";
-import { LinkRequestCard } from "./LinkRequestCard";
 import { SecretRequestCard } from "./SecretRequestCard";
 import { TimelineSystemDivider } from "./TimelineSystemDivider";
 
@@ -452,12 +450,9 @@ interface MessagesTimelineProps {
   paintOnly?: boolean;
   onOpenTurnDiff: (runId: RunId, filePath?: string) => void;
   onOpenThread: (threadId: OrchestrationV2TurnItem["threadId"]) => void;
-  /** The thread this one is a subagent of; `open` is absent when it cannot be opened from here. */
   parentThreadLink?: {
+    readonly threadId: ThreadId;
     readonly title: string;
-    /** Where it runs, when that is another environment. */
-    readonly environmentLabel?: string;
-    readonly open?: () => void;
   } | null;
   onForkFromRun: (input: {
     readonly sourceThreadId: ThreadId;
@@ -1401,15 +1396,10 @@ const ConversationTimeline = memo(function ConversationTimeline({
           <div className="chat-content-lane pt-1 sm:pt-2">
             <TimelineSystemDivider
               label="Subagent of"
-              detail={
-                parentThreadLink.environmentLabel === undefined
-                  ? parentThreadLink.title
-                  : `${parentThreadLink.title} on ${parentThreadLink.environmentLabel}`
-              }
+              detail={parentThreadLink.title}
               icon={BotIcon}
-              {...(parentThreadLink.open === undefined
-                ? {}
-                : { actionLabel: "Open parent thread", onAction: parentThreadLink.open })}
+              actionLabel="Open parent thread"
+              onAction={() => onOpenThread(parentThreadLink.threadId)}
             />
           </div>
         </div>
@@ -1421,7 +1411,7 @@ const ConversationTimeline = memo(function ConversationTimeline({
         {parentThreadLink !== null ? leadingContent : null}
       </>
     );
-  }, [historyControls, parentThreadLink, topFadeEnabled]);
+  }, [historyControls, onOpenThread, parentThreadLink, topFadeEnabled]);
 
   const canvas = useChatCanvas();
   const registerTimeline = canvas?.registerTimeline;
@@ -3115,15 +3105,6 @@ function V2EventTimelineRow({ row }: { row: Extract<TimelineRow, { kind: "event"
       />
     );
   }
-  if (item.type === "link_request") {
-    return (
-      <LinkRequestCard
-        environmentId={ctx.activeThreadEnvironmentId}
-        item={item}
-        visibility={visibility}
-      />
-    );
-  }
   if (isV2LifecycleItem(item)) {
     return (
       <V2LifecycleRow
@@ -4506,16 +4487,6 @@ const userMessageContextPresentationRegistry = createContextPresentationRegistry
       render: (record, context) =>
         record.kind === "thread" ? (
           <ThreadContextChip record={record} copyMarkdown={context.copyMarkdown} />
-        ) : (
-          <UnavailableUserMessageContextChip {...context} />
-        ),
-    },
-    {
-      kind: "environment",
-      canRender: (record) => record.kind === "environment",
-      render: (record, context) =>
-        record.kind === "environment" ? (
-          <EnvironmentContextChip record={record} copyMarkdown={context.copyMarkdown} />
         ) : (
           <UnavailableUserMessageContextChip {...context} />
         ),

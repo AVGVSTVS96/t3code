@@ -276,6 +276,7 @@ import { previewRuntimeTabId } from "../browser/previewRuntimeTabId";
 import { addBrowserSurface } from "./preview/addBrowserSurface";
 import { closePreviewSession } from "./preview/closePreviewSession";
 import { ThreadPreviewMiniPlayer } from "./preview/ThreadPreviewMiniPlayer";
+import { isRunUsingComputer, selectLatestComputerUse } from "./preview/computerUsePreview";
 import { usePreviewSession } from "./preview/usePreviewSession";
 import { subscribePreviewAction } from "./preview/previewActionBus";
 import { getConfiguredPreviewUrls } from "./preview/previewEmptyStateLogic";
@@ -283,6 +284,7 @@ import { getConfiguredPreviewUrls } from "./preview/previewEmptyStateLogic";
 import {
   browserMiniPlayerSource,
   previewMiniPlayerSourceKey,
+  COMPUTER_MINI_PLAYER_SOURCE,
   selectThreadPreviewMiniPlayer,
   usePreviewMiniPlayerStore,
 } from "../previewMiniPlayerStore";
@@ -310,6 +312,7 @@ import {
   AlarmClockIcon,
   CheckCircle2Icon,
   MessageCircleIcon,
+  MonitorIcon,
   PaperclipIcon,
   ChevronDownIcon,
   DownloadIcon,
@@ -428,7 +431,7 @@ import { vcsEnvironment } from "../state/vcs";
 import { sourceControlEnvironment } from "../state/sourceControl";
 import { useProjectClone } from "../state/projectClones";
 import { projectCloneDisplayName, projectCloneProgressSummary } from "@t3tools/contracts";
-import { useEnvironment, useEnvironments, usePrimaryEnvironment } from "../state/environments";
+import { useEnvironments, usePrimaryEnvironment } from "../state/environments";
 import {
   resolveThreadDetailRef,
   useEnvironmentSupportsServerBrowser,
@@ -1894,9 +1897,6 @@ export default function ChatView(props: ChatViewProps) {
   );
   const setComposerDraftReviewComments = useComposerDraftStore((store) => store.setReviewComments);
   const setComposerDraftThreadContexts = useComposerDraftStore((store) => store.setThreadContexts);
-  const setComposerDraftEnvironmentContexts = useComposerDraftStore(
-    (store) => store.setEnvironmentContexts,
-  );
   const setComposerDraftModelSelection = useComposerDraftStore((store) => store.setModelSelection);
   const setComposerDraftRuntimeMode = useComposerDraftStore((store) => store.setRuntimeMode);
   const setComposerDraftInteractionMode = useComposerDraftStore(
@@ -2217,59 +2217,7 @@ export default function ChatView(props: ChatViewProps) {
     return scopeThreadRef(parentSubagentEnvironmentId, parentSubagentThreadId);
   }, [parentSubagentEnvironmentId, parentSubagentThreadId]);
   const parentSubagentThread = useThreadShell(parentSubagentThreadRef);
-  // A linked environment's agent may have delegated this thread from there.
-  const delegatedFrom = activeThread?.delegatedFrom ?? null;
-  const delegatedFromEnvironment = useEnvironment(delegatedFrom?.environmentId ?? null);
-  const delegatedFromRef = useMemo(
-    () =>
-      delegatedFrom === null
-        ? null
-        : scopeThreadRef(delegatedFrom.environmentId, delegatedFrom.threadId),
-    [delegatedFrom],
-  );
-  // The title it had at delegation, until this client sees the parent itself.
-  const delegatedFromThread = useThreadShell(delegatedFromRef);
-  const parentThreadLink = useMemo(() => {
-    if (parentSubagentThreadRef !== null) {
-      return {
-        title: parentSubagentThread?.title ?? "Parent thread",
-        open: (): void => {
-          void navigate({
-            to: "/$environmentId/$threadId",
-            params: buildThreadRouteParams(parentSubagentThreadRef),
-          });
-        },
-      };
-    }
-    if (delegatedFrom === null || delegatedFromRef === null) return null;
-    const parentRef = delegatedFromRef;
-    return {
-      title: delegatedFromThread?.title ?? delegatedFrom.title,
-      environmentLabel: delegatedFromEnvironment?.label ?? activeThread?.linkOrigin?.label ?? "",
-      // Only an environment this client is connected to can open the parent.
-      ...(delegatedFromEnvironment === null
-        ? {}
-        : {
-            open: (): void => {
-              void navigate({
-                to: "/$environmentId/$threadId",
-                params: buildThreadRouteParams(parentRef),
-              });
-            },
-          }),
-    };
-  }, [
-    activeThread?.linkOrigin?.label,
-    delegatedFrom,
-    delegatedFromEnvironment,
-    delegatedFromRef,
-    delegatedFromThread?.title,
-    navigate,
-    parentSubagentThread?.title,
-    parentSubagentThreadRef,
-  ]);
-  // The header's breadcrumb opens a parent in this environment only.
-  const headerParentThreadLink = useMemo(
+  const parentThreadLink = useMemo(
     () =>
       parentSubagentThreadRef === null
         ? null
@@ -5366,6 +5314,38 @@ export default function ChatView(props: ChatViewProps) {
     deviceState.sessions,
     deviceState.devices,
   ]);
+  // A computer use call floats the driven window over chat the way an
+  // agent-opened device does. Each new call reopens a card the user closed;
+  // a browser or device the agent already floats keeps its place.
+  const computerUse = useMemo(
+    () => selectLatestComputerUse(serverProjection?.turnItems ?? []),
+    [serverProjection?.turnItems],
+  );
+  const lastShownComputerUseItemId = useRef<string | null>(null);
+  useEffect(() => {
+    if (!activeThreadRef) return;
+    const current =
+      usePreviewMiniPlayerStore.getState().byThreadKey[scopedThreadKey(activeThreadRef)];
+    if (latestRunSettled) {
+      if (current?.source.kind === "computer") {
+        usePreviewMiniPlayerStore.getState().close(activeThreadRef);
+      }
+      return;
+    }
+    if (!computerUse?.inProgress || shouldUsePlanSidebarSheet) return;
+    if (lastShownComputerUseItemId.current === computerUse.itemId) return;
+    lastShownComputerUseItemId.current = computerUse.itemId;
+    if (!autoShowFloatingPreview) return;
+    if (current && current.source.kind !== "computer") return;
+    usePreviewMiniPlayerStore.getState().open(activeThreadRef, COMPUTER_MINI_PLAYER_SOURCE);
+  }, [
+    activeThreadRef,
+    activePreviewMiniPlayer,
+    autoShowFloatingPreview,
+    computerUse,
+    latestRunSettled,
+    shouldUsePlanSidebarSheet,
+  ]);
   const previousServerPreviewTabs = useRef(new Map<string, Map<string, string | undefined>>());
   useEffect(() => {
     if (!activeThreadRef || !activeEnvironmentServerBrowser || !activePreviewState.listLoaded)
@@ -7498,6 +7478,30 @@ export default function ChatView(props: ChatViewProps) {
           },
         })
       : null;
+  const usingComputer = useMemo(
+    () => isRunUsingComputer(serverProjection?.turnItems ?? [], activeRunningTurnId),
+    [activeRunningTurnId, serverProjection?.turnItems],
+  );
+  const computerUseBannerItems = useMemo<ComposerBannerStackItem[]>(
+    () =>
+      usingComputer
+        ? [
+            {
+              id: "computer-use",
+              variant: "info",
+              priority: "activity",
+              icon: <MonitorIcon />,
+              title: "Using your computer",
+              actions: (
+                <Button size="xs" variant="ghost" onClick={() => void onInterrupt()}>
+                  Stop
+                </Button>
+              ),
+            },
+          ]
+        : [],
+    [onInterrupt, usingComputer],
+  );
   const composerBannerItems = useMemo<ComposerBannerStackItem[]>(() => {
     const limitRecoveryItems = limitRecoveryBanner === null ? [] : [limitRecoveryBanner];
     const backgroundWorkItems = [
@@ -7509,6 +7513,7 @@ export default function ChatView(props: ChatViewProps) {
     const projectCloneItems = projectCloneBannerItem === null ? [] : [projectCloneBannerItem];
     if (!localCheckoutBranchMismatch || !showBranchMismatchBanner || !activeBranchMismatchKey) {
       return [
+        ...computerUseBannerItems,
         ...feedbackBannerItems,
         ...limitRecoveryItems,
         ...usageLimitsItems,
@@ -7518,6 +7523,7 @@ export default function ChatView(props: ChatViewProps) {
       ];
     }
     return [
+      ...computerUseBannerItems,
       ...feedbackBannerItems,
       ...limitRecoveryItems,
       ...usageLimitsItems,
@@ -7569,6 +7575,7 @@ export default function ChatView(props: ChatViewProps) {
     activeThreadShell,
     serverRuntime?.usageLimitResetAt,
     canWriteSourceControl,
+    computerUseBannerItems,
     feedbackBannerItems,
     limitRecoveryBanner,
     handleRestoreThreadBranchStable,
@@ -8527,7 +8534,6 @@ export default function ChatView(props: ChatViewProps) {
       previewAnnotations: sendContextPreviewAnnotations,
       reviewComments: composerReviewComments,
       threadContexts: composerThreadContexts,
-      environmentContexts: composerEnvironmentContexts,
       selectedProvider: ctxSelectedProvider,
       selectedModel: ctxSelectedModel,
       selectedProviderModels: ctxSelectedProviderModels,
@@ -8661,7 +8667,6 @@ export default function ChatView(props: ChatViewProps) {
                         reviewComments: composerReviewComments,
                         previewAnnotations: composerPreviewAnnotations,
                         threadContexts: composerThreadContexts,
-                        environmentContexts: composerEnvironmentContexts,
                         attachments: newEditAttachments.map((attachment, index) => ({
                           attachment,
                           attachmentId:
@@ -8710,8 +8715,7 @@ export default function ChatView(props: ChatViewProps) {
       elementContextCount:
         composerPreviewAnnotations.length +
         composerReviewComments.length +
-        composerThreadContexts.length +
-        composerEnvironmentContexts.length,
+        composerThreadContexts.length,
     });
     const feedbackCommand =
       ctxSelectedProvider === "codex" &&
@@ -8720,8 +8724,7 @@ export default function ChatView(props: ChatViewProps) {
       sendableComposerTerminalContexts.length === 0 &&
       composerPreviewAnnotations.length === 0 &&
       composerReviewComments.length === 0 &&
-      composerThreadContexts.length === 0 &&
-      composerEnvironmentContexts.length === 0
+      composerThreadContexts.length === 0
         ? parseCodexFeedbackCommand(trimmed)
         : null;
     if (feedbackCommand && multipleModelSelections === null) {
@@ -8797,7 +8800,6 @@ export default function ChatView(props: ChatViewProps) {
       const followUpReviewComments = [...composerReviewComments];
       const followUpPreviewAnnotations = [...composerPreviewAnnotations];
       const followUpThreadContexts = [...composerThreadContexts];
-      const followUpEnvironmentContexts = [...composerEnvironmentContexts];
       promptRef.current = "";
       clearComposerDraftContent(composerDraftTarget);
       composerRef.current?.resetCursorState();
@@ -8808,7 +8810,6 @@ export default function ChatView(props: ChatViewProps) {
           reviewComments: composerReviewComments,
           previewAnnotations: composerPreviewAnnotations,
           threadContexts: composerThreadContexts,
-          environmentContexts: composerEnvironmentContexts,
         }),
         interactionMode: followUp.interactionMode,
       });
@@ -8822,7 +8823,6 @@ export default function ChatView(props: ChatViewProps) {
             reviewComments: followUpReviewComments,
             previewAnnotations: followUpPreviewAnnotations,
             threadContexts: followUpThreadContexts,
-            environmentContexts: followUpEnvironmentContexts,
           },
           writePrompt: (prompt) => setComposerDraftPrompt(composerDraftTarget, prompt),
           writeTerminalContexts: (contexts) =>
@@ -8833,8 +8833,6 @@ export default function ChatView(props: ChatViewProps) {
             setComposerDraftPreviewAnnotations(composerDraftTarget, [...annotations]),
           writeThreadContexts: (records) =>
             setComposerDraftThreadContexts(composerDraftTarget, [...records]),
-          writeEnvironmentContexts: (records) =>
-            setComposerDraftEnvironmentContexts(composerDraftTarget, [...records]),
           resetCursor: (options) => composerRef.current?.resetCursorState(options),
         });
       } else if (
@@ -8852,8 +8850,7 @@ export default function ChatView(props: ChatViewProps) {
       sendableComposerTerminalContexts.length === 0 &&
       composerPreviewAnnotations.length === 0 &&
       composerReviewComments.length === 0 &&
-      composerThreadContexts.length === 0 &&
-      composerEnvironmentContexts.length === 0
+      composerThreadContexts.length === 0
         ? parseStandaloneComposerSlashCommand(trimmed)
         : null;
     if (standaloneSlashCommand && multipleModelSelections === null) {
@@ -8912,7 +8909,6 @@ export default function ChatView(props: ChatViewProps) {
     const composerPreviewAnnotationsSnapshot = [...composerPreviewAnnotations];
     const composerReviewCommentsSnapshot: ReviewCommentContext[] = [...composerReviewComments];
     const composerThreadContextsSnapshot = [...composerThreadContexts];
-    const composerEnvironmentContextsSnapshot = [...composerEnvironmentContexts];
     const messageTextForSend = composerTerminalContexts
       .filter((context) => !composerTerminalContextsSnapshot.includes(context))
       .reduce(
@@ -8930,7 +8926,6 @@ export default function ChatView(props: ChatViewProps) {
         reviewComments: composerReviewCommentsSnapshot,
         previewAnnotations: composerPreviewAnnotationsSnapshot,
         threadContexts: composerThreadContextsSnapshot,
-        environmentContexts: composerEnvironmentContextsSnapshot,
         attachments: composerAttachmentsSnapshot.map((attachment, index) => ({
           attachment,
           attachmentId: attachmentIds[index] ?? attachment.id,
@@ -9342,10 +9337,6 @@ export default function ChatView(props: ChatViewProps) {
             );
             setComposerDraftReviewComments(composerDraftTarget, composerReviewCommentsSnapshot);
             setComposerDraftThreadContexts(composerDraftTarget, composerThreadContextsSnapshot);
-            setComposerDraftEnvironmentContexts(
-              composerDraftTarget,
-              composerEnvironmentContextsSnapshot,
-            );
             if (composerRef.current && currentRouteThreadKeyRef.current === routeThreadKey) {
               promptRef.current = messageTextForSend;
               composerRef.current.resetCursorState({
@@ -9725,9 +9716,7 @@ export default function ChatView(props: ChatViewProps) {
             (useComposerDraftStore.getState().getComposerDraft(composerDraftTarget)?.reviewComments
               .length ?? 0) === 0 &&
             (useComposerDraftStore.getState().getComposerDraft(composerDraftTarget)?.threadContexts
-              .length ?? 0) === 0 &&
-            (useComposerDraftStore.getState().getComposerDraft(composerDraftTarget)
-              ?.environmentContexts.length ?? 0) === 0
+              .length ?? 0) === 0
       ) {
         setOptimisticUserMessages((existing) => {
           const removed = existing.filter((message) => message.id === messageIdForSend);
@@ -9749,10 +9738,6 @@ export default function ChatView(props: ChatViewProps) {
         setComposerDraftPreviewAnnotations(composerDraftTarget, composerPreviewAnnotationsSnapshot);
         setComposerDraftReviewComments(composerDraftTarget, composerReviewCommentsSnapshot);
         setComposerDraftThreadContexts(composerDraftTarget, composerThreadContextsSnapshot);
-        setComposerDraftEnvironmentContexts(
-          composerDraftTarget,
-          composerEnvironmentContextsSnapshot,
-        );
         composerRef.current?.resetCursorState({
           cursor: collapseExpandedComposerCursor(messageTextForSend, messageTextForSend.length),
           prompt: messageTextForSend,
@@ -10943,9 +10928,8 @@ export default function ChatView(props: ChatViewProps) {
             activeThreadId={activeThread.id}
             isServerThread={isServerThread}
             activeThreadTitle={activeThread.title}
-            activeThreadLinkOrigin={activeThreadShell?.linkOrigin?.label ?? null}
             activeProject={activeProject ?? null}
-            parentThreadLink={headerParentThreadLink}
+            parentThreadLink={parentThreadLink}
             onOpenThread={onOpenRelatedThreadStable}
             rightPanelOpen={inlineRightPanelOwnsTitleBar}
             onNewThreadInProject={handleNewThreadInActiveProjectStable}
@@ -11228,7 +11212,11 @@ export default function ChatView(props: ChatViewProps) {
                               modelLabel={providerSubagentModelLabel}
                               effortLabel={providerSubagentEffortLabel}
                               status={providerSubagentStatus}
-                              onOpenParent={parentThreadLink?.open ?? null}
+                              onOpenParent={
+                                parentThreadLink
+                                  ? () => onOpenRelatedThread(parentThreadLink.threadId)
+                                  : null
+                              }
                             />
                           ) : null}
                           {!composerMounted ? null : (
@@ -11492,6 +11480,7 @@ export default function ChatView(props: ChatViewProps) {
                 key={`${activeThreadKey}:${previewMiniPlayerSourceKey(activePreviewMiniPlayer.source)}`}
                 threadRef={activeThreadRef}
                 miniPlayer={activePreviewMiniPlayer}
+                computerUse={computerUse}
               />
             ) : null}
 

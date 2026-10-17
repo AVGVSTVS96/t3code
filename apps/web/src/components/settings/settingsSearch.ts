@@ -55,9 +55,6 @@ export interface SettingsSearchItem {
   readonly localEnvironmentOnly?: boolean;
   readonly wslAvailableOnly?: boolean;
   readonly managedTunnelOnly?: boolean;
-  // Its section only renders for a connected environment with peer links that
-  // lets this session read its links.
-  readonly peerLinksOnly?: boolean;
   readonly secondary?: boolean;
   readonly requiresThreadAutoSettlement?: boolean;
 }
@@ -72,7 +69,6 @@ export interface SettingsSearchAvailability {
   readonly isWslSettingsRowVisible: boolean;
   readonly hasThreadAutoSettlement: boolean;
   readonly managedTunnelActive?: boolean;
-  readonly hasPeerLinkHost?: boolean;
 }
 
 export const SETTINGS_SECTION_LABELS: Readonly<Record<SettingsPath, string>> = {
@@ -677,6 +673,20 @@ export const SETTINGS_SEARCH_ITEMS = [
     searchTerms: ["allow simulator emulator ios android drive tools sessions"],
   },
   {
+    id: "agent-browser-tabs",
+    title: "Agent browser tabs",
+    to: "/settings/integrations",
+    targetId: "computer",
+    searchTerms: ["chrome devtools tabs sign-ins signed in browser remote debugging edge brave"],
+  },
+  {
+    id: "cua-computer-use",
+    title: "Computer use",
+    to: "/settings/integrations",
+    targetId: "computer",
+    searchTerms: ["cua driver apps desktop screen click type agents control mac linux windows"],
+  },
+  {
     id: "device-hub",
     title: "Device hub",
     to: "/settings/integrations",
@@ -954,14 +964,6 @@ export const SETTINGS_SEARCH_ITEMS = [
     ],
   },
   {
-    id: "linked-environments",
-    peerLinksOnly: true,
-    title: "Linked environments",
-    to: "/settings/connections",
-    targetId: "linked-environments",
-    searchTerms: ["link peer another machine vps agents work there handoff pairing code"],
-  },
-  {
     id: "remote-environments",
     title: "Environments",
     to: "/settings/connections",
@@ -1119,8 +1121,7 @@ export function filterAvailableSettingsSearchItems(
       (!item.localEnvironmentOnly || !availability.localEnvironmentDisabled) &&
       (!item.wslAvailableOnly || availability.isWslSettingsRowVisible) &&
       (!item.requiresThreadAutoSettlement || availability.hasThreadAutoSettlement) &&
-      (!item.managedTunnelOnly || availability.managedTunnelActive === true) &&
-      (!item.peerLinksOnly || availability.hasPeerLinkHost === true),
+      (!item.managedTunnelOnly || availability.managedTunnelActive === true),
   );
 }
 

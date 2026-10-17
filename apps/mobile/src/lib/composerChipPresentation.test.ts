@@ -17,14 +17,6 @@ describe("composerChipSizeSuffix", () => {
 });
 
 describe("contextChipPresentation image detection", () => {
-  it("draws a mentioned machine as a machine, not the generic file chip", async () => {
-    const { contextChipPresentation } = await import("./composerChipPresentation");
-    expect(contextChipPresentation("environment")).toEqual({
-      accent: "#3f9a4f",
-      symbol: "server.rack",
-    });
-  });
-
   it("treats a picture attached through the file picker as an image", async () => {
     const { contextChipPresentation } = await import("./composerChipPresentation");
     expect(

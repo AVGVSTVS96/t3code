@@ -51,10 +51,6 @@
       "types": "./src/secretRequest.ts",
       "default": "./src/secretRequest.ts"
     },
-    "./link-request": {
-      "types": "./src/linkRequest.ts",
-      "default": "./src/linkRequest.ts"
-    },
     "./scheduled-task-webhook": {
       "types": "./src/scheduledTaskWebhook.ts",
       "default": "./src/scheduledTaskWebhook.ts"
@@ -195,17 +191,13 @@
       "types": "./src/state/device.ts",
       "default": "./src/state/device.ts"
     },
+    "./state/cua": {
+      "types": "./src/state/cua.ts",
+      "default": "./src/state/cua.ts"
+    },
     "./state/deviceHubAccess": {
       "types": "./src/state/deviceHubAccess.ts",
       "default": "./src/state/deviceHubAccess.ts"
-    },
-    "./state/peerLinks": {
-      "types": "./src/state/peerLinks.ts",
-      "default": "./src/state/peerLinks.ts"
-    },
-    "./state/peerPairingCode": {
-      "types": "./src/state/peerPairingCode.ts",
-      "default": "./src/state/peerPairingCode.ts"
     },
     "./state/preview": {
       "types": "./src/state/preview.ts",

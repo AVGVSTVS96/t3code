@@ -21,11 +21,9 @@ import { AppText as Text } from "../../components/ui/AppText";
 import { useUniwindTheme } from "../../lib/useUniwindTheme";
 import { environmentThreadDetails } from "../../state/threads";
 import { NativeStackScreenOptions, nativeHeaderScrollEdgeEffects } from "../../native/StackHeader";
-import { useEnvironments } from "../../state/environments";
 import { SubagentRow } from "./SubagentRow";
 import { ScreenContent } from "../../components/ui/ScreenContent";
 import { useAdaptiveWorkspaceLayout } from "../layout/AdaptiveWorkspaceLayout";
-import { subagentThreadTarget } from "./threadAgentsPresentation";
 
 const HEADER_SCROLL_EDGE_EFFECTS = nativeHeaderScrollEdgeEffects(Platform.OS, Platform.Version);
 
@@ -53,14 +51,14 @@ export function ThreadAgentsSheet({ route }: StaticScreenProps<AgentsTarget>) {
   const subagents = turn?.subagents ?? [];
   const hasLiveAgent = (turn?.liveCount ?? 0) > 0;
 
-  const openChildThread = (child: { environmentId: EnvironmentId; threadId: ThreadId }) => {
+  const openChildThread = (childThreadId: ThreadId) => {
     void Haptics.selectionAsync();
     // Replace rather than push: the sheet is a leaf, and the child thread
     // belongs in the workspace stack where Home's back button expects it.
     navigation.dispatch(
       StackActions.replace("Thread", {
-        environmentId: child.environmentId,
-        threadId: child.threadId,
+        environmentId: target.environmentId,
+        threadId: childThreadId,
       }),
     );
   };
@@ -138,34 +136,26 @@ function AgentRow(props: {
   readonly environmentId: EnvironmentId;
   readonly subagent: OrchestrationV2Subagent;
   readonly tickSeconds: boolean;
-  readonly onOpen: (child: { environmentId: EnvironmentId; threadId: ThreadId }) => void;
+  readonly onOpen: (childThreadId: ThreadId) => void;
 }) {
   const { subagent } = props;
-  const { presentationById } = useEnvironments();
-  const target = subagentThreadTarget(subagent, props.environmentId, (id) =>
-    presentationById.has(id),
-  );
+  const childThreadId = subagent.childThreadId;
 
   const row = (
     <View className="border-b border-border py-3.5">
       <SubagentRow
         environmentId={props.environmentId}
         subagent={subagent}
-        canOpenRemote={target !== null}
         elapsed={<AgentElapsed subagent={subagent} tickSeconds={props.tickSeconds} />}
       />
     </View>
   );
 
-  if (target === null) {
+  if (childThreadId === null) {
     return (
       <View
         accessible
-        accessibilityHint={
-          subagent.remoteChild === undefined
-            ? "Provider-managed agent. Its work appears in the transcript."
-            : `Runs on ${subagent.remoteChild.label}. Connect to it to open its thread.`
-        }
+        accessibilityHint="Provider-managed agent. Its work appears in the transcript."
       >
         {row}
       </View>
@@ -176,7 +166,7 @@ function AgentRow(props: {
     <Pressable
       accessibilityRole="link"
       accessibilityHint="Opens this agent's thread"
-      onPress={() => props.onOpen(target)}
+      onPress={() => props.onOpen(childThreadId)}
       className="active:opacity-70"
     >
       {row}
