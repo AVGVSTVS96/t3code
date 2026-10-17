@@ -288,16 +288,6 @@ import {
 } from "./device.ts";
 import {} from "./previewAutomation.ts";
 import {
-  BrowserTabsAction,
-  BrowserTabsError,
-  BrowserTabsStatus,
-  CuaHostStatus,
-  CuaApplication,
-  CuaApplicationsError,
-  CuaWindowPreviewState,
-  CuaWindowPreviewSubscribeInput,
-} from "./cua.ts";
-import {
   ServerConfigStreamEvent,
   DesktopUpdateCommitInput,
   OtlpEndpointCheckInput,
@@ -474,10 +464,6 @@ export const WS_METHODS = {
 
   serverProbe: "server.probe",
   serverGetConfig: "server.getConfig",
-  serverCheckComputerUse: "server.checkComputerUse",
-  serverListApplications: "server.listApplications",
-  serverCheckBrowserTabs: "server.checkBrowserTabs",
-  serverRunBrowserTabsAction: "server.runBrowserTabsAction",
   serverRefreshProviders: "server.refreshProviders",
   serverUpdateProvider: "server.updateProvider",
   serverUpdateServer: "server.updateServer",
@@ -579,7 +565,6 @@ export const WS_METHODS = {
   subscribePreviewEvents: "subscribePreviewEvents",
   subscribeDiscoveredLocalServers: "subscribeDiscoveredLocalServers",
   subscribeDeviceState: "subscribeDeviceState",
-  subscribeCuaWindowPreview: "subscribeCuaWindowPreview",
   subscribeServerConfig: "subscribeServerConfig",
   subscribeServerLifecycle: "subscribeServerLifecycle",
   subscribeAuthAccess: "subscribeAuthAccess",
@@ -603,30 +588,6 @@ const WsServerProbeRpc = Rpc.make(WS_METHODS.serverProbe, {
   payload: Schema.Struct({}),
   success: Schema.Struct({}),
   error: EnvironmentAuthorizationError,
-});
-
-const WsServerCheckComputerUseRpc = Rpc.make(WS_METHODS.serverCheckComputerUse, {
-  payload: Schema.Struct({}),
-  success: CuaHostStatus,
-  error: EnvironmentAuthorizationError,
-});
-
-const WsServerListApplicationsRpc = Rpc.make(WS_METHODS.serverListApplications, {
-  payload: Schema.Struct({}),
-  success: Schema.Array(CuaApplication),
-  error: Schema.Union([CuaApplicationsError, EnvironmentAuthorizationError]),
-});
-
-const WsServerCheckBrowserTabsRpc = Rpc.make(WS_METHODS.serverCheckBrowserTabs, {
-  payload: Schema.Struct({}),
-  success: BrowserTabsStatus,
-  error: EnvironmentAuthorizationError,
-});
-
-const WsServerRunBrowserTabsActionRpc = Rpc.make(WS_METHODS.serverRunBrowserTabsAction, {
-  payload: Schema.Struct({ action: BrowserTabsAction }),
-  success: BrowserTabsStatus,
-  error: Schema.Union([BrowserTabsError, EnvironmentAuthorizationError]),
 });
 
 const WsServerGetConfigRpc = Rpc.make(WS_METHODS.serverGetConfig, {
@@ -1629,13 +1590,6 @@ const WsSubscribeDeviceStateRpc = Rpc.make(WS_METHODS.subscribeDeviceState, {
   stream: true,
 });
 
-const WsSubscribeCuaWindowPreviewRpc = Rpc.make(WS_METHODS.subscribeCuaWindowPreview, {
-  payload: CuaWindowPreviewSubscribeInput,
-  success: CuaWindowPreviewState,
-  error: EnvironmentAuthorizationError,
-  stream: true,
-});
-
 const WsOrchestrationV2DispatchCommandRpc = Rpc.make(ORCHESTRATION_V2_WS_METHODS.dispatchCommand, {
   payload: OrchestrationV2RpcSchemas.dispatchCommand.input,
   success: OrchestrationV2RpcSchemas.dispatchCommand.output,
@@ -1898,10 +1852,6 @@ export class RpcScopeAuthorization extends RpcMiddleware.Service<RpcScopeAuthori
 export const WsRpcGroup = RpcGroup.make(
   WsServerProbeRpc,
   WsServerGetConfigRpc,
-  WsServerCheckComputerUseRpc,
-  WsServerListApplicationsRpc,
-  WsServerCheckBrowserTabsRpc,
-  WsServerRunBrowserTabsActionRpc,
   WsServerRefreshProvidersRpc,
   WsServerUpdateProviderRpc,
   WsProviderConsumeResetCreditRpc,
@@ -2074,7 +2024,6 @@ export const WsRpcGroup = RpcGroup.make(
   WsDeviceDetailRpc,
   WsDeviceActionRpc,
   WsSubscribeDeviceStateRpc,
-  WsSubscribeCuaWindowPreviewRpc,
   WsSubscribeServerConfigRpc,
   WsSubscribeServerLifecycleRpc,
   WsSubscribeAuthAccessRpc,

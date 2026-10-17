@@ -42,10 +42,7 @@ import * as Schema from "effect/Schema";
 import * as Stream from "effect/Stream";
 
 import * as ProviderHost from "@t3tools/provider-core/server/ProviderHost";
-import {
-  cuaCallContext,
-  mcpToolPresentation,
-} from "@t3tools/provider-core/server/mcpToolPresentation";
+import { mcpToolPresentation } from "@t3tools/provider-core/server/mcpToolPresentation";
 import * as McpProviderSessions from "@t3tools/provider-core/server/McpProviderSessions";
 import * as McpProviderSession from "@t3tools/provider-core/server/mcpSession";
 import { CursorTransportFailure } from "./transportFailure.ts";
@@ -218,7 +215,6 @@ export function cursorMcpServers(
         Authorization: session.authorizationHeader,
       },
     },
-    ...McpProviderSession.localStdioMcpServers(session),
   };
 }
 
@@ -1290,14 +1286,6 @@ export const makeCursorAdapterV2 = Effect.fn("makeCursorAdapterV2")(function* (
                   ? mcpToolPresentation({
                       serverName: toolCall.args.providerIdentifier,
                       toolName: toolCall.args.toolName,
-                      ...cuaCallContext({
-                        serverName: toolCall.args.providerIdentifier,
-                        toolName: toolCall.args.toolName,
-                        threadId: base.threadId,
-                        status: base.status,
-                        args: toolCall.args.args,
-                        result: cursorToolOutput(toolCall),
-                      }),
                     })
                   : {}),
                 toolName: cursorToolName(toolCall),
@@ -2196,8 +2184,7 @@ export const makeCursorAdapterV2 = Effect.fn("makeCursorAdapterV2")(function* (
               detail: "Cursor turn requires non-empty text or attachments.",
             });
           }
-          const mcpSession = yield* mcpSessions.read(turnInput.threadId);
-          const text = `${userText}\n\n${buildRuntimeInstructions({ harness: "Cursor", model: turnInput.modelSelection.model, computerUse: mcpSession?.cuaDriver !== undefined, browserTabs: mcpSession?.browserTabs?.browserName })}`;
+          const text = `${userText}\n\n${buildRuntimeInstructions({ harness: "Cursor", model: turnInput.modelSelection.model })}`;
           return images.length === 0
             ? text
             : ({

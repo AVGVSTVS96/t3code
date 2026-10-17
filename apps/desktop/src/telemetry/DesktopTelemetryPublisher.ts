@@ -1,7 +1,5 @@
 import {
   DesktopHostTelemetryMessage,
-  type DesktopCuaDriverRequest,
-  type DesktopCuaDriverReport,
   type DesktopHostTelemetrySnapshot,
   type DesktopTelemetryControlMessage,
   type DesktopTelemetryCancelDesktopUpdate,
@@ -65,9 +63,6 @@ export class DesktopTelemetryPublisher extends Context.Service<
   {
     readonly latest: Effect.Effect<Option.Option<DesktopHostTelemetrySnapshot>>;
     readonly changes: Stream.Stream<DesktopHostTelemetrySnapshot>;
-    readonly cuaRequests: Stream.Stream<DesktopCuaDriverRequest>;
-    readonly publishCuaReport: (report: DesktopCuaDriverReport) => Effect.Effect<void>;
-    readonly encodedForSource: (sourceId: string) => Stream.Stream<Uint8Array>;
     readonly encoded: Stream.Stream<Uint8Array>;
     readonly handleControlForSource: (
       sourceId: string,
@@ -177,8 +172,6 @@ export const make = Effect.fn("desktop.telemetryPublisher.make")(function* () {
   const sequence = yield* Ref.make(0);
   const latestUpdateReport = yield* Ref.make(Option.none<DesktopUpdateStatusReport>());
   const updateReportChanges = yield* PubSub.sliding<DesktopUpdateStatusReport>(16);
-  const cuaRequests = yield* Queue.unbounded<DesktopCuaDriverRequest>();
-  const cuaReports = yield* PubSub.unbounded<DesktopCuaDriverReport>();
   const updateRequestQueue = yield* Queue.unbounded<DesktopTelemetryRequestDesktopUpdate>();
   const updateCommitQueue = yield* Queue.unbounded<DesktopTelemetryCommitDesktopUpdate>();
   const updateCancellationQueue = yield* Queue.unbounded<DesktopTelemetryCancelDesktopUpdate>();
@@ -327,10 +320,6 @@ export const make = Effect.fn("desktop.telemetryPublisher.make")(function* () {
     message,
   ) => {
     switch (message.type) {
-      case "cuaDriverRequest":
-        return sourceId === "primary"
-          ? Queue.offer(cuaRequests, message).pipe(Effect.asVoid)
-          : Effect.void;
       case "setDiagnosticsDemand":
         return Ref.modify(diagnosticsDemandSources, (sources) => {
           const previous = sources.size > 0;
@@ -374,16 +363,6 @@ export const make = Effect.fn("desktop.telemetryPublisher.make")(function* () {
         previous === enabled
           ? Effect.void
           : Queue.offer(sampleTriggers, undefined).pipe(Effect.asVoid),
-      ),
-      Effect.andThen(
-        sourceId === "primary"
-          ? Queue.offer(cuaRequests, {
-              version: 1,
-              type: "cuaDriverRequest",
-              requestId: "desktop-primary-detached",
-              enabled: false,
-            }).pipe(Effect.asVoid)
-          : Effect.void,
       ),
     );
 
@@ -434,22 +413,6 @@ export const make = Effect.fn("desktop.telemetryPublisher.make")(function* () {
     latest: Ref.get(latest),
     changes: Stream.fromPubSub(changes),
     encoded,
-    encodedForSource: (sourceId) =>
-      sourceId === "primary"
-        ? Stream.unwrap(
-            Effect.gen(function* () {
-              const subscription = yield* PubSub.subscribe(cuaReports);
-              return Stream.merge(
-                encoded,
-                Stream.fromSubscription(subscription).pipe(
-                  Stream.map((report) => textEncoder.encode(`${encodeMessage(report)}\n`)),
-                ),
-              );
-            }),
-          )
-        : encoded,
-    cuaRequests: Stream.fromQueue(cuaRequests),
-    publishCuaReport: (report) => PubSub.publish(cuaReports, report).pipe(Effect.asVoid),
     handleControlForSource,
     removeControlSource,
     publishUpdateReport,

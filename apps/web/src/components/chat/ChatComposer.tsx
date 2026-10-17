@@ -1,6 +1,4 @@
 import { formatProviderSkillDisplayName } from "@t3tools/shared/inlineSkills";
-import { formatNativeAppMention } from "@t3tools/shared/nativeAppMentions";
-import { useCuaApplications } from "~/state/cua";
 import { useComposerTypingGuard } from "./useComposerTypingGuard";
 import { DESKTOP_PASTE_AS_TEXT_EVENT } from "../../lib/desktopPasteAsText";
 import { runtimeModeConfig, runtimeModeOptions as runtimeModes } from "./runtimeModeConfig";
@@ -2487,7 +2485,6 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
   const settledPullRequestTextQuery =
     pullRequestTextQuery === debouncedPullRequestTextQuery ? pullRequestTextQuery : null;
   const isPathTrigger = composerTriggerKind === "path";
-  const applications = useCuaApplications(isPathTrigger ? environmentId : null);
   const environmentThreadShells = useThreadShells(isPathTrigger);
   const workspaceEntries = useComposerPathSearch({
     environmentId,
@@ -2579,19 +2576,6 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     if (!composerTrigger) return [];
     if (composerTrigger.kind === "path") {
       return [
-        ...(applications.data ?? [])
-          .filter((app) =>
-            app.name.toLocaleLowerCase().includes(composerTrigger.query.toLocaleLowerCase()),
-          )
-          .slice(0, 8)
-          .map((application) => ({
-            id: `application:${application.bundleId ?? application.launchPath ?? application.name}`,
-            type: "application" as const,
-            application,
-            environmentId,
-            label: application.name,
-            description: "Application",
-          })),
         ...matchComposerThreadItems({
           shells: environmentThreadShells,
           environmentId,
@@ -2743,7 +2727,6 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     return [];
   }, [
     activeThreadId,
-    applications.data,
     compactSlashCommandAvailable,
     composerTrigger,
     environmentId,
@@ -2833,7 +2816,6 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
   ]);
 
   const isComposerMenuLoading =
-    (isPathTrigger && applications.isPending) ||
     (composerTriggerKind === "path" && pathTriggerQuery.length > 0 && workspaceEntries.isPending) ||
     (composerTriggerKind === "pull-request" &&
       pullRequestProjectId !== null &&
@@ -2861,7 +2843,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         : "No pull requests found in this repository.";
     }
     return composerTriggerKind === "path"
-      ? "No matching files, threads, or applications."
+      ? "No matching files or folders."
       : "No matching command.";
   }, [
     composerTrigger,
@@ -3818,19 +3800,6 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     });
     const { snapshot, trigger } = resolveActiveComposerTrigger();
     if (!trigger) return;
-    if (item.type === "application") {
-      const replacement = `${formatNativeAppMention(item.application, item.environmentId)} `;
-      const replacementRangeEnd = extendReplacementRangeForTrailingSpace(
-        snapshot.value,
-        trigger.rangeEnd,
-        replacement,
-      );
-      const applied = applyPromptReplacement(trigger.rangeStart, replacementRangeEnd, replacement, {
-        expectedText: snapshot.value.slice(trigger.rangeStart, replacementRangeEnd),
-      });
-      if (applied) setComposerHighlightedItemId(null);
-      return;
-    }
     if (item.type === "path") {
       const replacement = `${serializeComposerFileLink(item.path)} `;
       const replacementRangeEnd = extendReplacementRangeForTrailingSpace(
@@ -6691,7 +6660,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                   ? isComposerMenuLoading
                     ? composerTriggerKind === "pull-request"
                       ? "Finding pull request..."
-                      : "Searching files, threads, and applications..."
+                      : "Searching workspace files..."
                     : composerMenuEmptyState
                   : ""}
               </div>
