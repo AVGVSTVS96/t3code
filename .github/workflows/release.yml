@@ -2,6 +2,10 @@ name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Upstream tag to release as. Defaults to the tag on the commit this fork last synced to.
+        required: false
 
 concurrency:
   group: release
@@ -33,6 +37,8 @@ jobs:
       - id: meta
         name: Find the upstream tag this fork is synced to
         shell: bash
+        env:
+          TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
           upstream="$(jq -r .upstream .autofork/config.json)"
@@ -43,10 +49,16 @@ jobs:
             exit 1
           fi
 
-          tags="$(git ls-remote --tags "https://github.com/$upstream" \
+          follow="$(jq -r .follow .autofork/config.json)"
+          tags="$TAG"
+          [[ -n "$tags" ]] || tags="$(git ls-remote --tags "https://github.com/$upstream" \
             | awk -v sha="$sha" 'index($1, sha) == 1 { sub("refs/tags/", "", $2); sub(/\^\{\}$/, "", $2); print $2 }' \
             | sort -uV)"
-          tag="$(grep -vm1 -- - <<<"$tags" || tail -n1 <<<"$tags")"
+          tag=""
+          if [[ "$follow" == *"*"* ]]; then
+            for candidate in $tags; do [[ "$candidate" == $follow ]] && tag="$candidate"; done
+          fi
+          [[ -n "$tag" ]] || tag="$(grep -vm1 -- - <<<"$tags" || tail -n1 <<<"$tags")"
           if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
             echo "No release tag on $upstream points at $sha (found: ${tags:-none})." >&2
             exit 1

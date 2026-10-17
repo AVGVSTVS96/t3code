@@ -34,7 +34,8 @@ jobs:
         if: steps.autofork.outputs.result == 'synced'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run release.yml --repo "$GITHUB_REPOSITORY"
+          TAG: ${{ steps.autofork.outputs.tag }}
+        run: gh workflow run release.yml --repo "$GITHUB_REPOSITORY" ${TAG:+-f tag="$TAG"}
 
       - name: Capture Claude accounting
         if: always()

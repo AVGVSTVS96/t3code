@@ -1,5 +1,5 @@
 {
   "upstream": "pingdotgg/t3code",
-  "follow": "prereleases",
+  "follow": "v*-nightly.*",
   "verify": "pnpm install --frozen-lockfile --ignore-scripts && pnpm --filter @t3tools/web typecheck"
 }
