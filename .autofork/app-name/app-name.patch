@@ -104,7 +104,7 @@ index 528609d36e608c9e2bb21493af1011bf651103c0..329be82c1d736bde827eeb01b2c705cf
    injectedDesktopAppBranding?.displayName ??
    formatAppDisplayName({ baseName: APP_BASE_NAME, stageLabel: APP_STAGE_LABEL });
 diff --git a/apps/web/src/routes/__root.tsx b/apps/web/src/routes/__root.tsx
-index 7bde1ecfd198c3498ec06f777a795132313fb8e3..881c3b5d650f2ea4a244b561ea238bc369bcbb52 100644
+index f8826276d7677f49078a80f265b41991b2373315..90df01dd120cdae4a88cef0568b96f7e71a05f7b 100644
 --- a/apps/web/src/routes/__root.tsx
 +++ b/apps/web/src/routes/__root.tsx
 @@ -14,8 +14,7 @@ import {
@@ -117,7 +117,7 @@ index 7bde1ecfd198c3498ec06f777a795132313fb8e3..881c3b5d650f2ea4a244b561ea238bc3
  import { AppSidebarLayout } from "../components/AppSidebarLayout";
  import { CommandPalette } from "../components/CommandPalette";
  import { CustomSnoozeDialogHost } from "../components/CustomSnoozeDialog";
-@@ -347,18 +346,9 @@ function FontAppearanceSync() {
+@@ -343,18 +342,9 @@ function FontAppearanceSync() {
  }
  
  function DocumentTitleSync() {
