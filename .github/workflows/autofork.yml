@@ -31,11 +31,11 @@ jobs:
 
       # Pushes made with GITHUB_TOKEN start no workflows, but dispatches do.
       - name: Release the synced build
-        if: steps.autofork.outputs.result == 'synced'
+        if: steps.autofork.outputs.result == 'synced' && steps.autofork.outputs.tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.autofork.outputs.tag }}
-        run: gh workflow run release.yml --repo "$GITHUB_REPOSITORY" ${TAG:+-f tag="$TAG"}
+        run: gh workflow run release.yml --repo "$GITHUB_REPOSITORY" -f tag="$TAG"
 
       - name: Capture Claude accounting
         if: always()

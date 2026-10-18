@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Upstream tag to release as. Defaults to the tag on the commit this fork last synced to.
-        required: false
+        description: Upstream release tag to build this fork's branch as. autofork.yml passes the tag each sync moved to.
+        required: true
 
 concurrency:
   group: release
@@ -30,45 +30,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
-          filter: blob:none
           sparse-checkout: .autofork
 
       - id: meta
-        name: Find the upstream tag this fork is synced to
+        name: Read the release version from the tag
         shell: bash
         env:
           TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "$TAG isn't a release tag." >&2
+            exit 1
+          fi
+
+          version="${TAG#v}"
           upstream="$(jq -r .upstream .autofork/config.json)"
-          subject="$(git log -1 --grep='^autofork: sync ' --format=%s)"
-          sha="${subject##* to }"
-          if [[ ! "$sha" =~ ^[0-9a-f]{7,40}$ ]]; then
-            echo "No autofork sync commit found in this branch's history." >&2
-            exit 1
-          fi
-
-          follow="$(jq -r .follow .autofork/config.json)"
-          tags="$TAG"
-          [[ -n "$tags" ]] || tags="$(git ls-remote --tags "https://github.com/$upstream" \
-            | awk -v sha="$sha" 'index($1, sha) == 1 { sub("refs/tags/", "", $2); sub(/\^\{\}$/, "", $2); print $2 }' \
-            | sort -uV)"
-          tag=""
-          if [[ "$follow" == *"*"* ]]; then
-            for candidate in $tags; do [[ "$candidate" == $follow ]] && tag="$candidate"; done
-          fi
-          [[ -n "$tag" ]] || tag="$(grep -vm1 -- - <<<"$tags" || tail -n1 <<<"$tags")"
-          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
-            echo "No release tag on $upstream points at $sha (found: ${tags:-none})." >&2
-            exit 1
-          fi
-
-          version="${tag#v}"
-          echo "Releasing $tag: $upstream@$sha plus this fork's patches, built from $GITHUB_SHA."
+          echo "Releasing $TAG: $upstream's release plus this fork's patches, built from $GITHUB_SHA."
           {
             echo "version=$version"
-            echo "tag=$tag"
+            echo "tag=$TAG"
             echo "upstream=$upstream"
             echo "prerelease=$([[ "$version" == *-* ]] && echo true || echo false)"
           } >> "$GITHUB_OUTPUT"
@@ -346,3 +327,31 @@ jobs:
           files: ${{ steps.release_files.outputs.files }}
           fail_on_unmatched_files: true
           token: ${{ github.token }}
+
+  # GitHub tells only whoever started a run that it failed, and autofork.yml's dispatch is started by GitHub's bot.
+  report:
+    name: Report a failed release
+    needs: [release]
+    if: failure()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Open an issue, or comment on the open one
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          title="Release failed"
+          issue="$(gh issue list -R "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number,title \
+            --jq "map(select(.title == \"$title\"))[0].number // empty")"
+          if [[ -n "$issue" ]]; then
+            gh issue comment "$issue" -R "$GITHUB_REPOSITORY" --body "Releasing $TAG failed too: $RUN"
+          else
+            gh issue create -R "$GITHUB_REPOSITORY" --title "$title" --body "Releasing $TAG failed: $RUN
+
+          Installs update again once a Release run passes. Fix what broke and run Release with this tag, or let the next sync's release do it, then close this issue."
+          fi
