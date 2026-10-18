@@ -31,10 +31,10 @@ index c029592bee283030dbfc0320df6d2c4d95926406..14f489e8067a8b113ee569f83d9a52e5
  export const CLI_RELEASE_BASE_URL_ENV = "T3CODE_RELEASE_BASE_URL";
  
 diff --git a/packages/ssh/src/tunnel.test.ts b/packages/ssh/src/tunnel.test.ts
-index 701d4f87df4091fc37a7bb3de8542e406fe7d626..d3f57b3b4e566da2900cb863d9f2d5f75ed16072 100644
+index 692f105e4a577482d2b453c1551b4cd68baee612..3dcf69b29cfa200579c4201ea3e5c174bb2fa293 100644
 --- a/packages/ssh/src/tunnel.test.ts
 +++ b/packages/ssh/src/tunnel.test.ts
-@@ -108,7 +108,7 @@ describe("ssh tunnel scripts", () => {
+@@ -110,7 +110,7 @@ describe("ssh tunnel scripts", () => {
      assert.include(script, "T3_NODE_SCRIPT_PATH=''");
      assert.include(
        script,

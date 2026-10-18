@@ -10,10 +10,10 @@ index d78ac0fd286a369d0fe5d7f2ac59aa00e022f0b0..a357ed831f0a5f2e406ad86856ed81f9
 +  "productName": "T3 Code (Bassim's autofork)"
  }
 diff --git a/apps/desktop/src/app/DesktopAppIdentity.test.ts b/apps/desktop/src/app/DesktopAppIdentity.test.ts
-index eecea6ad926151c9d20384288cdce5c7144589be..80ebcd4b95e733adb0f5495ef4978a8d82449eb5 100644
+index 1cd8485a1ec9b7975ae6ebda39b02471383aca38..4561c29f4bf75cb01a9e7a9f23eb603726b6208e 100644
 --- a/apps/desktop/src/app/DesktopAppIdentity.test.ts
 +++ b/apps/desktop/src/app/DesktopAppIdentity.test.ts
-@@ -218,7 +218,7 @@ describe("DesktopAppIdentity", () => {
+@@ -219,7 +219,7 @@ describe("DesktopAppIdentity", () => {
          yield* identity.configure;
  
          assert.deepEqual(calls.setName, ["T3 Code Beta"]);
@@ -22,7 +22,7 @@ index eecea6ad926151c9d20384288cdce5c7144589be..80ebcd4b95e733adb0f5495ef4978a8d
          assert.equal(calls.setAboutPanelOptions[0]?.applicationVersion, "1.2.3");
          assert.equal(calls.setAboutPanelOptions[0]?.version, "0123456789ab");
          assert.deepEqual(calls.setDockIcon, []);
-@@ -261,7 +261,10 @@ describe("DesktopAppIdentity", () => {
+@@ -262,7 +262,10 @@ describe("DesktopAppIdentity", () => {
          assert.isDefined(runtimeName);
          assert.equal(runtimeName, `T3 Code ${stage}`);
          assert.match(runtimeName.replaceAll(" ", ""), /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/);
@@ -61,10 +61,10 @@ index dd15f879fd8ee8c397134002af13688b15c24068..58f93db145169234bd701774f382f994
          assert.include(
            identity.desktopEntry ?? "",
 diff --git a/apps/desktop/src/window/DesktopApplicationMenu.test.ts b/apps/desktop/src/window/DesktopApplicationMenu.test.ts
-index cb0e5fa7c4109e68d8ec67f1004c75767b1c44da..81fb34e347d02468a9912b5a89e148f59d8d7b71 100644
+index fa3960a34ee5d10128e30833fd8fbc58b017910f..fd21fadd87746e9eecb8e667aa2ac3e5f9ab6eac 100644
 --- a/apps/desktop/src/window/DesktopApplicationMenu.test.ts
 +++ b/apps/desktop/src/window/DesktopApplicationMenu.test.ts
-@@ -142,21 +142,21 @@ describe("DesktopApplicationMenu", () => {
+@@ -143,21 +143,21 @@ describe("DesktopApplicationMenu", () => {
        const template = yield* Deferred.await(applicationMenuTemplate);
        const applicationMenu = template[0];
        assert.isDefined(applicationMenu);
@@ -139,7 +139,7 @@ index ece2903be3d3e201c0c12796b0982a57c58a0862..f2f8ffc8dc5df80dbd8805583ee4b895
    return null;
  }
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index 1edd8f0551bec2565d15e088f79d48b1c2b90779..065429ccff922e27a251023a7080975bc8ce152f 100644
+index 8a0dbc4faa8b7bb8629ae834d8f968964546a645..b269e3ff424e2f3298378db70427c2520fab2ec2 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
 @@ -267,9 +267,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
@@ -158,7 +158,7 @@ index 1edd8f0551bec2565d15e088f79d48b1c2b90779..065429ccff922e27a251023a7080975b
    });
  
    it("switches desktop packaging icons to the nightly artwork for nightly versions", () => {
-@@ -682,7 +685,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -698,7 +701,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
          "**/*.map",
        ]);
        assert.deepStrictEqual(mac.dmg, {
@@ -168,7 +168,7 @@ index 1edd8f0551bec2565d15e088f79d48b1c2b90779..065429ccff922e27a251023a7080975b
          window: { width: 640, height: 432 },
          contents: [
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index 1c4d80f88822e42eb2b323f08a223ffac4283cb0..dd9a2c2683f75d3594c1376564f2d7587bf7c53d 100644
+index e58e15aeb3ee29aa1b0fcf889253f4e7a819846d..c19b13d6e78d6f538b587d1e12bc06b71cd09c7b 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
 @@ -2669,10 +2669,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {

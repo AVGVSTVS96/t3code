@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index f9c107a6e79c209e39ca4e985abdac79bc66ed5d..8302559c9baf64f5a7c1b37f712229faa448792a 100644
+index 063e9ecd086ee45d4493b37ebbd75d9f687f8249..fc8d72285cc49bdd24d0d30b03bbb4ef080c96ae 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -452,6 +452,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
+@@ -458,6 +458,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
  import { resolveThreadSyncPhase } from "../threadSync";
  import {
    hasAvailableCompactionProvider,
@@ -10,7 +10,7 @@ index f9c107a6e79c209e39ca4e985abdac79bc66ed5d..8302559c9baf64f5a7c1b37f712229fa
    hasDismissedResumeCompaction,
    shouldOfferResumeCompaction,
  } from "./chat/ContextWindowMeter.logic";
-@@ -5260,36 +5261,39 @@ export default function ChatView(props: ChatViewProps) {
+@@ -5295,36 +5296,39 @@ export default function ChatView(props: ChatViewProps) {
            ? "Compaction is unavailable for this provider"
            : "Compacting is unavailable right now"
      : null;
@@ -68,7 +68,7 @@ index f9c107a6e79c209e39ca4e985abdac79bc66ed5d..8302559c9baf64f5a7c1b37f712229fa
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const handleRestoreThreadBranch = () => {
      if (!canWriteSourceControl) return;
-@@ -6308,13 +6312,8 @@ export default function ChatView(props: ChatViewProps) {
+@@ -6344,13 +6348,8 @@ export default function ChatView(props: ChatViewProps) {
      );
      const messageIdForSend = newMessageId();
      const messageCreatedAt = new Date().toISOString();
@@ -84,7 +84,7 @@ index f9c107a6e79c209e39ca4e985abdac79bc66ed5d..8302559c9baf64f5a7c1b37f712229fa
      const turnDispatchMode = compactBeforeSend || sendQueuesBehindSetup ? "queue" : dispatchMode;
      const shouldQueueBehindActiveRun =
        compactBeforeSend ||
-@@ -6970,7 +6969,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -7010,7 +7009,7 @@ export default function ChatView(props: ChatViewProps) {
          failure = startResult;
        } else {
          turnStartSucceeded = true;
@@ -93,7 +93,7 @@ index f9c107a6e79c209e39ca4e985abdac79bc66ed5d..8302559c9baf64f5a7c1b37f712229fa
          clearUsageLimitsFor(routeThreadKey);
          if (turnUsesAttachmentUploads) {
            releaseDraftAttachments(composerAttachmentsSnapshot);
-@@ -8176,9 +8175,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -8217,9 +8216,12 @@ export default function ChatView(props: ChatViewProps) {
                                isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
                                queuedRunsControl={queuedRunsControl}
                                bannerItems={composerBannerItems}
@@ -109,10 +109,10 @@ index f9c107a6e79c209e39ca4e985abdac79bc66ed5d..8302559c9baf64f5a7c1b37f712229fa
                                  usageLimitsOffered &&
                                  usageLimitsKey !== null &&
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index ddca044b04685f5c29353ad844fa7c76ef7376e9..c3c7ea3f672564e3106bf136d07a4e4fea9c28ed 100644
+index 4370d0da4a785c8e7d9ac3b9c6e05f2227e86c7e..40307a087d8bbe1d2774807ecc8fd8824c984bc1 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -1371,7 +1371,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
+@@ -1378,7 +1378,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
    compactDisabledReason: string | null;
    compactBeforeSendTokens: number | null;
    keepFullHistory: boolean;
@@ -122,7 +122,7 @@ index ddca044b04685f5c29353ad844fa7c76ef7376e9..c3c7ea3f672564e3106bf136d07a4e4f
  }) {
    return (
      <>
-@@ -1414,6 +1415,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
+@@ -1421,6 +1422,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
          compactBeforeSendTokens={props.compactBeforeSendTokens}
          keepFullHistory={props.keepFullHistory}
          onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -130,7 +130,7 @@ index ddca044b04685f5c29353ad844fa7c76ef7376e9..c3c7ea3f672564e3106bf136d07a4e4f
        />
      </>
    );
-@@ -1516,9 +1518,11 @@ export interface ChatComposerProps {
+@@ -1523,9 +1525,11 @@ export interface ChatComposerProps {
    isPreparingWorktree: boolean;
    isCompacting: boolean;
    bannerItems: readonly ComposerBannerStackItem[];
@@ -143,7 +143,7 @@ index ddca044b04685f5c29353ad844fa7c76ef7376e9..c3c7ea3f672564e3106bf136d07a4e4f
    onUsageLimitsCommand?: (() => void) | undefined;
    environmentUnavailable: {
      readonly label: string;
-@@ -7329,6 +7333,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -7298,6 +7302,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
