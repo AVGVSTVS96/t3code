@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 10baf8ec91bc98d837dd19f50168c8fc28464ecc..0fe4450bd4567d5f13549b943418ae0f088fd812 100644
+index f9c107a6e79c209e39ca4e985abdac79bc66ed5d..8302559c9baf64f5a7c1b37f712229faa448792a 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -452,6 +452,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
@@ -10,7 +10,7 @@ index 10baf8ec91bc98d837dd19f50168c8fc28464ecc..0fe4450bd4567d5f13549b943418ae0f
    hasDismissedResumeCompaction,
    shouldOfferResumeCompaction,
  } from "./chat/ContextWindowMeter.logic";
-@@ -5250,36 +5251,39 @@ export default function ChatView(props: ChatViewProps) {
+@@ -5260,36 +5261,39 @@ export default function ChatView(props: ChatViewProps) {
            ? "Compaction is unavailable for this provider"
            : "Compacting is unavailable right now"
      : null;
@@ -68,7 +68,7 @@ index 10baf8ec91bc98d837dd19f50168c8fc28464ecc..0fe4450bd4567d5f13549b943418ae0f
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const handleRestoreThreadBranch = () => {
      if (!canWriteSourceControl) return;
-@@ -6298,13 +6302,8 @@ export default function ChatView(props: ChatViewProps) {
+@@ -6308,13 +6312,8 @@ export default function ChatView(props: ChatViewProps) {
      );
      const messageIdForSend = newMessageId();
      const messageCreatedAt = new Date().toISOString();
@@ -84,7 +84,7 @@ index 10baf8ec91bc98d837dd19f50168c8fc28464ecc..0fe4450bd4567d5f13549b943418ae0f
      const turnDispatchMode = compactBeforeSend || sendQueuesBehindSetup ? "queue" : dispatchMode;
      const shouldQueueBehindActiveRun =
        compactBeforeSend ||
-@@ -6960,7 +6959,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -6970,7 +6969,7 @@ export default function ChatView(props: ChatViewProps) {
          failure = startResult;
        } else {
          turnStartSucceeded = true;
@@ -93,7 +93,7 @@ index 10baf8ec91bc98d837dd19f50168c8fc28464ecc..0fe4450bd4567d5f13549b943418ae0f
          clearUsageLimitsFor(routeThreadKey);
          if (turnUsesAttachmentUploads) {
            releaseDraftAttachments(composerAttachmentsSnapshot);
-@@ -8166,9 +8165,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -8176,9 +8175,12 @@ export default function ChatView(props: ChatViewProps) {
                                isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
                                queuedRunsControl={queuedRunsControl}
                                bannerItems={composerBannerItems}
