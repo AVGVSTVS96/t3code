@@ -1,8 +1,8 @@
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index 20dedcabcdc54b14aa176ead12adc1a9a04736d5..2277d960eae5d5028218bec8fc57ff7292d9ada3 100644
+index b85ec535d739a8c71d9951845382f341d6995a23..1bc0a81587d805df484db5d1f6ce30c8d97f7445 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
-@@ -1016,7 +1016,6 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -1017,7 +1017,6 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
        assert.deepStrictEqual(linux.files, [...DESKTOP_FILE_EXCLUSIONS, ...LINUX_FILE_EXCLUSIONS]);
        assert.deepStrictEqual(win.files, DESKTOP_FILE_EXCLUSIONS);
        assert.deepStrictEqual(winWithoutWslRuntime.files, win.files);
@@ -10,7 +10,7 @@ index 20dedcabcdc54b14aa176ead12adc1a9a04736d5..2277d960eae5d5028218bec8fc57ff72
        assert.propertyVal(
          (mac.mac as Record<string, unknown>).extendInfo as Record<string, unknown>,
          "NSLocalNetworkUsageDescription",
-@@ -2402,6 +2401,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -2426,6 +2425,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
      }).pipe(Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv({ env: {} })))),
    );
  
@@ -37,7 +37,7 @@ index 20dedcabcdc54b14aa176ead12adc1a9a04736d5..2277d960eae5d5028218bec8fc57ff72
      Effect.gen(function* () {
        const config = yield* createBuildConfig(
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index 3698eb090a1665d15244ab23fcb2dd06dd2f7f78..f3ce59846cb5b7452912432a664e4c8033c15120 100644
+index caea713229545b08ffc9ce72465366f0d20e1bf7..4bb2684237b9852a5cd6cd26c107beaae88a74fc 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
 @@ -2915,7 +2915,8 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (

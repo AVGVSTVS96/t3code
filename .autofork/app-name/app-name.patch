@@ -139,10 +139,10 @@ index 31f944ef7fd4c15569ed784791f294a739cc221f..c12dfe4e1059e4931e7472cbc567562a
    return null;
  }
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index 77cf9ba3a26e96aea206ab08386fe86efe7fd0d8..20dedcabcdc54b14aa176ead12adc1a9a04736d5 100644
+index 7bf7fbe173e0b4c9730b93f8a69659824bbc99a1..b85ec535d739a8c71d9951845382f341d6995a23 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
-@@ -544,9 +544,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -545,9 +545,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
      assert.equal(resolveDesktopUpdateChannel("0.0.17"), "latest");
    });
  
@@ -158,7 +158,7 @@ index 77cf9ba3a26e96aea206ab08386fe86efe7fd0d8..20dedcabcdc54b14aa176ead12adc1a9
    });
  
    it("switches desktop packaging icons to the nightly artwork for nightly versions", () => {
-@@ -978,7 +981,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -979,7 +982,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
          "**/*.map",
        ]);
        assert.deepStrictEqual(mac.dmg, {
@@ -168,7 +168,7 @@ index 77cf9ba3a26e96aea206ab08386fe86efe7fd0d8..20dedcabcdc54b14aa176ead12adc1a9
          window: { width: 640, height: 432 },
          contents: [
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index 66f05377c323ab16145541eb8c46163af1c1659d..3698eb090a1665d15244ab23fcb2dd06dd2f7f78 100644
+index d2cff472634557e58d4f508ee4439bd5feeb218b..caea713229545b08ffc9ce72465366f0d20e1bf7 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
 @@ -2806,10 +2806,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
