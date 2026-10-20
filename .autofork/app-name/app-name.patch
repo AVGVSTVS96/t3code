@@ -1,5 +1,5 @@
 diff --git a/apps/desktop/package.json b/apps/desktop/package.json
-index d78ac0fd286a369d0fe5d7f2ac59aa00e022f0b0..a357ed831f0a5f2e406ad86856ed81f9a4f7d24a 100644
+index a6fe979100d64ce52d69e14570e15a55045b5772..e5eb26eb156661bc34e63d0c50541126a908fc61 100644
 --- a/apps/desktop/package.json
 +++ b/apps/desktop/package.json
 @@ -42,5 +42,5 @@
@@ -48,20 +48,20 @@ index ecf08255feb3f758bd2f785b07e2f57f4a9f4e67..e1b93c59bf174e2ffbc21d1f00527da0
  }
  
 diff --git a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
-index dd15f879fd8ee8c397134002af13688b15c24068..58f93db145169234bd701774f382f99432286b54 100644
+index d27251d7b2f926d2f3640ff6b53b429da2570da6..6783e1bbd3f7347158b16b845a27d20a912467ad 100644
 --- a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
 +++ b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
-@@ -175,7 +175,7 @@ describe("DesktopPreReadyPlatform", () => {
+@@ -237,7 +237,7 @@ describe("DesktopPreReadyPlatform", () => {
          const identity = yield* Effect.promise(() => portalIdentity);
          assert.equal(identity.desktopName, "com.t3tools.T3Code.desktop");
-         assert.include(identity.desktopEntry ?? "", 'Exec="/Applications/current.AppImage" %U');
+         assert.include(identity.desktopEntry ?? "", "Exec=/Applications/current.AppImage %U");
 -        assert.include(identity.desktopEntry ?? "", "Name=T3 Code (Beta)");
 +        assert.include(identity.desktopEntry ?? "", "Name=T3 Code (Bassim's autofork)");
          assert.include(identity.desktopEntry ?? "", "MimeType=x-scheme-handler/t3code;");
          assert.include(
            identity.desktopEntry ?? "",
 diff --git a/apps/desktop/src/window/DesktopApplicationMenu.test.ts b/apps/desktop/src/window/DesktopApplicationMenu.test.ts
-index fa3960a34ee5d10128e30833fd8fbc58b017910f..fd21fadd87746e9eecb8e667aa2ac3e5f9ab6eac 100644
+index a07a24a66c219a163a5c820fc7f50add44c67329..9a4030297beae0e7ac13e88e0cafe2de655a1840 100644
 --- a/apps/desktop/src/window/DesktopApplicationMenu.test.ts
 +++ b/apps/desktop/src/window/DesktopApplicationMenu.test.ts
 @@ -143,21 +143,21 @@ describe("DesktopApplicationMenu", () => {
@@ -91,7 +91,7 @@ index fa3960a34ee5d10128e30833fd8fbc58b017910f..fd21fadd87746e9eecb8e667aa2ac3e5
      }),
    );
 diff --git a/apps/web/src/branding.ts b/apps/web/src/branding.ts
-index 528609d36e608c9e2bb21493af1011bf651103c0..329be82c1d736bde827eeb01b2c705cfc99485de 100644
+index 7d14e2cea858b8215d5f1e21acd80f0fb410fce5..6e4dc59fc658eede039e6920ccd95e076d0a5a62 100644
 --- a/apps/web/src/branding.ts
 +++ b/apps/web/src/branding.ts
 @@ -20,7 +20,7 @@ export const APP_BASE_NAME = injectedDesktopAppBranding?.baseName ?? "T3 Code";
@@ -104,7 +104,7 @@ index 528609d36e608c9e2bb21493af1011bf651103c0..329be82c1d736bde827eeb01b2c705cf
    injectedDesktopAppBranding?.displayName ??
    formatAppDisplayName({ baseName: APP_BASE_NAME, stageLabel: APP_STAGE_LABEL });
 diff --git a/apps/web/src/routes/__root.tsx b/apps/web/src/routes/__root.tsx
-index ece2903be3d3e201c0c12796b0982a57c58a0862..f2f8ffc8dc5df80dbd8805583ee4b895c1912639 100644
+index 31f944ef7fd4c15569ed784791f294a739cc221f..c12dfe4e1059e4931e7472cbc567562a17fc25bc 100644
 --- a/apps/web/src/routes/__root.tsx
 +++ b/apps/web/src/routes/__root.tsx
 @@ -14,8 +14,7 @@ import {
@@ -117,7 +117,7 @@ index ece2903be3d3e201c0c12796b0982a57c58a0862..f2f8ffc8dc5df80dbd8805583ee4b895
  import { AppSidebarLayout } from "../components/AppSidebarLayout";
  import { CommandPalette } from "../components/CommandPalette";
  import { CustomSnoozeDialogHost } from "../components/CustomSnoozeDialog";
-@@ -352,18 +351,9 @@ function BrowserChromeThemeSync() {
+@@ -356,18 +355,9 @@ function BrowserChromeThemeSync() {
  }
  
  function DocumentTitleSync() {
@@ -139,10 +139,10 @@ index ece2903be3d3e201c0c12796b0982a57c58a0862..f2f8ffc8dc5df80dbd8805583ee4b895
    return null;
  }
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index 8a0dbc4faa8b7bb8629ae834d8f968964546a645..b269e3ff424e2f3298378db70427c2520fab2ec2 100644
+index 77cf9ba3a26e96aea206ab08386fe86efe7fd0d8..20dedcabcdc54b14aa176ead12adc1a9a04736d5 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
-@@ -267,9 +267,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -544,9 +544,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
      assert.equal(resolveDesktopUpdateChannel("0.0.17"), "latest");
    });
  
@@ -158,7 +158,7 @@ index 8a0dbc4faa8b7bb8629ae834d8f968964546a645..b269e3ff424e2f3298378db70427c252
    });
  
    it("switches desktop packaging icons to the nightly artwork for nightly versions", () => {
-@@ -698,7 +701,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -978,7 +981,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
          "**/*.map",
        ]);
        assert.deepStrictEqual(mac.dmg, {
@@ -168,10 +168,10 @@ index 8a0dbc4faa8b7bb8629ae834d8f968964546a645..b269e3ff424e2f3298378db70427c252
          window: { width: 640, height: 432 },
          contents: [
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index e58e15aeb3ee29aa1b0fcf889253f4e7a819846d..c19b13d6e78d6f538b587d1e12bc06b71cd09c7b 100644
+index 66f05377c323ab16145541eb8c46163af1c1659d..3698eb090a1665d15244ab23fcb2dd06dd2f7f78 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
-@@ -2669,10 +2669,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
+@@ -2806,10 +2806,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
    return `${trimmed.slice(0, versionSeparator)}/${trimmed.slice(versionSeparator + 1)}`;
  }
  

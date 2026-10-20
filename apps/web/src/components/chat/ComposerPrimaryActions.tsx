@@ -164,13 +164,20 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
           </button>
         </TooltipTrigger>
         <TooltipPopup>
-          <div>
-            {compactsBeforeSend
-              ? `Next send compacts ${compactTokens} tokens first. Click to keep full history`
-              : canToggleCompact
-                ? `Next send keeps all ${compactTokens} tokens. Click to compact first`
-                : `${compactTokens} tokens in context`}
-          </div>
+          {canToggleCompact ? (
+            <>
+              <div>
+                {compactsBeforeSend
+                  ? `Next send compacts ${compactTokens} tokens first.`
+                  : `Next send keeps all ${compactTokens} tokens.`}
+              </div>
+              <div>
+                {compactsBeforeSend ? "Click to keep full history" : "Click to compact first"}
+              </div>
+            </>
+          ) : (
+            <div>{compactTokens} tokens in context</div>
+          )}
           {promptCacheStatus ? <div>{promptCacheStatus}</div> : null}
         </TooltipPopup>
       </Tooltip>
@@ -296,7 +303,9 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
                   "h-9 rounded-l-none border-l border-message-action-foreground/20 px-2 sm:h-8",
                 )}
                 aria-label="Implementation actions"
-                {...pointerFocusProps}
+                onMouseDown={
+                  preserveComposerFocusOnPointerDown ? (event) => event.preventDefault() : undefined
+                }
                 disabled={isSendBusy || isSendDisabled || isConnecting || isEnvironmentUnavailable}
               />
             }

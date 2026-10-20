@@ -1,8 +1,8 @@
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index b269e3ff424e2f3298378db70427c2520fab2ec2..be7fe10728ebc1fc66dde81d6823cfa038ee23e0 100644
+index 20dedcabcdc54b14aa176ead12adc1a9a04736d5..2277d960eae5d5028218bec8fc57ff7292d9ada3 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
-@@ -736,7 +736,6 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -1016,7 +1016,6 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
        assert.deepStrictEqual(linux.files, [...DESKTOP_FILE_EXCLUSIONS, ...LINUX_FILE_EXCLUSIONS]);
        assert.deepStrictEqual(win.files, DESKTOP_FILE_EXCLUSIONS);
        assert.deepStrictEqual(winWithoutWslRuntime.files, win.files);
@@ -10,7 +10,7 @@ index b269e3ff424e2f3298378db70427c2520fab2ec2..be7fe10728ebc1fc66dde81d6823cfa0
        assert.propertyVal(
          (mac.mac as Record<string, unknown>).extendInfo as Record<string, unknown>,
          "NSLocalNetworkUsageDescription",
-@@ -2131,6 +2130,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -2402,6 +2401,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
      }).pipe(Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv({ env: {} })))),
    );
  
@@ -37,10 +37,10 @@ index b269e3ff424e2f3298378db70427c2520fab2ec2..be7fe10728ebc1fc66dde81d6823cfa0
      Effect.gen(function* () {
        const config = yield* createBuildConfig(
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index c19b13d6e78d6f538b587d1e12bc06b71cd09c7b..6fbb32be740e2d7b55ff9f535335a2f84ff144f9 100644
+index 3698eb090a1665d15244ab23fcb2dd06dd2f7f78..f3ce59846cb5b7452912432a664e4c8033c15120 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
-@@ -2774,7 +2774,8 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
+@@ -2915,7 +2915,8 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
            role: "Viewer",
          },
        ],
