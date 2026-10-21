@@ -1,18 +1,10 @@
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index b85ec535d739a8c71d9951845382f341d6995a23..1bc0a81587d805df484db5d1f6ce30c8d97f7445 100644
+index 6ad4413adb5671dd2766c0992bcb745fa4892290..e414d8790627f60257798df76354f4cefb61723d 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
-@@ -1017,7 +1017,6 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
-       assert.deepStrictEqual(linux.files, [...DESKTOP_FILE_EXCLUSIONS, ...LINUX_FILE_EXCLUSIONS]);
-       assert.deepStrictEqual(win.files, DESKTOP_FILE_EXCLUSIONS);
-       assert.deepStrictEqual(winWithoutWslRuntime.files, win.files);
--      assert.notProperty(mac.mac as Record<string, unknown>, "sign");
-       assert.propertyVal(
-         (mac.mac as Record<string, unknown>).extendInfo as Record<string, unknown>,
-         "NSLocalNetworkUsageDescription",
-@@ -2426,6 +2425,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
-     }).pipe(Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv({ env: {} })))),
-   );
+@@ -1485,6 +1485,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+     assert.notInclude(error.message, secret);
+   });
  
 +  it.effect("signs unsigned macOS builds ad hoc, without the hardened runtime", () =>
 +    Effect.gen(function* () {
@@ -33,9 +25,9 @@ index b85ec535d739a8c71d9951845382f341d6995a23..1bc0a81587d805df484db5d1f6ce30c8
 +    }).pipe(Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv({ env: {} })))),
 +  );
 +
-   it.effect("uses the nightly DMG background for nightly macOS builds", () =>
+   it.effect("signs Windows builds with signtool on Windows and the jsign hook elsewhere", () =>
      Effect.gen(function* () {
-       const config = yield* createBuildConfig(
+       const signedWinConfig = (hostPlatform: string) =>
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
 index caea713229545b08ffc9ce72465366f0d20e1bf7..4bb2684237b9852a5cd6cd26c107beaae88a74fc 100644
 --- a/scripts/build-desktop-artifact.ts
@@ -51,13 +43,37 @@ index caea713229545b08ffc9ce72465366f0d20e1bf7..4bb2684237b9852a5cd6cd26c107beaa
          ? {
              entitlements: macPasskeySigning.entitlementsPath,
 diff --git a/scripts/sign-macos.test.ts b/scripts/sign-macos.test.ts
-index fd8d365c90dba89df72396c8dd46e48645df2ec9..47892b051732264ed6b7fb7baf1e40489b02de8a 100644
---- a/scripts/sign-macos.test.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..47892b051732264ed6b7fb7baf1e40489b02de8a
+--- /dev/null
 +++ b/scripts/sign-macos.test.ts
-@@ -24,3 +24,24 @@ it("batches codesign calls without changing existing signing options", async ()
-     batchCodesignCalls: true,
-   });
- });
+@@ -0,0 +1,47 @@
++import { sign as signApplication, type SignOptions } from "@electron/osx-sign";
++import { expect, it, vi } from "vite-plus/test";
++
++import sign from "./sign-macos.ts";
++
++vi.mock("@electron/osx-sign", () => ({ sign: vi.fn() }));
++
++it("batches codesign calls without changing existing signing options", async () => {
++  const options = {
++    app: "/tmp/T3 Code.app",
++    identity: "Developer ID Application: T3 Tools, Inc.",
++    keychain: "/tmp/t3code.keychain",
++    provisioningProfile: "/tmp/t3code.provisionprofile",
++    optionsForFile: () => ({
++      entitlements: "/tmp/t3code.entitlements.plist",
++      hardenedRuntime: true,
++    }),
++  } satisfies SignOptions;
++
++  await sign(options);
++
++  expect(signApplication).toHaveBeenCalledExactlyOnceWith({
++    ...options,
++    batchCodesignCalls: true,
++  });
++});
 +
 +it("pins ad-hoc builds to their bundle id so later builds can update them", async () => {
 +  const options = {

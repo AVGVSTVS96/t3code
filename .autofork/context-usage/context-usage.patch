@@ -109,7 +109,7 @@ index 1f9eb813a455fb9e3c4dc229e1324f26467ee751..17457f813d5e153f4ce89c9c32e3577b
                                  usageLimitsOffered &&
                                  usageLimitsKey !== null &&
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index b62812f25775fb3dbab94b120da4c82771fcdf6e..2b6b40f464e4cb8ef4362321c3aa4b6c90c34912 100644
+index f600b831c53e6a0064fcc8d0ce5731cfa1f3656c..04066f9b1fc43bbc36ba8917effe4233ece914b0 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
 @@ -1386,7 +1386,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(

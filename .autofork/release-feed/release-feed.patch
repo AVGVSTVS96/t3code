@@ -1,8 +1,8 @@
 diff --git a/apps/mobile/src/features/settings/environment-maintenance.test.ts b/apps/mobile/src/features/settings/environment-maintenance.test.ts
-index 69adfd8b8d7da16d90214ebe355692c480199934..b0292eaab2f36c955aac5ad40e1f92e2f923f436 100644
+index 86b104a45e638d7a203658cda7f3033c6b2e4f54..0f7e39c9ae768beaeea83a82e311a85f1759d69a 100644
 --- a/apps/mobile/src/features/settings/environment-maintenance.test.ts
 +++ b/apps/mobile/src/features/settings/environment-maintenance.test.ts
-@@ -161,7 +161,7 @@ describe("environment release checks", () => {
+@@ -58,7 +58,7 @@ describe("environment release checks", () => {
    const signal = new AbortController().signal;
    const feed = (...tags: ReadonlyArray<string>) =>
      new Response(
@@ -11,16 +11,7 @@ index 69adfd8b8d7da16d90214ebe355692c480199934..b0292eaab2f36c955aac5ad40e1f92e2
          .map((tag) => `<entry><id>tag:github.com,2008:Repository/1/${tag}</id></entry>`)
          .join("")}</feed>`,
      );
-@@ -170,7 +170,7 @@ describe("environment release checks", () => {
-     vi.stubGlobal(
-       "fetch",
-       vi.fn(async (url: string, init?: RequestInit) =>
--        url === "https://github.com/pingdotgg/t3code/releases/latest" &&
-+        url === "https://github.com/AVGVSTVS96/t3code/releases/latest" &&
-         new Headers(init?.headers).get("Accept") === "application/json"
-           ? Response.json({ tag_name: "v1.1.0" })
-           : new Response(null, { status: 403 }),
-@@ -185,7 +185,7 @@ describe("environment release checks", () => {
+@@ -67,7 +67,7 @@ describe("environment release checks", () => {
      vi.stubGlobal(
        "fetch",
        vi.fn(async (url: string) =>
@@ -29,7 +20,7 @@ index 69adfd8b8d7da16d90214ebe355692c480199934..b0292eaab2f36c955aac5ad40e1f92e2
            ? feed(
                "desktop-preview",
                "v1.0.0-preview.20260924.3",
-@@ -211,11 +211,11 @@ describe("environment release checks", () => {
+@@ -93,11 +93,11 @@ describe("environment release checks", () => {
      vi.stubGlobal(
        "fetch",
        vi.fn(async (url: string) => {
@@ -45,10 +36,10 @@ index 69adfd8b8d7da16d90214ebe355692c480199934..b0292eaab2f36c955aac5ad40e1f92e2
              { tag_name: "v1.0.0-preview.20260925.1", draft: true },
              { tag_name: "v1.0.0-preview.20260924.3" },
 diff --git a/apps/server/src/cli/update.test.ts b/apps/server/src/cli/update.test.ts
-index 48c7c3a4f44cb0d77fa79345e7f8f3fbf6b88195..560ebc6d0a3f85d613ff2f8984b1ccb2f2e33f49 100644
+index e6a6eb5ee1dbfc7770d9383200cab117c3e07373..f044c456d77286f4ab06384577a3beb080339e60 100644
 --- a/apps/server/src/cli/update.test.ts
 +++ b/apps/server/src/cli/update.test.ts
-@@ -55,7 +55,7 @@ it.effect("authenticates each release page until the requested channel is found"
+@@ -18,7 +18,7 @@ it.effect("authenticates each release page until the requested channel is found"
      const httpClient = HttpClient.make((request) => {
        const url = new URL(request.url);
        assert.equal(url.origin, "https://api.github.com");
@@ -57,28 +48,6 @@ index 48c7c3a4f44cb0d77fa79345e7f8f3fbf6b88195..560ebc6d0a3f85d613ff2f8984b1ccb2
        assert.equal(request.headers.accept, "application/vnd.github+json");
        assert.equal(request.headers.authorization, "Bearer gh-token");
        const page = url.searchParams.get("page") ?? "";
-diff --git a/packages/shared/src/cliRelease.test.ts b/packages/shared/src/cliRelease.test.ts
-index 953d8999d750ac00c86a74ccffc17844885c3098..6e1d17bd8eaa8939cda08863b04ed90ceed1b9ff 100644
---- a/packages/shared/src/cliRelease.test.ts
-+++ b/packages/shared/src/cliRelease.test.ts
-@@ -32,7 +32,7 @@ describe("cliRelease", () => {
- 
-   it("resolves download URLs under the tagged release, honoring a mirror", () => {
-     expect(cliReleaseDownloadBaseUrl("1.2.3")).toBe(
--      "https://github.com/pingdotgg/t3code/releases/download/v1.2.3",
-+      "https://github.com/AVGVSTVS96/t3code/releases/download/v1.2.3",
-     );
-     expect(cliReleaseDownloadBaseUrl("1.2.3", "https://mirror.example/t3/")).toBe(
-       "https://mirror.example/t3/v1.2.3",
-@@ -85,7 +85,7 @@ describe("cliRelease", () => {
- 
-   it("pages through the release index at the largest page GitHub allows", () => {
-     expect(cliReleaseIndexPageUrl(1)).toBe(
--      "https://api.github.com/repos/pingdotgg/t3code/releases?per_page=100&page=1",
-+      "https://api.github.com/repos/AVGVSTVS96/t3code/releases?per_page=100&page=1",
-     );
-     expect(cliReleaseIndexPageUrl(3)).toContain("page=3");
-   });
 diff --git a/packages/shared/src/cliRelease.ts b/packages/shared/src/cliRelease.ts
 index 22476c632df20d1e9b4bb40d7f5d70a9edf25dc4..dc3d2682d83f659fab2c968c61c40729c8874297 100644
 --- a/packages/shared/src/cliRelease.ts
@@ -89,16 +58,3 @@ index 22476c632df20d1e9b4bb40d7f5d70a9edf25dc4..dc3d2682d83f659fab2c968c61c40729
  export const CLI_RELEASES_PAGE_URL = `https://github.com/${CLI_RELEASE_REPOSITORY}/releases`;
  export const CLI_RELEASE_CHECKSUMS_FILE = "SHA256SUMS";
  export const CLI_RELEASE_BASE_URL_ENV = "T3CODE_RELEASE_BASE_URL";
-diff --git a/packages/ssh/src/tunnel.test.ts b/packages/ssh/src/tunnel.test.ts
-index ff94ef833fbf9e28514dca40be07cbe4856c7179..9faa8439deff2d46bc71ac3d6b61938d5692757c 100644
---- a/packages/ssh/src/tunnel.test.ts
-+++ b/packages/ssh/src/tunnel.test.ts
-@@ -110,7 +110,7 @@ describe("ssh tunnel scripts", () => {
-     assert.include(script, "T3_NODE_SCRIPT_PATH=''");
-     assert.include(
-       script,
--      "T3_RELEASE_BASE_URL='https://github.com/pingdotgg/t3code/releases/download'",
-+      "T3_RELEASE_BASE_URL='https://github.com/AVGVSTVS96/t3code/releases/download'",
-     );
-     assert.include(script, 'T3_RUNTIME_DIR="$HOME/.t3/runtime/versions/$T3_ARCHIVE_VERSION"');
-     assert.include(script, 'T3_ARCHIVE="t3-$T3_ARCHIVE_VERSION-$T3_PLATFORM-$T3_ARCH.tar.gz"');

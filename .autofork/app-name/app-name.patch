@@ -1,5 +1,5 @@
 diff --git a/apps/desktop/package.json b/apps/desktop/package.json
-index a6fe979100d64ce52d69e14570e15a55045b5772..e5eb26eb156661bc34e63d0c50541126a908fc61 100644
+index 778c3d13f79175ad0e0a1906340e7e672ba5ab96..f73a52d02375acaee548537f09d2815266838e63 100644
 --- a/apps/desktop/package.json
 +++ b/apps/desktop/package.json
 @@ -42,5 +42,5 @@
@@ -10,19 +10,10 @@ index a6fe979100d64ce52d69e14570e15a55045b5772..e5eb26eb156661bc34e63d0c50541126
 +  "productName": "T3 Code (Bassim's autofork)"
  }
 diff --git a/apps/desktop/src/app/DesktopAppIdentity.test.ts b/apps/desktop/src/app/DesktopAppIdentity.test.ts
-index 1cd8485a1ec9b7975ae6ebda39b02471383aca38..4561c29f4bf75cb01a9e7a9f23eb603726b6208e 100644
+index 32e7b3b3118d9f062b1a9b625cba261db0af56eb..c8452738df97376e4dd45c7933055a94b01e7090 100644
 --- a/apps/desktop/src/app/DesktopAppIdentity.test.ts
 +++ b/apps/desktop/src/app/DesktopAppIdentity.test.ts
-@@ -219,7 +219,7 @@ describe("DesktopAppIdentity", () => {
-         yield* identity.configure;
- 
-         assert.deepEqual(calls.setName, ["T3 Code Beta"]);
--        assert.equal(calls.setAboutPanelOptions[0]?.applicationName, "T3 Code (Beta)");
-+        assert.equal(calls.setAboutPanelOptions[0]?.applicationName, "T3 Code (Bassim's autofork)");
-         assert.equal(calls.setAboutPanelOptions[0]?.applicationVersion, "1.2.3");
-         assert.equal(calls.setAboutPanelOptions[0]?.version, "0123456789ab");
-         assert.deepEqual(calls.setDockIcon, []);
-@@ -262,7 +262,10 @@ describe("DesktopAppIdentity", () => {
+@@ -201,7 +201,10 @@ describe("DesktopAppIdentity", () => {
          assert.isDefined(runtimeName);
          assert.equal(runtimeName, `T3 Code ${stage}`);
          assert.match(runtimeName.replaceAll(" ", ""), /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/);
@@ -48,10 +39,10 @@ index ecf08255feb3f758bd2f785b07e2f57f4a9f4e67..e1b93c59bf174e2ffbc21d1f00527da0
  }
  
 diff --git a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
-index d27251d7b2f926d2f3640ff6b53b429da2570da6..6783e1bbd3f7347158b16b845a27d20a912467ad 100644
+index 143a6e5fd87c74d21e49e41b3a7fd92809b1e1ec..e4a1b21d75f8360da5ddf3010b628b0f09d8ecf8 100644
 --- a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
 +++ b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
-@@ -237,7 +237,7 @@ describe("DesktopPreReadyPlatform", () => {
+@@ -155,7 +155,7 @@ describe("DesktopPreReadyPlatform", () => {
          const identity = yield* Effect.promise(() => portalIdentity);
          assert.equal(identity.desktopName, "com.t3tools.T3Code.desktop");
          assert.include(identity.desktopEntry ?? "", "Exec=/Applications/current.AppImage %U");
@@ -60,36 +51,6 @@ index d27251d7b2f926d2f3640ff6b53b429da2570da6..6783e1bbd3f7347158b16b845a27d20a
          assert.include(identity.desktopEntry ?? "", "MimeType=x-scheme-handler/t3code;");
          assert.include(
            identity.desktopEntry ?? "",
-diff --git a/apps/desktop/src/window/DesktopApplicationMenu.test.ts b/apps/desktop/src/window/DesktopApplicationMenu.test.ts
-index a07a24a66c219a163a5c820fc7f50add44c67329..9a4030297beae0e7ac13e88e0cafe2de655a1840 100644
---- a/apps/desktop/src/window/DesktopApplicationMenu.test.ts
-+++ b/apps/desktop/src/window/DesktopApplicationMenu.test.ts
-@@ -143,21 +143,21 @@ describe("DesktopApplicationMenu", () => {
-       const template = yield* Deferred.await(applicationMenuTemplate);
-       const applicationMenu = template[0];
-       assert.isDefined(applicationMenu);
--      assert.equal(applicationMenu.label, "T3 Code (Nightly)");
-+      assert.equal(applicationMenu.label, "T3 Code (Bassim's autofork)");
-       if (!Array.isArray(applicationMenu.submenu)) {
-         throw new Error("Expected application menu submenu to be an array.");
-       }
-       assert.equal(
-         applicationMenu.submenu.find((item) => item.role === "about")?.label,
--        "About T3 Code (Nightly)",
-+        "About T3 Code (Bassim's autofork)",
-       );
-       assert.equal(
-         applicationMenu.submenu.find((item) => item.role === "hide")?.label,
--        "Hide T3 Code (Nightly)",
-+        "Hide T3 Code (Bassim's autofork)",
-       );
-       assert.equal(
-         applicationMenu.submenu.find((item) => item.role === "quit")?.label,
--        "Quit T3 Code (Nightly)",
-+        "Quit T3 Code (Bassim's autofork)",
-       );
-     }),
-   );
 diff --git a/apps/web/src/branding.ts b/apps/web/src/branding.ts
 index 7d14e2cea858b8215d5f1e21acd80f0fb410fce5..6e4dc59fc658eede039e6920ccd95e076d0a5a62 100644
 --- a/apps/web/src/branding.ts
@@ -138,35 +99,6 @@ index 31f944ef7fd4c15569ed784791f294a739cc221f..c12dfe4e1059e4931e7472cbc567562a
  
    return null;
  }
-diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index 7bf7fbe173e0b4c9730b93f8a69659824bbc99a1..b85ec535d739a8c71d9951845382f341d6995a23 100644
---- a/scripts/build-desktop-artifact.test.ts
-+++ b/scripts/build-desktop-artifact.test.ts
-@@ -545,9 +545,12 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
-     assert.equal(resolveDesktopUpdateChannel("0.0.17"), "latest");
-   });
- 
--  it("switches desktop packaging product names to nightly for nightly builds", () => {
--    assert.equal(resolveDesktopProductName("0.1.0"), "T3 Code (Beta)");
--    assert.equal(resolveDesktopProductName("0.0.17-nightly.20260413.42"), "T3 Code (Nightly)");
-+  it("names every desktop build after the fork", () => {
-+    assert.equal(resolveDesktopProductName("0.0.17"), "T3 Code (Bassim's autofork)");
-+    assert.equal(
-+      resolveDesktopProductName("0.0.17-nightly.20260413.42"),
-+      "T3 Code (Bassim's autofork)",
-+    );
-   });
- 
-   it("switches desktop packaging icons to the nightly artwork for nightly versions", () => {
-@@ -979,7 +982,7 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
-         "**/*.map",
-       ]);
-       assert.deepStrictEqual(mac.dmg, {
--        title: "T3 Code (Beta) 1.2.3 Installer",
-+        title: "T3 Code (Bassim's autofork) 1.2.3 Installer",
-         background: "dmg/dmg-background-latest.png",
-         window: { width: 640, height: 432 },
-         contents: [
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
 index d2cff472634557e58d4f508ee4439bd5feeb218b..caea713229545b08ffc9ce72465366f0d20e1bf7 100644
 --- a/scripts/build-desktop-artifact.ts
