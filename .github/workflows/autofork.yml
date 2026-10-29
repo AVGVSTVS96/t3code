@@ -29,7 +29,9 @@ jobs:
         with:
           node-version: 24
       - id: autofork
-        uses: AVGVSTVS96/autofork@v1
+        uses: AVGVSTVS96/autofork@github-workflows
+        with:
+          workflow-token-url: https://autofork.com/api/github/token
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
