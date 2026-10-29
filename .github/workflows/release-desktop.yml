@@ -223,8 +223,6 @@ jobs:
       - name: Build CLI single-executable
         if: inputs.cli_archive
         shell: bash
-        env:
-          VP_NODE_VERSION: "26.8.2"
         run: node apps/server/scripts/cli.ts build-exe --verbose
 
       - name: Stage resource monitor for the CLI archive
@@ -239,6 +237,12 @@ jobs:
           target_dir="$RUNNER_TEMP/cli-resource-monitor/${{ inputs.resource_key }}"
           mkdir -p "$target_dir"
           cp "native/resource-monitor/target/${{ inputs.rust_target }}/release/${binary_name}" "$target_dir/$binary_name"
+
+      # The Linux archive ships libatomic.so.1 and points t3's RUNPATH at it.
+      - name: Install patchelf
+        if: inputs.cli_archive && inputs.platform == 'linux'
+        shell: bash
+        run: command -v patchelf || { sudo apt-get update && sudo apt-get install -y patchelf; }
 
       - name: Build CLI archive
         if: inputs.cli_archive

@@ -1,33 +1,37 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 1f9eb813a455fb9e3c4dc229e1324f26467ee751..17457f813d5e153f4ce89c9c32e3577b8f9eb8aa 100644
+index 1bf6f9b0fc0e8ad5fd341604013f2b32d2799c07..ad6b6e912e661c8e6d606d0417d8fef2f858bd59 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -471,6 +471,7 @@ import { ComposerSurface } from "./chat/ComposerSurface";
+@@ -311,6 +311,7 @@ import { modelFallbackBannerItem } from "./chat/ComposerUsageLimits";
+ import { ComposerSurface } from "./chat/ComposerSurface";
  import { resolveThreadSyncPhase } from "../threadSync";
  import {
-   hasAvailableCompactionProvider,
 +  describePromptCache,
+   hasAvailableCompactionProvider,
    hasDismissedResumeCompaction,
    shouldOfferResumeCompaction,
- } from "./chat/ContextWindowMeter.logic";
-@@ -5558,36 +5559,39 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2439,40 +2440,43 @@ export default function ChatView(props: ChatViewProps) {
            ? "Compaction is unavailable for this provider"
            : "Compacting is unavailable right now"
      : null;
 -  const resumeCompactionTokens =
 -    activeContextWindow &&
--    !resumeCompactionPermanentlyDismissed &&
--    !nativeResumeCompactionDismissed &&
 +  const compactBeforeSendAvailable =
 +    activeContextWindow !== null &&
-     !compactDisabled &&
-     !hasHeldQueuedRuns &&
--    multipleModelSelections === null &&
++    !compactDisabled &&
++    !hasHeldQueuedRuns &&
 +    multipleModelSelections === null;
 +  const resumeCompactionOffered =
 +    compactBeforeSendAvailable &&
-+    !resumeCompactionPermanentlyDismissed &&
-+    !nativeResumeCompactionDismissed &&
+     resolveIdleCompaction(
+       settings,
+       activeProviderInstanceId ?? ProviderInstanceId.make("claudeAgent"),
+     ) !== "off" &&
+     !resumeCompactionPermanentlyDismissed &&
+     !nativeResumeCompactionDismissed &&
+-    !compactDisabled &&
+-    !hasHeldQueuedRuns &&
+-    multipleModelSelections === null &&
      shouldOfferResumeCompaction({
        provider: selectedProvider,
        usedTokens: activeContextWindow.usedTokens,
@@ -39,10 +43,7 @@ index 1f9eb813a455fb9e3c4dc229e1324f26467ee751..17457f813d5e153f4ce89c9c32e3577b
 -      : null;
 -  const [fullHistoryThreadKeys, setFullHistoryThreadKeys] = useState<ReadonlySet<string>>(
 -    () => new Set(),
-+    });
-+  const [compactChoices, setCompactChoices] = useState<ReadonlyMap<string, boolean>>(
-+    () => new Map(),
-   );
+-  );
 -  const keepFullHistory = fullHistoryThreadKeys.has(routeThreadKey);
 -  const setKeepFullHistory = (threadKey: string, keep: boolean) => {
 -    setFullHistoryThreadKeys((current) => {
@@ -50,6 +51,10 @@ index 1f9eb813a455fb9e3c4dc229e1324f26467ee751..17457f813d5e153f4ce89c9c32e3577b
 -      const next = new Set(current);
 -      if (keep) next.add(threadKey);
 -      else next.delete(threadKey);
++    });
++  const [compactChoices, setCompactChoices] = useState<ReadonlyMap<string, boolean>>(
++    () => new Map(),
++  );
 +  const keepFullHistory = !(
 +    compactBeforeSendAvailable &&
 +    (compactChoices.get(routeThreadKey) ?? resumeCompactionOffered)
@@ -68,35 +73,28 @@ index 1f9eb813a455fb9e3c4dc229e1324f26467ee751..17457f813d5e153f4ce89c9c32e3577b
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const handleRestoreThreadBranch = () => {
      if (!canWriteSourceControl) return;
-@@ -6619,13 +6623,8 @@ export default function ChatView(props: ChatViewProps) {
-     );
-     const messageIdForSend = newMessageId();
-     const messageCreatedAt = new Date().toISOString();
--    // A stale Claude session compacts before this message so the turn does not re-read the
--    // old history. The message queues behind the /compact run, since steering into it is
--    // rejected.
--    const compactBeforeSend =
--      resumeCompactionTokens !== null &&
--      !keepFullHistory &&
--      messageTextForSend.toLowerCase() !== "/compact";
-+    // The message queues behind the /compact run, since steering into it is rejected.
-+    const compactBeforeSend = !keepFullHistory && messageTextForSend.toLowerCase() !== "/compact";
-     const turnDispatchMode = compactBeforeSend || sendQueuesBehindSetup ? "queue" : dispatchMode;
-     const shouldQueueBehindActiveRun =
-       compactBeforeSend ||
-@@ -7279,7 +7278,7 @@ export default function ChatView(props: ChatViewProps) {
-         failure = startResult;
-       } else {
-         turnStartSucceeded = true;
--        setKeepFullHistory(routeThreadKey, false);
-+        setCompactChoice(routeThreadKey, undefined);
-         clearUsageLimitsFor(routeThreadKey);
-         if (turnUsesAttachmentUploads) {
-           releaseDraftAttachments(composerAttachmentsSnapshot);
-@@ -8491,9 +8490,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2836,7 +2840,7 @@ export default function ChatView(props: ChatViewProps) {
+     panelAnimationsActive,
+     panelAnimationDurationMs,
+     keepFullHistory,
+-    resumeCompactionTokens,
++    resumeCompactionTokens: activeContextWindow?.usedTokens ?? null,
+     showPlanFollowUpPrompt,
+     usageLimitsKey,
+     usageLimitsOffered,
+@@ -2863,7 +2867,7 @@ export default function ChatView(props: ChatViewProps) {
+     },
+     setFeedbackSubmissionsByThreadKey,
+     setThreadError,
+-    setKeepFullHistory,
++    resetCompactChoice: (threadKey) => setCompactChoice(threadKey, undefined),
+     anchorNewTurn,
+     acknowledgeActiveThreadWoke,
+     handleInteractionModeChange,
+@@ -3523,9 +3527,12 @@ export default function ChatView(props: ChatViewProps) {
+                               }
                                isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
-                               queuedRunsControl={queuedRunsControl}
-                               bannerItems={composerBannerItems}
+                               bannerItems={isDraftHeroState ? [] : composerBannerItems}
 -                              resumeCompactionTokens={resumeCompactionTokens}
 +                              resumeCompactionTokens={activeContextWindow?.usedTokens ?? null}
                                keepFullHistory={keepFullHistory}
@@ -109,10 +107,32 @@ index 1f9eb813a455fb9e3c4dc229e1324f26467ee751..17457f813d5e153f4ce89c9c32e3577b
                                  usageLimitsOffered &&
                                  usageLimitsKey !== null &&
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index f600b831c53e6a0064fcc8d0ce5731cfa1f3656c..04066f9b1fc43bbc36ba8917effe4233ece914b0 100644
+index d7878cc29a1653d3138fdbbe938ec417da21cdd5..43b028cc657e8d2b2781ea6f31621b6141ffca56 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -1386,7 +1386,8 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
+@@ -380,7 +380,8 @@ export interface ChatComposerProps {
+   bannerItems: readonly ComposerBannerStackItem[];
+   resumeCompactionTokens: number | null;
+   keepFullHistory: boolean;
+-  onToggleKeepFullHistory: () => void;
++  onToggleKeepFullHistory?: (() => void) | undefined;
++  promptCacheStatus: string | null;
+   onUsageLimitsCommand?: (() => void) | undefined;
+   environmentUnavailable: {
+     readonly label: string;
+@@ -3498,6 +3499,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+                     compactBeforeSendTokens={props.resumeCompactionTokens}
+                     keepFullHistory={props.keepFullHistory}
+                     onToggleKeepFullHistory={props.onToggleKeepFullHistory}
++                    promptCacheStatus={props.promptCacheStatus}
+                     compactDisabled={compactDisabled || noProviderAvailable || isSendBusy}
+                     compactDisabledReason={resolvedCompactDisabledReason}
+                     {...(compactCommandAvailable
+diff --git a/apps/web/src/components/chat/ComposerFooterControls.tsx b/apps/web/src/components/chat/ComposerFooterControls.tsx
+index 46de66194dd0d6f55274a34237902344b9104139..48ec897899828149b841292c5f89ba8a0016999e 100644
+--- a/apps/web/src/components/chat/ComposerFooterControls.tsx
++++ b/apps/web/src/components/chat/ComposerFooterControls.tsx
+@@ -279,7 +279,8 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
    compactDisabledReason: string | null;
    compactBeforeSendTokens: number | null;
    keepFullHistory: boolean;
@@ -122,7 +142,7 @@ index f600b831c53e6a0064fcc8d0ce5731cfa1f3656c..04066f9b1fc43bbc36ba8917effe4233
  }) {
    return (
      <>
-@@ -1429,6 +1430,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
+@@ -321,6 +322,7 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
          compactBeforeSendTokens={props.compactBeforeSendTokens}
          keepFullHistory={props.keepFullHistory}
          onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -130,42 +150,12 @@ index f600b831c53e6a0064fcc8d0ce5731cfa1f3656c..04066f9b1fc43bbc36ba8917effe4233
        />
      </>
    );
-@@ -1531,9 +1533,11 @@ export interface ChatComposerProps {
-   isPreparingWorktree: boolean;
-   isCompacting: boolean;
-   bannerItems: readonly ComposerBannerStackItem[];
-+  /** Tokens in the thread's context window; null before the provider reports usage. */
-   resumeCompactionTokens: number | null;
-   keepFullHistory: boolean;
--  onToggleKeepFullHistory: () => void;
-+  onToggleKeepFullHistory?: (() => void) | undefined;
-+  promptCacheStatus: string | null;
-   onUsageLimitsCommand?: (() => void) | undefined;
-   environmentUnavailable: {
-     readonly label: string;
-@@ -7375,6 +7379,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
-                     compactBeforeSendTokens={props.resumeCompactionTokens}
-                     keepFullHistory={props.keepFullHistory}
-                     onToggleKeepFullHistory={props.onToggleKeepFullHistory}
-+                    promptCacheStatus={props.promptCacheStatus}
-                     compactDisabled={
-                       compactDisabled || noProviderAvailable || isSendBusy || isConnecting
-                     }
 diff --git a/apps/web/src/components/chat/ComposerPrimaryActions.tsx b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
-index 03d74039945eabec29e71648c6e2dd96845f555e..e946880126d09c96b37024a06b99fbab4cbeba97 100644
+index 965c95d481e998dacc9945f3134b8c7ea90a37be..f221c4e7733c60563b8b7bae43038d19997df88c 100644
 --- a/apps/web/src/components/chat/ComposerPrimaryActions.tsx
 +++ b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
-@@ -1,4 +1,4 @@
--import { memo, type MouseEventHandler, type PointerEventHandler } from "react";
-+import { memo, type MouseEventHandler, type PointerEventHandler, type ReactNode } from "react";
- import { CheckIcon, ChevronDownIcon, ChevronLeftIcon, Minimize2Icon, PlayIcon } from "lucide-react";
- import { CornerUpRight, ListPlus } from "lucide";
- import { MorphIcon } from "~/components/MorphIcon";
-@@ -50,9 +50,11 @@ interface ComposerPrimaryActionsProps {
-   onPreviousPendingQuestion: () => void;
-   onInterrupt: () => void;
+@@ -51,7 +51,8 @@ interface ComposerPrimaryActionsProps {
    onImplementPlanInNewThread: () => void;
-+  /** Tokens in the thread's context window. When set, a Compact chip shows the count. */
    compactBeforeSendTokens?: number | null;
    keepFullHistory?: boolean;
 -  onToggleKeepFullHistory?: () => void;
@@ -174,7 +164,7 @@ index 03d74039945eabec29e71648c6e2dd96845f555e..e946880126d09c96b37024a06b99fbab
  }
  
  const formatPendingPrimaryActionLabel = (input: {
-@@ -108,6 +110,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -106,6 +107,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
    compactBeforeSendTokens = null,
    keepFullHistory = false,
    onToggleKeepFullHistory,
@@ -182,43 +172,40 @@ index 03d74039945eabec29e71648c6e2dd96845f555e..e946880126d09c96b37024a06b99fbab
  }: ComposerPrimaryActionsProps) {
    const pointerFocusProps = preserveComposerFocusOnPointerDown
      ? { onPointerDown: preventPointerFocus }
-@@ -128,6 +131,67 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
-     environmentIdentificationMode === "artwork",
-   );
- 
-+  const showResume = canResume && !hasSendableContent && !isEditingQueuedMessage;
-+  const compactTokens =
-+    compactBeforeSendTokens !== null ? formatContextWindowTokens(compactBeforeSendTokens) : null;
-+  const canToggleCompact =
-+    compactTokens !== null &&
-+    onToggleKeepFullHistory !== undefined &&
-+    !showResume &&
-+    !isEditingQueuedMessage;
+@@ -269,7 +271,8 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+     compactBeforeSendTokens !== null && !showResume && !isEditingQueuedMessage
+       ? formatContextWindowTokens(compactBeforeSendTokens)
+       : null;
+-  const compactsBeforeSend = compactTokens !== null && !keepFullHistory;
++  const canToggleCompact = compactTokens !== null && onToggleKeepFullHistory !== undefined;
 +  const compactsBeforeSend = canToggleCompact && !keepFullHistory;
-+
-+  const compactChip =
-+    compactTokens === null ? null : (
-+      <Tooltip>
-+        <TooltipTrigger render={<span className="inline-flex" />}>
-+          <button
-+            type="button"
-+            className={cn(
-+              "flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-2.5 text-xs tabular-nums outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-64 sm:h-8 [&_svg]:pointer-events-none [&_svg]:size-3.5",
-+              compactsBeforeSend
-+                ? "border-warning/40 text-warning hover:bg-warning/8"
-+                : "border-border text-muted-foreground hover:text-foreground",
-+            )}
-+            {...pointerFocusProps}
-+            aria-pressed={compactsBeforeSend}
-+            aria-label={`Compact ${compactTokens} tokens of history before sending`}
-+            disabled={!canOperateThread || !canToggleCompact}
-+            onClick={onToggleKeepFullHistory}
-+          >
-+            <Minimize2Icon aria-hidden="true" />
-+            <span>{compactTokens}</span>
-+          </button>
-+        </TooltipTrigger>
-+        <TooltipPopup>
+ 
+   const submitLabel = showResume
+     ? "Resume thread"
+@@ -363,24 +366,32 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+               type="button"
+               className="flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-(--control-radius) px-2 font-medium text-base text-foreground/80 tabular-nums outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-64 sm:text-sm aria-pressed:bg-accent/60 aria-pressed:text-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:text-muted-foreground"
+               {...pointerFocusProps}
+-              aria-pressed={!keepFullHistory}
++              aria-pressed={compactsBeforeSend}
+               aria-label={`Compact ${compactTokens} tokens of history before sending`}
+-              disabled={!canOperateThread}
++              disabled={!canOperateThread || !canToggleCompact}
+               onClick={onToggleKeepFullHistory}
+             />
+           }
+         >
+           <Minimize2Icon aria-hidden="true" />
+-          {keepFullHistory ? "Keep" : "Compact"}
+           <span className="text-muted-foreground">{compactTokens}</span>
+         </TooltipTrigger>
+         <TooltipPopup>
+-          <div>
+-            {keepFullHistory
+-              ? `Next send keeps all ${compactTokens} tokens.`
+-              : `Next send compacts ${compactTokens} tokens first.`}
+-          </div>
+-          <div>{keepFullHistory ? "Click to compact first" : "Click to keep full history"}</div>
 +          {canToggleCompact ? (
 +            <>
 +              <div>
@@ -234,133 +221,11 @@ index 03d74039945eabec29e71648c6e2dd96845f555e..e946880126d09c96b37024a06b99fbab
 +            <div>{compactTokens} tokens in context</div>
 +          )}
 +          {promptCacheStatus ? <div>{promptCacheStatus}</div> : null}
-+        </TooltipPopup>
-+      </Tooltip>
-+    );
-+  const withCompactChip = (actions: ReactNode) =>
-+    compactChip === null ? (
-+      actions
-+    ) : (
-+      <div data-chat-composer-compact-send="true" className="flex items-center gap-2">
-+        {compactChip}
-+        {actions}
-+      </div>
-+    );
-+
-   const renderStopGenerationButton = (insidePendingAction: boolean) => (
-     <Tooltip key="interrupt">
-       <TooltipTrigger
-@@ -156,7 +220,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
-   );
- 
-   if (pendingAction) {
--    return (
-+    return withCompactChip(
-       <div className={cn("flex items-center justify-end", compact ? "gap-1.5" : "gap-2")}>
-         {canInterrupt ? renderStopGenerationButton(true) : null}
-         {pendingAction.questionIndex > 0 ? (
-@@ -201,13 +265,13 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
-             questionIndex: pendingAction.questionIndex,
-           })}
-         </button>
--      </div>
-+      </div>,
-     );
-   }
- 
-   if (showPlanFollowUpPrompt && (promptHasText || !canResume)) {
-     if (promptHasText) {
--      return (
-+      return withCompactChip(
-         <button
-           type="submit"
-           className={cn(messageActionPillClassName, "h-9 sm:h-8", compact ? "px-3" : "px-4")}
-@@ -215,11 +279,11 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
-           disabled={isSendBusy || isSendDisabled || isConnecting || isEnvironmentUnavailable}
-         >
-           {isConnecting || isSendBusy ? "Sending..." : "Refine"}
--        </button>
-+        </button>,
-       );
-     }
- 
--    return (
-+    return withCompactChip(
-       <div data-chat-composer-implement-actions="true" className="flex items-center justify-end">
-         <button
-           type="submit"
-@@ -259,22 +323,14 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
-             </MenuItem>
-           </MenuPopup>
-         </Menu>
--      </div>
-+      </div>,
-     );
-   }
- 
-   if (canInterrupt && !hasSendableContent && !isEditingQueuedMessage) {
--    return renderStopGenerationButton(false);
-+    return withCompactChip(renderStopGenerationButton(false));
-   }
- 
--  const showResume = canResume && !hasSendableContent && !isEditingQueuedMessage;
--
--  const compactTokens =
--    compactBeforeSendTokens !== null && !showResume && !isEditingQueuedMessage
--      ? formatContextWindowTokens(compactBeforeSendTokens)
--      : null;
--  const compactsBeforeSend = compactTokens !== null && !keepFullHistory;
--
-   const submitLabel = showResume
-     ? "Resume thread"
-     : isEditingQueuedMessage
-@@ -359,43 +415,5 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
-       <TooltipPopup>{submitTooltip}</TooltipPopup>
-     </Tooltip>
-   );
--  if (compactTokens === null) return submit;
--
--  return (
--    <div data-chat-composer-compact-send="true" className="flex items-center gap-2">
--      <Tooltip>
--        <TooltipTrigger
--          render={
--            <button
--              type="button"
--              className={cn(
--                "flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-2.5 text-xs tabular-nums outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-64 sm:h-8 [&_svg]:pointer-events-none [&_svg]:size-3.5",
--                keepFullHistory
--                  ? "border-border text-muted-foreground hover:text-foreground"
--                  : "border-warning/40 text-warning hover:bg-warning/8",
--              )}
--              {...pointerFocusProps}
--              aria-pressed={!keepFullHistory}
--              aria-label={`Compact ${compactTokens} tokens of history before sending`}
--              disabled={!canOperateThread}
--              onClick={onToggleKeepFullHistory}
--            />
--          }
--        >
--          <Minimize2Icon aria-hidden="true" />
--          {keepFullHistory ? "Full" : "Compact"}
--          <span>{compactTokens}</span>
--        </TooltipTrigger>
--        <TooltipPopup>
--          <div>
--            {keepFullHistory
--              ? `Next send keeps all ${compactTokens} tokens.`
--              : `Next send compacts ${compactTokens} tokens first.`}
--          </div>
--          <div>{keepFullHistory ? "Click to compact first" : "Click to keep full history"}</div>
--        </TooltipPopup>
--      </Tooltip>
--      {submit}
--    </div>
--  );
-+  return withCompactChip(submit);
- });
+         </TooltipPopup>
+       </Tooltip>
+       {submit}
 diff --git a/apps/web/src/components/chat/ContextWindowMeter.logic.ts b/apps/web/src/components/chat/ContextWindowMeter.logic.ts
-index 69c4fbbec5b6ec978d4050dc19ea4f764caf116b..7b9b2f7db46edaad9cc67126f6a4f84344f4a08e 100644
+index 5a0911a10a05f4880aba07c9b12b28a1bb4285cd..3ecea59842e71ef365f0497328e2719716fc9ca5 100644
 --- a/apps/web/src/components/chat/ContextWindowMeter.logic.ts
 +++ b/apps/web/src/components/chat/ContextWindowMeter.logic.ts
 @@ -1,4 +1,9 @@
@@ -378,10 +243,10 @@ index 69c4fbbec5b6ec978d4050dc19ea4f764caf116b..7b9b2f7db46edaad9cc67126f6a4f843
    resolveSelectableProviderInstanceEntry,
    type ProviderInstanceEntry,
  } from "../../providerInstances";
-+import { formatRelativeTimeLabel, formatRelativeTimeUntilLabel } from "../../timestampFormat";
- import { getTriggerDisplayModelName, type ModelEsque } from "./providerIconUtils";
++import { formatExpiresInLabel, formatRelativeTimeLabel } from "../../timestampFormat";
+ import { getDisplayModelName, type ModelEsque } from "./providerIconUtils";
  
- // Used when the provider did not report its cache TTL: Claude's 1h cache plus slack.
+ // Fallback TTL: Claude's 1h cache plus slack.
 @@ -84,6 +90,18 @@ export function shouldOfferResumeCompaction(input: {
    );
  }
@@ -394,10 +259,41 @@ index 69c4fbbec5b6ec978d4050dc19ea4f764caf116b..7b9b2f7db46edaad9cc67126f6a4f843
 +  if (!Number.isFinite(expiresAtMs)) return null;
 +  const expiresAt = new Date(expiresAtMs).toISOString();
 +  return expiresAtMs > Date.now()
-+    ? `Prompt cache warm, ${formatRelativeTimeUntilLabel(expiresAt)}`
++    ? `Prompt cache warm. ${formatExpiresInLabel(expiresAt)}`
 +    : `Prompt cache expired ${formatRelativeTimeLabel(expiresAt)}`;
 +}
 +
  export function resolveContextWindowModelDisplayName(
    selection: ModelSelection | null | undefined,
    modelOptionsByInstance: ReadonlyMap<ProviderInstanceId, ReadonlyArray<ModelEsque>>,
+diff --git a/apps/web/src/components/chat/useComposerSend.ts b/apps/web/src/components/chat/useComposerSend.ts
+index a5fa30ffe15a9642b447fd73d27674383556b5ec..78bf24d80919a4fc09ace35a67e1c93e52423a86 100644
+--- a/apps/web/src/components/chat/useComposerSend.ts
++++ b/apps/web/src/components/chat/useComposerSend.ts
+@@ -232,7 +232,7 @@ interface ComposerSendInput {
+     SetStateAction<Record<string, ReadonlyArray<CodexFeedbackSubmission>>>
+   >;
+   readonly setThreadError: ReturnType<typeof makeThreadErrorSetter>;
+-  readonly setKeepFullHistory: (threadKey: string, keep: boolean) => void;
++  readonly resetCompactChoice: (threadKey: string) => void;
+   readonly anchorNewTurn: TimelineFollow["anchorNewTurn"];
+   readonly acknowledgeActiveThreadWoke: () => void;
+   readonly handleInteractionModeChange: (mode: ProviderInteractionMode) => void;
+@@ -317,7 +317,7 @@ export function useComposerSend(input: ComposerSendInput) {
+     optimisticBlobPreviews,
+     setFeedbackSubmissionsByThreadKey,
+     setThreadError,
+-    setKeepFullHistory,
++    resetCompactChoice,
+     anchorNewTurn,
+     acknowledgeActiveThreadWoke,
+     handleInteractionModeChange,
+@@ -1329,7 +1329,7 @@ export function useComposerSend(input: ComposerSendInput) {
+         failure = startResult;
+       } else {
+         turnStartSucceeded = true;
+-        setKeepFullHistory(routeThreadKey, false);
++        resetCompactChoice(routeThreadKey);
+         clearUsageLimitsFor(routeThreadKey);
+         if (turnUsesAttachmentUploads) {
+           releaseDraftAttachments(composerAttachmentsSnapshot);

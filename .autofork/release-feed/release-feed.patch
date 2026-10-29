@@ -49,10 +49,13 @@ index e6a6eb5ee1dbfc7770d9383200cab117c3e07373..f044c456d77286f4ab06384577a3beb0
        assert.equal(request.headers.authorization, "Bearer gh-token");
        const page = url.searchParams.get("page") ?? "";
 diff --git a/packages/shared/src/cliRelease.ts b/packages/shared/src/cliRelease.ts
-index 22476c632df20d1e9b4bb40d7f5d70a9edf25dc4..dc3d2682d83f659fab2c968c61c40729c8874297 100644
+index 66777cc0444780e6910b8cc630e3f83b7e6b9c4e..a39745315d7d4c87c4f611206ff485deb5221a5b 100644
 --- a/packages/shared/src/cliRelease.ts
 +++ b/packages/shared/src/cliRelease.ts
-@@ -1,4 +1,4 @@
+@@ -3,7 +3,7 @@ import * as Schema from "effect/Schema";
+ 
+ import { compareSemverVersions } from "./semver.ts";
+ 
 -const CLI_RELEASE_REPOSITORY = "pingdotgg/t3code";
 +const CLI_RELEASE_REPOSITORY = "AVGVSTVS96/t3code";
  export const CLI_RELEASES_PAGE_URL = `https://github.com/${CLI_RELEASE_REPOSITORY}/releases`;

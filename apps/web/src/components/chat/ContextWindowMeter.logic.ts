@@ -13,10 +13,10 @@ import {
   resolveSelectableProviderInstanceEntry,
   type ProviderInstanceEntry,
 } from "../../providerInstances";
-import { formatRelativeTimeLabel, formatRelativeTimeUntilLabel } from "../../timestampFormat";
-import { getTriggerDisplayModelName, type ModelEsque } from "./providerIconUtils";
+import { formatExpiresInLabel, formatRelativeTimeLabel } from "../../timestampFormat";
+import { getDisplayModelName, type ModelEsque } from "./providerIconUtils";
 
-// Used when the provider did not report its cache TTL: Claude's 1h cache plus slack.
+// Fallback TTL: Claude's 1h cache plus slack.
 const CLAUDE_RESUME_COMPACTION_FALLBACK_MS = 70 * 60_000;
 
 export function providerSupportsManualCompaction(
@@ -98,7 +98,7 @@ export function describePromptCache(
   if (!Number.isFinite(expiresAtMs)) return null;
   const expiresAt = new Date(expiresAtMs).toISOString();
   return expiresAtMs > Date.now()
-    ? `Prompt cache warm, ${formatRelativeTimeUntilLabel(expiresAt)}`
+    ? `Prompt cache warm. ${formatExpiresInLabel(expiresAt)}`
     : `Prompt cache expired ${formatRelativeTimeLabel(expiresAt)}`;
 }
 
@@ -114,7 +114,7 @@ export function resolveContextWindowModelDisplayName(
     .get(selection.instanceId)
     ?.find((model) => model.slug === selection.model);
 
-  return selectedModel ? getTriggerDisplayModelName(selectedModel) : selection.model;
+  return selectedModel ? getDisplayModelName(selectedModel) : selection.model;
 }
 
 export function formatContextWindowCompactionMessage(

@@ -1,8 +1,8 @@
 diff --git a/apps/desktop/package.json b/apps/desktop/package.json
-index 778c3d13f79175ad0e0a1906340e7e672ba5ab96..f73a52d02375acaee548537f09d2815266838e63 100644
+index 886ccf3cd798fd6621826addc11c62fe2fad36f0..9d59c0effd5784e346783686092c9ba028e7e203 100644
 --- a/apps/desktop/package.json
 +++ b/apps/desktop/package.json
-@@ -42,5 +42,5 @@
+@@ -40,5 +40,5 @@
      "tailwindcss": "^4.0.0",
      "vite-plus": "catalog:"
    },
@@ -26,10 +26,10 @@ index 32e7b3b3118d9f062b1a9b625cba261db0af56eb..c8452738df97376e4dd45c7933055a94
        { calls, environment },
      );
 diff --git a/apps/desktop/src/app/DesktopEnvironment.ts b/apps/desktop/src/app/DesktopEnvironment.ts
-index ecf08255feb3f758bd2f785b07e2f57f4a9f4e67..e1b93c59bf174e2ffbc21d1f00527da0beb7b515 100644
+index 1066198b8f610569545870e16c71d7676b8eafe9..b0a1fa2b8291a193d41662601aa80c86d5742194 100644
 --- a/apps/desktop/src/app/DesktopEnvironment.ts
 +++ b/apps/desktop/src/app/DesktopEnvironment.ts
-@@ -106,7 +106,7 @@ export function resolveDesktopAppBranding(input: {
+@@ -107,7 +107,7 @@ export function resolveDesktopAppBranding(input: {
    return {
      baseName: APP_BASE_NAME,
      stageLabel,
@@ -39,7 +39,7 @@ index ecf08255feb3f758bd2f785b07e2f57f4a9f4e67..e1b93c59bf174e2ffbc21d1f00527da0
  }
  
 diff --git a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
-index 143a6e5fd87c74d21e49e41b3a7fd92809b1e1ec..e4a1b21d75f8360da5ddf3010b628b0f09d8ecf8 100644
+index f2b176ee3761f7d0863953e689cde96554c43491..d5aa55d6c15953a11e6aa2dae593ad8750747288 100644
 --- a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
 +++ b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
 @@ -155,7 +155,7 @@ describe("DesktopPreReadyPlatform", () => {
@@ -51,8 +51,50 @@ index 143a6e5fd87c74d21e49e41b3a7fd92809b1e1ec..e4a1b21d75f8360da5ddf3010b628b0f
          assert.include(identity.desktopEntry ?? "", "MimeType=x-scheme-handler/t3code;");
          assert.include(
            identity.desktopEntry ?? "",
+diff --git a/apps/web/src/appInit.tsx b/apps/web/src/appInit.tsx
+index b9312858e334beadb8c01052142282294c071a9c..094e40bf4ecfb728606a7395803a41b10956003f 100644
+--- a/apps/web/src/appInit.tsx
++++ b/apps/web/src/appInit.tsx
+@@ -20,8 +20,7 @@ import { startDesktopUpdateLaunchNotice } from "./components/sidebar/updateEvery
+ import { startSlowRpcRequestToasts } from "./components/SlowRpcRequestToastCoordinator";
+ import { startThreadNotifications } from "./components/ThreadNotificationCoordinator";
+ import { startGuideRunNotifications } from "./components/pullRequest/guide/PullRequestGuideRunCoordinator";
+-import { APP_BASE_NAME, APP_DISPLAY_NAME, APP_STAGE_LABEL } from "./branding";
+-import { resolveServerBackedAppDisplayName } from "./branding.logic";
++import { APP_DISPLAY_NAME } from "./branding";
+ import { isElectron } from "./env";
+ import {
+   subscribeComposerDraftModelReconciliation,
+@@ -45,7 +44,6 @@ import {
+ import { startProviderAuthDelivery } from "./providerAuthDelivery";
+ import { getRouter, type AppRouter } from "./router";
+ import { appAtomRegistry } from "./rpc/atomRegistry";
+-import { primaryServerConfigAtom } from "./state/server";
+ import { environmentShell } from "./state/shell";
+ import { installChatRouteCommands } from "./shortcuts/chatRouteCommands";
+ import { startWorkspaceFocus } from "./lib/workspaceFocus";
+@@ -104,18 +102,7 @@ function startClientAppearance(): void {
+ }
+ 
+ function startDocumentTitle(): void {
+-  appAtomRegistry.subscribe(
+-    primaryServerConfigAtom,
+-    (config) => {
+-      document.title = resolveServerBackedAppDisplayName({
+-        baseName: APP_BASE_NAME,
+-        fallbackDisplayName: APP_DISPLAY_NAME,
+-        fallbackStageLabel: APP_STAGE_LABEL,
+-        primaryServerVersion: config?.environment.serverVersion ?? null,
+-      });
+-    },
+-    { immediate: true },
+-  );
++  document.title = APP_DISPLAY_NAME;
+ }
+ 
+ /**
 diff --git a/apps/web/src/branding.ts b/apps/web/src/branding.ts
-index 7d14e2cea858b8215d5f1e21acd80f0fb410fce5..6e4dc59fc658eede039e6920ccd95e076d0a5a62 100644
+index 05b4fa6a8f9dae5321ab5fd9e55b8b4131a25a7f..f0ad919fd8176597444cbd2d6981b314edb9360a 100644
 --- a/apps/web/src/branding.ts
 +++ b/apps/web/src/branding.ts
 @@ -20,7 +20,7 @@ export const APP_BASE_NAME = injectedDesktopAppBranding?.baseName ?? "T3 Code";
@@ -64,46 +106,11 @@ index 7d14e2cea858b8215d5f1e21acd80f0fb410fce5..6e4dc59fc658eede039e6920ccd95e07
  export const APP_DISPLAY_NAME =
    injectedDesktopAppBranding?.displayName ??
    formatAppDisplayName({ baseName: APP_BASE_NAME, stageLabel: APP_STAGE_LABEL });
-diff --git a/apps/web/src/routes/__root.tsx b/apps/web/src/routes/__root.tsx
-index 31f944ef7fd4c15569ed784791f294a739cc221f..c12dfe4e1059e4931e7472cbc567562a17fc25bc 100644
---- a/apps/web/src/routes/__root.tsx
-+++ b/apps/web/src/routes/__root.tsx
-@@ -14,8 +14,7 @@ import {
- import { Check, Copy } from "lucide";
- import { useEffect, useEffectEvent, useRef, useState } from "react";
- 
--import { APP_BASE_NAME, APP_DISPLAY_NAME, APP_STAGE_LABEL, APP_VERSION } from "../branding";
--import { resolveServerBackedAppDisplayName } from "../branding.logic";
-+import { APP_DISPLAY_NAME, APP_VERSION } from "../branding";
- import { AppSidebarLayout } from "../components/AppSidebarLayout";
- import { CommandPalette } from "../components/CommandPalette";
- import { CustomSnoozeDialogHost } from "../components/CustomSnoozeDialog";
-@@ -356,18 +355,9 @@ function BrowserChromeThemeSync() {
- }
- 
- function DocumentTitleSync() {
--  const primaryServerVersion =
--    useAtomValue(primaryServerConfigAtom)?.environment.serverVersion ?? null;
--  const title = resolveServerBackedAppDisplayName({
--    baseName: APP_BASE_NAME,
--    fallbackDisplayName: APP_DISPLAY_NAME,
--    fallbackStageLabel: APP_STAGE_LABEL,
--    primaryServerVersion,
--  });
--
-   useEffect(() => {
--    document.title = title;
--  }, [title]);
-+    document.title = APP_DISPLAY_NAME;
-+  }, []);
- 
-   return null;
- }
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index d2cff472634557e58d4f508ee4439bd5feeb218b..caea713229545b08ffc9ce72465366f0d20e1bf7 100644
+index 3a8686f248f0a09c17b5e9c2e93d6f82e298e2bc..39155020eae72c758b1856d0935fd77f9fb3232f 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
-@@ -2806,10 +2806,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
+@@ -2748,10 +2748,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
    return `${trimmed.slice(0, versionSeparator)}/${trimmed.slice(versionSeparator + 1)}`;
  }
  
