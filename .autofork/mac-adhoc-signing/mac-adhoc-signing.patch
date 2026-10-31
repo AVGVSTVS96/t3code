@@ -1,8 +1,8 @@
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index a4cef9ba03b8d1bf93a0e9ccc624af871048da9e..231195cb8c5a8561c936e2a3a6274951f380611d 100644
+index 165ca80cb30a33351cdaddec7129b881a92ecb49..fe66a4cd9ed2b1b92dacba7195d03601760353d1 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
-@@ -1559,6 +1559,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -1560,6 +1560,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
      assert.notInclude(error.message, secret);
    });
  
@@ -29,7 +29,7 @@ index a4cef9ba03b8d1bf93a0e9ccc624af871048da9e..231195cb8c5a8561c936e2a3a6274951
      Effect.gen(function* () {
        const signedWinConfig = (hostPlatform: string) =>
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index 39155020eae72c758b1856d0935fd77f9fb3232f..6c012f6b900079e93df12466e27f4d07c550b9b1 100644
+index f28e17eb1f690f6b804825dff66e5e1a2549eb89..665ceb796f8b0e8fa7738547ea88b639508e67c9 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
 @@ -2853,7 +2853,8 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (

@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 4171499367550c52a8ef0513a5311298d6338ced..f39d86360588e95ccf3e15210290f47f72d9dec1 100644
+index 63ff8b8463eeef73f4b9b95ecdcea5a93fc59ed0..eee03c60c42489adaa200a33c77de205cd420a50 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -311,6 +311,7 @@ import { modelFallbackBannerItem } from "./chat/ComposerUsageLimits";
@@ -10,7 +10,7 @@ index 4171499367550c52a8ef0513a5311298d6338ced..f39d86360588e95ccf3e15210290f47f
    hasAvailableCompactionProvider,
    hasDismissedResumeCompaction,
    shouldOfferResumeCompaction,
-@@ -2446,40 +2447,43 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2445,40 +2446,43 @@ export default function ChatView(props: ChatViewProps) {
            ? "Compaction is unavailable for this provider"
            : "Compacting is unavailable right now"
      : null;
@@ -73,7 +73,7 @@ index 4171499367550c52a8ef0513a5311298d6338ced..f39d86360588e95ccf3e15210290f47f
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const handleRestoreThreadBranch = () => {
      if (!canWriteSourceControl) return;
-@@ -2843,7 +2847,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2842,7 +2846,7 @@ export default function ChatView(props: ChatViewProps) {
      panelAnimationsActive,
      panelAnimationDurationMs,
      keepFullHistory,
@@ -82,7 +82,7 @@ index 4171499367550c52a8ef0513a5311298d6338ced..f39d86360588e95ccf3e15210290f47f
      showPlanFollowUpPrompt,
      usageLimitsKey,
      usageLimitsOffered,
-@@ -2870,7 +2874,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2869,7 +2873,7 @@ export default function ChatView(props: ChatViewProps) {
      },
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -91,7 +91,7 @@ index 4171499367550c52a8ef0513a5311298d6338ced..f39d86360588e95ccf3e15210290f47f
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      handleInteractionModeChange,
-@@ -3527,9 +3531,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3526,9 +3530,12 @@ export default function ChatView(props: ChatViewProps) {
                                }
                                isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
                                bannerItems={isDraftHeroState ? [] : composerBannerItems}
@@ -107,10 +107,10 @@ index 4171499367550c52a8ef0513a5311298d6338ced..f39d86360588e95ccf3e15210290f47f
                                  usageLimitsOffered &&
                                  usageLimitsKey !== null &&
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index ae0bb19336e0e756ded38990129603a4a79af1ca..df60e47e818e5a402689f932728acbde95d08a6a 100644
+index c4963ad73ba3a0bb3b31c6ec0edbc1999dd81db6..bd0719a14a9c81b65f40c291a2a83fe47958eb9b 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -380,7 +380,8 @@ export interface ChatComposerProps {
+@@ -379,7 +379,8 @@ export interface ChatComposerProps {
    bannerItems: readonly ComposerBannerStackItem[];
    resumeCompactionTokens: number | null;
    keepFullHistory: boolean;
@@ -120,7 +120,7 @@ index ae0bb19336e0e756ded38990129603a4a79af1ca..df60e47e818e5a402689f932728acbde
    onUsageLimitsCommand?: (() => void) | undefined;
    environmentUnavailable: {
      readonly label: string;
-@@ -3499,6 +3500,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -3478,6 +3479,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -151,7 +151,7 @@ index 46de66194dd0d6f55274a34237902344b9104139..48ec897899828149b841292c5f89ba8a
      </>
    );
 diff --git a/apps/web/src/components/chat/ComposerPrimaryActions.tsx b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
-index 965c95d481e998dacc9945f3134b8c7ea90a37be..f221c4e7733c60563b8b7bae43038d19997df88c 100644
+index a4a8993a7036e3665f5c676a46d1600b68a472d1..f221c4e7733c60563b8b7bae43038d19997df88c 100644
 --- a/apps/web/src/components/chat/ComposerPrimaryActions.tsx
 +++ b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
 @@ -51,7 +51,8 @@ interface ComposerPrimaryActionsProps {
@@ -182,7 +182,7 @@ index 965c95d481e998dacc9945f3134b8c7ea90a37be..f221c4e7733c60563b8b7bae43038d19
  
    const submitLabel = showResume
      ? "Resume thread"
-@@ -363,24 +366,32 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -363,26 +366,32 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
                type="button"
                className="flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-(--control-radius) px-2 font-medium text-base text-foreground/80 tabular-nums outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-64 sm:text-sm aria-pressed:bg-accent/60 aria-pressed:text-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:text-muted-foreground"
                {...pointerFocusProps}
@@ -196,7 +196,9 @@ index 965c95d481e998dacc9945f3134b8c7ea90a37be..f221c4e7733c60563b8b7bae43038d19
            }
          >
            <Minimize2Icon aria-hidden="true" />
--          {keepFullHistory ? "Keep" : "Compact"}
+-          <span className="@max-[480px]/composer-surface:hidden">
+-            {keepFullHistory ? "Keep" : "Compact"}
+-          </span>
            <span className="text-muted-foreground">{compactTokens}</span>
          </TooltipTrigger>
          <TooltipPopup>
@@ -267,10 +269,10 @@ index 5a0911a10a05f4880aba07c9b12b28a1bb4285cd..3ecea59842e71ef365f0497328e27197
    selection: ModelSelection | null | undefined,
    modelOptionsByInstance: ReadonlyMap<ProviderInstanceId, ReadonlyArray<ModelEsque>>,
 diff --git a/apps/web/src/components/chat/useComposerSend.ts b/apps/web/src/components/chat/useComposerSend.ts
-index a5fa30ffe15a9642b447fd73d27674383556b5ec..78bf24d80919a4fc09ace35a67e1c93e52423a86 100644
+index a3bdcd2d9c502f0461296dcb2ad2780c67376c4c..44cfdaa569bdc7f98502884b7b51ec522bdf6700 100644
 --- a/apps/web/src/components/chat/useComposerSend.ts
 +++ b/apps/web/src/components/chat/useComposerSend.ts
-@@ -232,7 +232,7 @@ interface ComposerSendInput {
+@@ -233,7 +233,7 @@ interface ComposerSendInput {
      SetStateAction<Record<string, ReadonlyArray<CodexFeedbackSubmission>>>
    >;
    readonly setThreadError: ReturnType<typeof makeThreadErrorSetter>;
@@ -279,7 +281,7 @@ index a5fa30ffe15a9642b447fd73d27674383556b5ec..78bf24d80919a4fc09ace35a67e1c93e
    readonly anchorNewTurn: TimelineFollow["anchorNewTurn"];
    readonly acknowledgeActiveThreadWoke: () => void;
    readonly handleInteractionModeChange: (mode: ProviderInteractionMode) => void;
-@@ -317,7 +317,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -318,7 +318,7 @@ export function useComposerSend(input: ComposerSendInput) {
      optimisticBlobPreviews,
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -288,7 +290,7 @@ index a5fa30ffe15a9642b447fd73d27674383556b5ec..78bf24d80919a4fc09ace35a67e1c93e
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      handleInteractionModeChange,
-@@ -1329,7 +1329,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -1330,7 +1330,7 @@ export function useComposerSend(input: ComposerSendInput) {
          failure = startResult;
        } else {
          turnStartSucceeded = true;
