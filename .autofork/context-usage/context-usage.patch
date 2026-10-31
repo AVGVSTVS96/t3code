@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 22ccaaaf807ee0618fafe1ecb9aac65b70f26374..f0d16f359b3debdfc32ba5c0306cfaa659cffe70 100644
+index e15424cf090fa3e3f4700d2f59724281e921b3a9..32aaf6fd0e47cade1dbbb12676d0073abd0b1253 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -314,6 +314,7 @@ import { modelFallbackBannerItem } from "./chat/ComposerUsageLimits";
+@@ -315,6 +315,7 @@ import { modelFallbackBannerItem } from "./chat/ComposerUsageLimits";
  import { ComposerSurface } from "./chat/ComposerSurface";
  import { resolveThreadSyncPhase } from "../threadSync";
  import {
@@ -10,7 +10,7 @@ index 22ccaaaf807ee0618fafe1ecb9aac65b70f26374..f0d16f359b3debdfc32ba5c0306cfaa6
    hasAvailableCompactionProvider,
    hasDismissedResumeCompaction,
    shouldOfferResumeCompaction,
-@@ -2494,40 +2495,43 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2496,40 +2497,43 @@ export default function ChatView(props: ChatViewProps) {
            ? "Compaction is unavailable for this provider"
            : "Compacting is unavailable right now"
      : null;
@@ -73,7 +73,7 @@ index 22ccaaaf807ee0618fafe1ecb9aac65b70f26374..f0d16f359b3debdfc32ba5c0306cfaa6
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const handleRestoreThreadBranch = () => {
      if (!canWriteSourceControl) return;
-@@ -2938,7 +2942,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2940,7 +2944,7 @@ export default function ChatView(props: ChatViewProps) {
      panelAnimationsActive,
      panelAnimationDurationMs,
      keepFullHistory,
@@ -82,7 +82,7 @@ index 22ccaaaf807ee0618fafe1ecb9aac65b70f26374..f0d16f359b3debdfc32ba5c0306cfaa6
      showPlanFollowUpPrompt,
      usageLimitsKey,
      usageLimitsOffered,
-@@ -2965,7 +2969,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2967,7 +2971,7 @@ export default function ChatView(props: ChatViewProps) {
      },
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -91,7 +91,7 @@ index 22ccaaaf807ee0618fafe1ecb9aac65b70f26374..f0d16f359b3debdfc32ba5c0306cfaa6
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      handleInteractionModeChange,
-@@ -3633,9 +3637,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3635,9 +3639,12 @@ export default function ChatView(props: ChatViewProps) {
                                }
                                isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
                                bannerItems={isDraftHeroState ? [] : composerBannerItems}
