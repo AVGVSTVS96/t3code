@@ -52,10 +52,10 @@ index f2b176ee3761f7d0863953e689cde96554c43491..d5aa55d6c15953a11e6aa2dae593ad87
          assert.include(
            identity.desktopEntry ?? "",
 diff --git a/apps/web/src/appInit.tsx b/apps/web/src/appInit.tsx
-index b9312858e334beadb8c01052142282294c071a9c..094e40bf4ecfb728606a7395803a41b10956003f 100644
+index 9d77c475155cbe010eb8e3e269545c41dc01cdc4..1ed768c2d786083a770a322d145546aa4fb736bc 100644
 --- a/apps/web/src/appInit.tsx
 +++ b/apps/web/src/appInit.tsx
-@@ -20,8 +20,7 @@ import { startDesktopUpdateLaunchNotice } from "./components/sidebar/updateEvery
+@@ -21,8 +21,7 @@ import { startDesktopUpdateLaunchNotice } from "./components/sidebar/updateEvery
  import { startSlowRpcRequestToasts } from "./components/SlowRpcRequestToastCoordinator";
  import { startThreadNotifications } from "./components/ThreadNotificationCoordinator";
  import { startGuideRunNotifications } from "./components/pullRequest/guide/PullRequestGuideRunCoordinator";
@@ -65,7 +65,7 @@ index b9312858e334beadb8c01052142282294c071a9c..094e40bf4ecfb728606a7395803a41b1
  import { isElectron } from "./env";
  import {
    subscribeComposerDraftModelReconciliation,
-@@ -45,7 +44,6 @@ import {
+@@ -47,7 +46,6 @@ import {
  import { startProviderAuthDelivery } from "./providerAuthDelivery";
  import { getRouter, type AppRouter } from "./router";
  import { appAtomRegistry } from "./rpc/atomRegistry";
@@ -73,7 +73,7 @@ index b9312858e334beadb8c01052142282294c071a9c..094e40bf4ecfb728606a7395803a41b1
  import { environmentShell } from "./state/shell";
  import { installChatRouteCommands } from "./shortcuts/chatRouteCommands";
  import { startWorkspaceFocus } from "./lib/workspaceFocus";
-@@ -104,18 +102,7 @@ function startClientAppearance(): void {
+@@ -117,18 +115,7 @@ function startClientAppearance(): void {
  }
  
  function startDocumentTitle(): void {
