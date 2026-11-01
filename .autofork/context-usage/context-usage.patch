@@ -107,10 +107,10 @@ index 55d951d1bdf8023bfc02e1d52e1287130c05d215..fb8d5f33f1ee0f5be7a76b1c56306e84
                                sideChatDisabledReason={sideChatDisabledReason}
                                onUsageLimitsCommand={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 82b6b9617c1b048254e5f3113bd65f90652eb307..fa20f2dd1847ef8e7511275a435db99c7d292334 100644
+index 7d1f0ade71081f54c0947b02d4775924b5d32857..420b405f17361a74d86ee65765cce78bb7fc1827 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -382,7 +382,8 @@ export interface ChatComposerProps {
+@@ -386,7 +386,8 @@ export interface ChatComposerProps {
    bannerItems: readonly ComposerBannerStackItem[];
    resumeCompactionTokens: number | null;
    keepFullHistory: boolean;
@@ -120,7 +120,7 @@ index 82b6b9617c1b048254e5f3113bd65f90652eb307..fa20f2dd1847ef8e7511275a435db99c
    onUsageLimitsCommand?: (() => void) | undefined;
    sideChatAvailable?: boolean;
    sideChatDisabledReason?: string | null;
-@@ -3506,6 +3507,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -3547,6 +3548,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -129,10 +129,10 @@ index 82b6b9617c1b048254e5f3113bd65f90652eb307..fa20f2dd1847ef8e7511275a435db99c
                      compactDisabledReason={resolvedCompactDisabledReason}
                      {...(compactCommandAvailable
 diff --git a/apps/web/src/components/chat/ComposerFooterControls.tsx b/apps/web/src/components/chat/ComposerFooterControls.tsx
-index 31c5889db9b22f6c06cdbb18716764d31bd5752b..b00f837ae761e0211b02358d7f2cd343e880b7e4 100644
+index cb5e78c1e8cfe20d2899d588b6e1319ef84f3f0d..c886965e239149c5e83d1c816d18485c21e27aff 100644
 --- a/apps/web/src/components/chat/ComposerFooterControls.tsx
 +++ b/apps/web/src/components/chat/ComposerFooterControls.tsx
-@@ -279,7 +279,8 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
+@@ -283,7 +283,8 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
    compactDisabledReason: string | null;
    compactBeforeSendTokens: number | null;
    keepFullHistory: boolean;
@@ -142,7 +142,7 @@ index 31c5889db9b22f6c06cdbb18716764d31bd5752b..b00f837ae761e0211b02358d7f2cd343
  }) {
    return (
      <>
-@@ -321,6 +322,7 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
+@@ -325,6 +326,7 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
          compactBeforeSendTokens={props.compactBeforeSendTokens}
          keepFullHistory={props.keepFullHistory}
          onToggleKeepFullHistory={props.onToggleKeepFullHistory}
