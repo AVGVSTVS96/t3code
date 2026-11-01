@@ -26,10 +26,10 @@ index 32e7b3b3118d9f062b1a9b625cba261db0af56eb..c8452738df97376e4dd45c7933055a94
        { calls, environment },
      );
 diff --git a/apps/desktop/src/app/DesktopEnvironment.ts b/apps/desktop/src/app/DesktopEnvironment.ts
-index 1066198b8f610569545870e16c71d7676b8eafe9..b0a1fa2b8291a193d41662601aa80c86d5742194 100644
+index d5fed4b228b6f63c3637f34d8aec5d267626196b..37ce6bf08b62ac588dff5f7354aaddbdee96184e 100644
 --- a/apps/desktop/src/app/DesktopEnvironment.ts
 +++ b/apps/desktop/src/app/DesktopEnvironment.ts
-@@ -107,7 +107,7 @@ export function resolveDesktopAppBranding(input: {
+@@ -106,7 +106,7 @@ export function resolveDesktopAppBranding(input: {
    return {
      baseName: APP_BASE_NAME,
      stageLabel,

@@ -36,10 +36,10 @@ index 86b104a45e638d7a203658cda7f3033c6b2e4f54..0f7e39c9ae768beaeea83a82e311a85f
              { tag_name: "v1.0.0-preview.20260925.1", draft: true },
              { tag_name: "v1.0.0-preview.20260924.3" },
 diff --git a/apps/server/src/cli/update.test.ts b/apps/server/src/cli/update.test.ts
-index e6a6eb5ee1dbfc7770d9383200cab117c3e07373..f044c456d77286f4ab06384577a3beb080339e60 100644
+index 0f28a68c3b43883792ec926cbfef2863f6bc7639..13ed644358e9eeb57b33af1d1c0ff9d876c08c7c 100644
 --- a/apps/server/src/cli/update.test.ts
 +++ b/apps/server/src/cli/update.test.ts
-@@ -18,7 +18,7 @@ it.effect("authenticates each release page until the requested channel is found"
+@@ -39,7 +39,7 @@ it.effect("authenticates each release page until the requested channel is found"
      const httpClient = HttpClient.make((request) => {
        const url = new URL(request.url);
        assert.equal(url.origin, "https://api.github.com");

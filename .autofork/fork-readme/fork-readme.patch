@@ -1,5 +1,5 @@
 diff --git a/README.md b/README.md
-index 6f6dab985e154fd3b6709404d7998baabdbc8de5..e46e4d5a3a2f5365c1f82aa696c6e0c539f11530 100644
+index 1f63f3609ae0dd709256623cf34f6fab8168d2f2..d12aca81697832dc1133a604f25ec12bd7f82e61 100644
 --- a/README.md
 +++ b/README.md
 @@ -1,5 +1,7 @@
@@ -9,4 +9,4 @@ index 6f6dab985e154fd3b6709404d7998baabdbc8de5..e46e4d5a3a2f5365c1f82aa696c6e0c5
 +
  T3 Code is an "agent harness control surface". It enables control of the agents on your machine with a best-in-class mobile app ([iOS](https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824), [Android](https://play.google.com/store/apps/details?id=com.t3tools.t3code)), [web app](https://app.t3.codes) and [Electron-based desktop app](https://t3.codes).
  
- Works with your subscriptions on Claude Code, Codex, Cursor, Grok Build, OpenCode, and Google Antigravity. If they're set up on your computer, T3 Code can control them.
+ Works with your subscriptions on Claude Code, Codex, Cursor, Grok Build, OpenCode, Google Antigravity, and fx. If they're set up on your computer, T3 Code can control them.
