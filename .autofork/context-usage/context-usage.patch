@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 55d951d1bdf8023bfc02e1d52e1287130c05d215..fb8d5f33f1ee0f5be7a76b1c56306e843ba5ab2f 100644
+index 6cd1c7775d96b66108259e1d09c481e8c0bca3ab..a477465eafb03a408d1b5a06a61d2e5b8b069b98 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -313,6 +313,7 @@ import { modelFallbackBannerItem } from "./chat/ComposerUsageLimits";
@@ -10,7 +10,7 @@ index 55d951d1bdf8023bfc02e1d52e1287130c05d215..fb8d5f33f1ee0f5be7a76b1c56306e84
    hasAvailableCompactionProvider,
    hasDismissedResumeCompaction,
    shouldOfferResumeCompaction,
-@@ -2480,40 +2481,43 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2479,40 +2480,44 @@ export default function ChatView(props: ChatViewProps) {
            ? "Compaction is unavailable for this provider"
            : "Compacting is unavailable right now"
      : null;
@@ -21,6 +21,7 @@ index 55d951d1bdf8023bfc02e1d52e1287130c05d215..fb8d5f33f1ee0f5be7a76b1c56306e84
 +    !compactDisabled &&
 +    !hasHeldQueuedRuns &&
 +    multipleModelSelections === null;
++  const resumeCompactionTokens = activeContextWindow?.usedTokens ?? null;
 +  const resumeCompactionOffered =
 +    compactBeforeSendAvailable &&
      resolveIdleCompaction(
@@ -73,16 +74,7 @@ index 55d951d1bdf8023bfc02e1d52e1287130c05d215..fb8d5f33f1ee0f5be7a76b1c56306e84
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const handleRestoreThreadBranch = () => {
      if (!canWriteSourceControl) return;
-@@ -2924,7 +2928,7 @@ export default function ChatView(props: ChatViewProps) {
-     panelAnimationsActive,
-     panelAnimationDurationMs,
-     keepFullHistory,
--    resumeCompactionTokens,
-+    resumeCompactionTokens: activeContextWindow?.usedTokens ?? null,
-     showPlanFollowUpPrompt,
-     usageLimitsKey,
-     usageLimitsOffered,
-@@ -2951,7 +2955,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2950,7 +2955,7 @@ export default function ChatView(props: ChatViewProps) {
      },
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -91,12 +83,9 @@ index 55d951d1bdf8023bfc02e1d52e1287130c05d215..fb8d5f33f1ee0f5be7a76b1c56306e84
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      handleInteractionModeChange,
-@@ -3622,9 +3626,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3627,7 +3632,10 @@ export default function ChatView(props: ChatViewProps) {
                                }
-                               isPreparingWorktree={isPreparingWorktree && !sendQueuesBehindSetup}
-                               bannerItems={isDraftHeroState ? [] : composerBannerItems}
--                              resumeCompactionTokens={resumeCompactionTokens}
-+                              resumeCompactionTokens={activeContextWindow?.usedTokens ?? null}
+                               resumeCompactionTokens={resumeCompactionTokens}
                                keepFullHistory={keepFullHistory}
 -                              onToggleKeepFullHistory={toggleKeepFullHistoryStable}
 +                              onToggleKeepFullHistory={
@@ -107,10 +96,10 @@ index 55d951d1bdf8023bfc02e1d52e1287130c05d215..fb8d5f33f1ee0f5be7a76b1c56306e84
                                sideChatDisabledReason={sideChatDisabledReason}
                                onUsageLimitsCommand={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 7d1f0ade71081f54c0947b02d4775924b5d32857..420b405f17361a74d86ee65765cce78bb7fc1827 100644
+index 9ad9158cd4da3bf4e2479bd3bbe7519126004b2a..c97716f26101ae9e7c5e9eb492e3442478125c59 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -386,7 +386,8 @@ export interface ChatComposerProps {
+@@ -381,7 +381,8 @@ export interface ChatComposerProps {
    bannerItems: readonly ComposerBannerStackItem[];
    resumeCompactionTokens: number | null;
    keepFullHistory: boolean;
@@ -120,7 +109,7 @@ index 7d1f0ade71081f54c0947b02d4775924b5d32857..420b405f17361a74d86ee65765cce78b
    onUsageLimitsCommand?: (() => void) | undefined;
    sideChatAvailable?: boolean;
    sideChatDisabledReason?: string | null;
-@@ -3547,6 +3548,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -3553,6 +3554,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -269,7 +258,7 @@ index 5a0911a10a05f4880aba07c9b12b28a1bb4285cd..3ecea59842e71ef365f0497328e27197
    selection: ModelSelection | null | undefined,
    modelOptionsByInstance: ReadonlyMap<ProviderInstanceId, ReadonlyArray<ModelEsque>>,
 diff --git a/apps/web/src/components/chat/useComposerSend.ts b/apps/web/src/components/chat/useComposerSend.ts
-index b22c313f6932b2a2ed65de90b783c76cc65ebe0b..c3a5d8bdac9151edcce16167c6e45b93220925f2 100644
+index 98084e9795443bfae954178986a9f8f842e8f522..e5ac085f72f6fdc561d051d39fb3b59e397f2eef 100644
 --- a/apps/web/src/components/chat/useComposerSend.ts
 +++ b/apps/web/src/components/chat/useComposerSend.ts
 @@ -237,7 +237,7 @@ interface ComposerSendInput {
@@ -290,7 +279,7 @@ index b22c313f6932b2a2ed65de90b783c76cc65ebe0b..c3a5d8bdac9151edcce16167c6e45b93
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      handleInteractionModeChange,
-@@ -1390,7 +1390,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -1396,7 +1396,7 @@ export function useComposerSend(input: ComposerSendInput) {
          failure = startResult;
        } else {
          turnStartSucceeded = true;
