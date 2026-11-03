@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 6fd54db6bd52a8cd2fb03f928de72235be3c4db7..ca52ed9df696d37556349348ea9ed20aa95fcd14 100644
+index 6ec89f8c36256ee6e0961c72f404b26c28009fe2..025c3ae3700213fa024404aef526a11df1099e1b 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -314,6 +314,7 @@ import { modelFallbackBannerItem } from "./chat/ComposerUsageLimits";
+@@ -315,6 +315,7 @@ import { modelFallbackBannerItem } from "./chat/ComposerUsageLimits";
  import { ComposerSurface } from "./chat/ComposerSurface";
  import { resolveThreadSyncPhase } from "../threadSync";
  import {
@@ -10,7 +10,7 @@ index 6fd54db6bd52a8cd2fb03f928de72235be3c4db7..ca52ed9df696d37556349348ea9ed20a
    hasAvailableCompactionProvider,
    hasDismissedResumeCompaction,
    shouldOfferResumeCompaction,
-@@ -2480,40 +2481,44 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2481,40 +2482,44 @@ export default function ChatView(props: ChatViewProps) {
            ? "Compaction is unavailable for this provider"
            : "Compacting is unavailable right now"
      : null;
@@ -74,7 +74,7 @@ index 6fd54db6bd52a8cd2fb03f928de72235be3c4db7..ca52ed9df696d37556349348ea9ed20a
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const handleRestoreThreadBranch = () => {
      if (!canWriteSourceControl) return;
-@@ -2951,7 +2956,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2952,7 +2957,7 @@ export default function ChatView(props: ChatViewProps) {
      },
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -83,7 +83,7 @@ index 6fd54db6bd52a8cd2fb03f928de72235be3c4db7..ca52ed9df696d37556349348ea9ed20a
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      handleInteractionModeChange,
-@@ -3636,7 +3641,10 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3639,7 +3644,10 @@ export default function ChatView(props: ChatViewProps) {
                                }
                                resumeCompactionTokens={resumeCompactionTokens}
                                keepFullHistory={keepFullHistory}
