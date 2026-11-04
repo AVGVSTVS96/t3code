@@ -36,10 +36,10 @@ index 86b104a45e638d7a203658cda7f3033c6b2e4f54..0f7e39c9ae768beaeea83a82e311a85f
              { tag_name: "v1.0.0-preview.20260925.1", draft: true },
              { tag_name: "v1.0.0-preview.20260924.3" },
 diff --git a/apps/server/src/cli/update.test.ts b/apps/server/src/cli/update.test.ts
-index 848c2c798df4198eb4e120d6ca004b501e902cac..a53ae0ad8a48e1238e7c019ab128ff5f174c22b2 100644
+index 7540c678f59d4c820b4ece05ec3ed1c29d17143c..e219223c760e86f8434df2a666f00800730477fc 100644
 --- a/apps/server/src/cli/update.test.ts
 +++ b/apps/server/src/cli/update.test.ts
-@@ -43,7 +43,7 @@ it.effect("authenticates each release page until the requested channel is found"
+@@ -51,7 +51,7 @@ it.effect("authenticates each release page until the requested channel is found"
      const httpClient = HttpClient.make((request) => {
        const url = new URL(request.url);
        assert.equal(url.origin, "https://api.github.com");
@@ -49,7 +49,7 @@ index 848c2c798df4198eb4e120d6ca004b501e902cac..a53ae0ad8a48e1238e7c019ab128ff5f
        assert.equal(request.headers.authorization, "Bearer gh-token");
        const page = url.searchParams.get("page") ?? "";
 diff --git a/packages/shared/src/cliRelease.ts b/packages/shared/src/cliRelease.ts
-index 66777cc0444780e6910b8cc630e3f83b7e6b9c4e..a39745315d7d4c87c4f611206ff485deb5221a5b 100644
+index 80eeec4397545991779a70a24a9a28b48d4fc873..160a4ac805ff4925c68c11008a3be21242afdd84 100644
 --- a/packages/shared/src/cliRelease.ts
 +++ b/packages/shared/src/cliRelease.ts
 @@ -3,7 +3,7 @@ import * as Schema from "effect/Schema";
