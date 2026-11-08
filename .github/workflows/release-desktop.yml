@@ -275,6 +275,8 @@ jobs:
           name: cli-${{ inputs.platform }}-${{ inputs.arch }}
           path: release-cli/*
           if-no-files-found: error
+          # The archive is already gzip or zip; deflating it again saves under 2%.
+          compression-level: 0
 
       - name: Collect release assets
         shell: bash
@@ -307,3 +309,5 @@ jobs:
           name: desktop-${{ inputs.platform }}-${{ inputs.arch }}
           path: release-publish/*
           if-no-files-found: error
+          # Installers, zips and blockmaps are already compressed; deflating them again saves under 0.3%.
+          compression-level: 0

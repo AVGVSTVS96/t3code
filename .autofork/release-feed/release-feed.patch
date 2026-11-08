@@ -36,7 +36,7 @@ index 86b104a45e638d7a203658cda7f3033c6b2e4f54..0f7e39c9ae768beaeea83a82e311a85f
              { tag_name: "v1.0.0-preview.20260925.1", draft: true },
              { tag_name: "v1.0.0-preview.20260924.3" },
 diff --git a/apps/server/src/cli/update.test.ts b/apps/server/src/cli/update.test.ts
-index 7540c678f59d4c820b4ece05ec3ed1c29d17143c..e219223c760e86f8434df2a666f00800730477fc 100644
+index 98ec13d32808ef34e9ad68b20a3ec3f1d6c62cd1..c0c52838dbb1679c0e0ad5b733966a1312e3f6fb 100644
 --- a/apps/server/src/cli/update.test.ts
 +++ b/apps/server/src/cli/update.test.ts
 @@ -51,7 +51,7 @@ it.effect("authenticates each release page until the requested channel is found"

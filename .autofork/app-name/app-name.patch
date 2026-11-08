@@ -10,10 +10,10 @@ index 3d9e3239840cfe53200983ed3b0de487191cb551..dc529f57885f9e5021e20fc0040066a1
 +  "productName": "T3 Code (Bassim's autofork)"
  }
 diff --git a/apps/desktop/src/app/DesktopAppIdentity.test.ts b/apps/desktop/src/app/DesktopAppIdentity.test.ts
-index 32e7b3b3118d9f062b1a9b625cba261db0af56eb..c8452738df97376e4dd45c7933055a94b01e7090 100644
+index 74d134c0b1001988c168f07fb729bdc16b03c09a..b6bcd10f9f344617960321e56e501463882c48ed 100644
 --- a/apps/desktop/src/app/DesktopAppIdentity.test.ts
 +++ b/apps/desktop/src/app/DesktopAppIdentity.test.ts
-@@ -201,7 +201,10 @@ describe("DesktopAppIdentity", () => {
+@@ -202,7 +202,10 @@ describe("DesktopAppIdentity", () => {
          assert.isDefined(runtimeName);
          assert.equal(runtimeName, `T3 Code ${stage}`);
          assert.match(runtimeName.replaceAll(" ", ""), /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/);
@@ -39,10 +39,10 @@ index d5fed4b228b6f63c3637f34d8aec5d267626196b..37ce6bf08b62ac588dff5f7354aaddbd
  }
  
 diff --git a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
-index f2b176ee3761f7d0863953e689cde96554c43491..d5aa55d6c15953a11e6aa2dae593ad8750747288 100644
+index 22bfc969c4088c0d27254f499f0531447c6d9cea..62f638e93532f7d5717859866901d7d026bf1c9d 100644
 --- a/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
 +++ b/apps/desktop/src/app/DesktopPreReadyPlatform.test.ts
-@@ -155,7 +155,7 @@ describe("DesktopPreReadyPlatform", () => {
+@@ -160,7 +160,7 @@ describe("DesktopPreReadyPlatform", () => {
          const identity = yield* Effect.promise(() => portalIdentity);
          assert.equal(identity.desktopName, "com.t3tools.T3Code.desktop");
          assert.include(identity.desktopEntry ?? "", "Exec=/Applications/current.AppImage %U");
@@ -52,7 +52,7 @@ index f2b176ee3761f7d0863953e689cde96554c43491..d5aa55d6c15953a11e6aa2dae593ad87
          assert.include(
            identity.desktopEntry ?? "",
 diff --git a/apps/web/src/appInit.tsx b/apps/web/src/appInit.tsx
-index 9d77c475155cbe010eb8e3e269545c41dc01cdc4..1ed768c2d786083a770a322d145546aa4fb736bc 100644
+index ccb7a8b82000e20282ec12231d566e1ce15e85a8..3aa9730920a2e1468c780154990136c164f0b676 100644
 --- a/apps/web/src/appInit.tsx
 +++ b/apps/web/src/appInit.tsx
 @@ -21,8 +21,7 @@ import { startDesktopUpdateLaunchNotice } from "./components/sidebar/updateEvery
@@ -65,7 +65,7 @@ index 9d77c475155cbe010eb8e3e269545c41dc01cdc4..1ed768c2d786083a770a322d145546aa
  import { isElectron } from "./env";
  import {
    subscribeComposerDraftModelReconciliation,
-@@ -47,7 +46,6 @@ import {
+@@ -48,7 +47,6 @@ import {
  import { startProviderAuthDelivery } from "./providerAuthDelivery";
  import { getRouter, type AppRouter } from "./router";
  import { appAtomRegistry } from "./rpc/atomRegistry";
@@ -73,7 +73,7 @@ index 9d77c475155cbe010eb8e3e269545c41dc01cdc4..1ed768c2d786083a770a322d145546aa
  import { environmentShell } from "./state/shell";
  import { installChatRouteCommands } from "./shortcuts/chatRouteCommands";
  import { startWorkspaceFocus } from "./lib/workspaceFocus";
-@@ -117,18 +115,7 @@ function startClientAppearance(): void {
+@@ -118,18 +116,7 @@ function startClientAppearance(): void {
  }
  
  function startDocumentTitle(): void {
@@ -107,10 +107,10 @@ index 05b4fa6a8f9dae5321ab5fd9e55b8b4131a25a7f..f0ad919fd8176597444cbd2d6981b314
    injectedDesktopAppBranding?.displayName ??
    formatAppDisplayName({ baseName: APP_BASE_NAME, stageLabel: APP_STAGE_LABEL });
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index 6756f6fea855d8e72616eed8a6e522c19e1e79fc..5ddf81ee14c3124ff9aad6924070d8e82766607f 100644
+index 599c6b809a18ff4ce320c9780c87bd244d94dad3..c73539d81de7079f97aa2ff5986884806f7cca0a 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
-@@ -2748,10 +2748,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
+@@ -2757,10 +2757,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
    return `${trimmed.slice(0, versionSeparator)}/${trimmed.slice(versionSeparator + 1)}`;
  }
  

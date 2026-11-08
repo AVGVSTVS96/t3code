@@ -85,11 +85,10 @@ jobs:
       - name: Align package versions to release version
         run: node scripts/update-release-package-versions.ts "${{ needs.preflight.outputs.version }}"
 
-      - name: Install browser secret helper build libraries
-        run: sudo apt-get update && sudo apt-get install -y libsecret-1-dev pkg-config
-
+      # build:desktop:bundle skips the Linux browser secret helper, which this
+      # artifact does not carry; each Linux package job compiles its own per arch.
       - name: Build JS bundle
-        run: vp run build:desktop
+        run: vp run build:desktop:bundle
 
       - name: Upload JS bundle
         uses: actions/upload-artifact@v7
