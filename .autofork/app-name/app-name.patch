@@ -107,7 +107,7 @@ index 05b4fa6a8f9dae5321ab5fd9e55b8b4131a25a7f..f0ad919fd8176597444cbd2d6981b314
    injectedDesktopAppBranding?.displayName ??
    formatAppDisplayName({ baseName: APP_BASE_NAME, stageLabel: APP_STAGE_LABEL });
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index 599c6b809a18ff4ce320c9780c87bd244d94dad3..c73539d81de7079f97aa2ff5986884806f7cca0a 100644
+index 2fff4919c40d35d1e9d566002bee6681f3bfaf83..c68282664aaac183293afa7a7d9e004334a40d7e 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
 @@ -2757,10 +2757,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
