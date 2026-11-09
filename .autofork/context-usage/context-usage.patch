@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 92149651480db1e917e13c50e3931824bff0bf13..d60a078b52fcd616a05c42479d92872c6af9b8ac 100644
+index 6daf189f7d6dfcbb9b0b01fbedcb5010c5bd4fb4..0fb73203d7fcf2728da4217565b7c2220d8502ec 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -315,7 +315,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
@@ -11,7 +11,7 @@ index 92149651480db1e917e13c50e3931824bff0bf13..d60a078b52fcd616a05c42479d92872c
  import {
    deriveLatestContextWindowSnapshot,
    hasDismissedResumeCompaction,
-@@ -2453,36 +2453,40 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2456,36 +2456,40 @@ export default function ChatView(props: ChatViewProps) {
      pendingApprovals.length > 0 ||
      pendingUserInputs.length > 0;
    const compactDisabled = compactThreadUnavailable;
@@ -70,7 +70,7 @@ index 92149651480db1e917e13c50e3931824bff0bf13..d60a078b52fcd616a05c42479d92872c
        return next;
      });
    };
-@@ -2492,7 +2496,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2495,7 +2499,7 @@ export default function ChatView(props: ChatViewProps) {
    const freshSessionCommandAvailable =
      freshSessionAvailable && activePendingApproval === null && pendingUserInputs.length === 0;
    const freshSessionArmed = useFreshSessionArmed(routeThreadKey);
@@ -79,7 +79,7 @@ index 92149651480db1e917e13c50e3931824bff0bf13..d60a078b52fcd616a05c42479d92872c
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const armFreshSessionStable = useStableCallback(() => armFreshSession(routeThreadKey));
    const handleRestoreThreadBranch = () => {
-@@ -2927,7 +2931,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2930,7 +2934,7 @@ export default function ChatView(props: ChatViewProps) {
      },
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -88,7 +88,7 @@ index 92149651480db1e917e13c50e3931824bff0bf13..d60a078b52fcd616a05c42479d92872c
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat: sideChat.available ? sendSideChatStable : undefined,
-@@ -3614,7 +3618,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3617,7 +3621,12 @@ export default function ChatView(props: ChatViewProps) {
                                  }
                                  resumeCompactionTokens={resumeCompactionTokens}
                                  keepFullHistory={keepFullHistory}
@@ -103,10 +103,10 @@ index 92149651480db1e917e13c50e3931824bff0bf13..d60a078b52fcd616a05c42479d92872c
                                  sideChatDisabledReason={sideChatDisabledReason}
                                  onFreshSession={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index b1faa65363c7752742d15d371c41389fa0aec693..e13e4e525ecf53dad96f9a32e30b04b52ea608a4 100644
+index 2f20c4810d9941ea1f43d7df3facec291100030e..e4c6039393f02ffc2c037537395996c7b6dcdf6d 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -366,7 +366,8 @@ export interface ChatComposerProps {
+@@ -368,7 +368,8 @@ export interface ChatComposerProps {
    bannerItems: readonly ComposerBannerStackItem[];
    resumeCompactionTokens: number | null;
    keepFullHistory: boolean;
@@ -116,7 +116,7 @@ index b1faa65363c7752742d15d371c41389fa0aec693..e13e4e525ecf53dad96f9a32e30b04b5
    onUsageLimitsCommand?: (() => void) | undefined;
    sideChatAvailable?: boolean;
    sideChatDisabledReason?: string | null;
-@@ -3587,6 +3588,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -3608,6 +3609,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}

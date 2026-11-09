@@ -1,5 +1,5 @@
 diff --git a/apps/desktop/package.json b/apps/desktop/package.json
-index 3d9e3239840cfe53200983ed3b0de487191cb551..dc529f57885f9e5021e20fc0040066a1eb99e879 100644
+index 87a1eb2a8deda97e96eddd425bd55c9936965450..5e2e300871cfcd323452638efeb49a86532c5a7e 100644
 --- a/apps/desktop/package.json
 +++ b/apps/desktop/package.json
 @@ -40,5 +40,5 @@
@@ -52,7 +52,7 @@ index 22bfc969c4088c0d27254f499f0531447c6d9cea..62f638e93532f7d5717859866901d7d0
          assert.include(
            identity.desktopEntry ?? "",
 diff --git a/apps/web/src/appInit.tsx b/apps/web/src/appInit.tsx
-index ccb7a8b82000e20282ec12231d566e1ce15e85a8..3aa9730920a2e1468c780154990136c164f0b676 100644
+index 3be9175c4f2e4f3091d224d0074d766e7d6af3e6..0dc7b3684f959a45678db1c150051d016e0e0532 100644
 --- a/apps/web/src/appInit.tsx
 +++ b/apps/web/src/appInit.tsx
 @@ -21,8 +21,7 @@ import { startDesktopUpdateLaunchNotice } from "./components/sidebar/updateEvery
@@ -94,7 +94,7 @@ index ccb7a8b82000e20282ec12231d566e1ce15e85a8..3aa9730920a2e1468c780154990136c1
  
  /**
 diff --git a/apps/web/src/branding.ts b/apps/web/src/branding.ts
-index 05b4fa6a8f9dae5321ab5fd9e55b8b4131a25a7f..f0ad919fd8176597444cbd2d6981b314edb9360a 100644
+index 6ac2d1f397a47188ae13b552bc2f80a5379f230c..ceade7ffb29f30a4f575cef9ac06fa8bae4e0412 100644
 --- a/apps/web/src/branding.ts
 +++ b/apps/web/src/branding.ts
 @@ -20,7 +20,7 @@ export const APP_BASE_NAME = injectedDesktopAppBranding?.baseName ?? "T3 Code";
