@@ -103,7 +103,7 @@ index 6daf189f7d6dfcbb9b0b01fbedcb5010c5bd4fb4..0fb73203d7fcf2728da4217565b7c222
                                  sideChatDisabledReason={sideChatDisabledReason}
                                  onFreshSession={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 2f20c4810d9941ea1f43d7df3facec291100030e..e4c6039393f02ffc2c037537395996c7b6dcdf6d 100644
+index 65eb3896f48ce1aba23d1828f43237ca3a3792ca..ed924e6fd245bd9dba430e6ac4fe302e0ccaf4f2 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
 @@ -368,7 +368,8 @@ export interface ChatComposerProps {
@@ -116,7 +116,7 @@ index 2f20c4810d9941ea1f43d7df3facec291100030e..e4c6039393f02ffc2c037537395996c7
    onUsageLimitsCommand?: (() => void) | undefined;
    sideChatAvailable?: boolean;
    sideChatDisabledReason?: string | null;
-@@ -3608,6 +3609,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -3612,6 +3613,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -261,7 +261,7 @@ index ff3edb8e66b93f981e1155341c867ef01c0bc297..0b1b4fdbbc931bb859a3f391b9137cd4
    if (typeof autoCompactThreshold === "number" && autoCompactThreshold > 0) {
      return `Compacts automatically at about ${autoCompactThreshold.toLocaleString("en-US")} tokens.`;
 diff --git a/apps/web/src/components/chat/useComposerSend.ts b/apps/web/src/components/chat/useComposerSend.ts
-index 1371324aa7aeb58df3b3047e118f84db2790e4d1..42d53f3d7a7eb6bc49c01beefbfa3c9353c7c1be 100644
+index 2b1b8d73c756b6bfc6d5beee803ab5c595780224..70649d0b30207d559850c38a1adc9893853e7063 100644
 --- a/apps/web/src/components/chat/useComposerSend.ts
 +++ b/apps/web/src/components/chat/useComposerSend.ts
 @@ -230,7 +230,7 @@ interface ComposerSendInput {
@@ -282,7 +282,7 @@ index 1371324aa7aeb58df3b3047e118f84db2790e4d1..42d53f3d7a7eb6bc49c01beefbfa3c93
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat,
-@@ -1272,7 +1272,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -1282,7 +1282,7 @@ export function useComposerSend(input: ComposerSendInput) {
          failure = startResult;
        } else {
          turnStartSucceeded = true;
