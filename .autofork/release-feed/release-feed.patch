@@ -49,7 +49,7 @@ index 98ec13d32808ef34e9ad68b20a3ec3f1d6c62cd1..c0c52838dbb1679c0e0ad5b733966a13
        assert.equal(request.headers.authorization, "Bearer gh-token");
        const page = url.searchParams.get("page") ?? "";
 diff --git a/packages/shared/src/cliRelease.ts b/packages/shared/src/cliRelease.ts
-index 80eeec4397545991779a70a24a9a28b48d4fc873..160a4ac805ff4925c68c11008a3be21242afdd84 100644
+index 07a0c73b179471784801612f23356c223149aecd..f541fe696fe21e12d0a8115797ac942e580e6d0e 100644
 --- a/packages/shared/src/cliRelease.ts
 +++ b/packages/shared/src/cliRelease.ts
 @@ -3,7 +3,7 @@ import * as Schema from "effect/Schema";
