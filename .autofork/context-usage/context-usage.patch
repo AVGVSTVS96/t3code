@@ -103,7 +103,7 @@ index f4561188df0cc87c8b9a457f14d6dea49b6f1db8..9deb52c265430de2a15106cd1616ba7b
                                  sideChatDisabledReason={sideChatDisabledReason}
                                  onFreshSession={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index f722fd1eb6e1f2f229f0269f43b0c7927cc439f3..6b3bc8676fbc794609b841ab35ef50374ba60271 100644
+index cba7c434b1bab6dd8d2097fc564da5f743ce5f69..00ac56d348ac29a9afdbcbd3a84f01c40b97c6ba 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
 @@ -373,7 +373,8 @@ export interface ChatComposerProps {
@@ -116,7 +116,7 @@ index f722fd1eb6e1f2f229f0269f43b0c7927cc439f3..6b3bc8676fbc794609b841ab35ef5037
    onUsageLimitsCommand?: (() => void) | undefined;
    sideChatAvailable?: boolean;
    sideChatDisabledReason?: string | null;
-@@ -3619,6 +3620,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -3620,6 +3621,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      compactBeforeSendTokens={props.resumeCompactionTokens}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
