@@ -147,10 +147,10 @@ index 2e2e9323b3eda410eeeab0ccbc7d0dfbce5209ec..f921bc2273196b21b82da27cc6c769c7
          {props.children}
        </ComposerPrimaryActions>
 diff --git a/apps/web/src/components/chat/ComposerPrimaryActions.tsx b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
-index cd37a8181ded7c18ff48b56fa58b96803a800b2a..f55a4ec7c150acad2e666d23fb82b961e8d1fecd 100644
+index ec9ec10332b7ac26879c79348a568d9a9cf2cbf9..ce26c6951ac58e302020ca1da3bf51a2f11f35df 100644
 --- a/apps/web/src/components/chat/ComposerPrimaryActions.tsx
 +++ b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
-@@ -50,7 +50,8 @@ interface ComposerPrimaryActionsProps {
+@@ -55,7 +55,8 @@ interface ComposerPrimaryActionsProps {
    onInterrupt: () => void;
    compactBeforeSendTokens?: number | null;
    keepFullHistory?: boolean;
@@ -160,7 +160,7 @@ index cd37a8181ded7c18ff48b56fa58b96803a800b2a..f55a4ec7c150acad2e666d23fb82b961
  }
  
  const formatPendingPrimaryActionLabel = (input: {
-@@ -104,6 +105,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -109,6 +110,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
    compactBeforeSendTokens = null,
    keepFullHistory = false,
    onToggleKeepFullHistory,
@@ -168,7 +168,7 @@ index cd37a8181ded7c18ff48b56fa58b96803a800b2a..f55a4ec7c150acad2e666d23fb82b961
  }: ComposerPrimaryActionsProps) {
    const pointerFocusProps = preserveComposerFocusOnPointerDown
      ? { onPointerDown: preventPointerFocus }
-@@ -219,7 +221,8 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -224,7 +226,8 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
      compactBeforeSendTokens !== null && !showResume && !isEditingQueuedMessage
        ? formatContextWindowTokens(compactBeforeSendTokens)
        : null;
@@ -178,7 +178,7 @@ index cd37a8181ded7c18ff48b56fa58b96803a800b2a..f55a4ec7c150acad2e666d23fb82b961
  
    const submitLabel = showResume
      ? "Resume thread"
-@@ -320,26 +323,32 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -327,26 +330,32 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
                type="button"
                className="flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-(--control-radius) px-2 font-medium text-base text-foreground/80 tabular-nums outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-64 sm:text-sm aria-pressed:bg-accent/60 aria-pressed:text-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:text-muted-foreground"
                {...pointerFocusProps}
