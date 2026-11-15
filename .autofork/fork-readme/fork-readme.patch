@@ -1,12 +1,13 @@
 diff --git a/README.md b/README.md
-index 4abbd5bd932cf0f1f681f9ef4da927b98c316a60..2fd17a55065cd3f2eb1568995292c1da853a1ab1 100644
+index 24dc0f8f7f6669ee439bc13f496e0451239f0e31..26b54fb746101c2d566e698d6d5aca45affb0613 100644
 --- a/README.md
 +++ b/README.md
-@@ -1,5 +1,7 @@
- # T3 Code
+@@ -6,6 +6,8 @@
+ 
+ <h1 align="center">T3 Code</h1>
  
 +> A personal fork of [T3 Code](https://github.com/pingdotgg/t3code) that updates itself with [autofork](https://autofork.com). Its changes, each described in plain words, are in [`.autofork/`](.autofork).
 +
- T3 Code is an "agent harness control surface". It enables control of the agents on your machine with a best-in-class mobile app ([iOS](https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824), [Android](https://play.google.com/store/apps/details?id=com.t3tools.t3code)), [web app](https://app.t3.codes) and [Electron-based desktop app](https://t3.codes).
+ <p align="center">The open-source control plane for coding agents.</p>
  
- Works with your subscriptions on Claude Code, Codex, Cursor, Grok Build, OpenCode, Google Antigravity, and fx. If they're set up on your computer, T3 Code can control them.
+ <p align="center">
