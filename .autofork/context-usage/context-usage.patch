@@ -104,7 +104,7 @@ index fbec56205975c3b49766645c56eb6bf2e0f1c6b0..37aef4fae1b004637c3560494d0aa09d
                                  sideChatDisabledReason={sideChatDisabledReason}
                                  onFreshSession={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index ff14154dccb8fb65c5ab48fdb3fca65c30bc6dd1..8e6c292833e4e9a5385efbb8f11d56c5e9d62b1e 100644
+index 83bd2f63883e7bad725e4e369a756b75ab5e25b4..3b4a4260da174f13e94ad649b16c37c1211a2dad 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
 @@ -384,7 +384,8 @@ export interface ChatComposerProps {
@@ -117,7 +117,7 @@ index ff14154dccb8fb65c5ab48fdb3fca65c30bc6dd1..8e6c292833e4e9a5385efbb8f11d56c5
    onUsageLimitsCommand?: (() => void) | undefined;
    sideChatAvailable?: boolean;
    sideChatDisabledReason?: string | null;
-@@ -3775,6 +3776,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -3778,6 +3779,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      hideCompactToggle={dictationTakesFooter}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -262,7 +262,7 @@ index ff3edb8e66b93f981e1155341c867ef01c0bc297..0b1b4fdbbc931bb859a3f391b9137cd4
    if (typeof autoCompactThreshold === "number" && autoCompactThreshold > 0) {
      return `Compacts automatically at about ${autoCompactThreshold.toLocaleString("en-US")} tokens.`;
 diff --git a/apps/web/src/components/chat/useComposerSend.ts b/apps/web/src/components/chat/useComposerSend.ts
-index 72e6f3bf792c0689675d9eb3edcca6a59bc53c69..bf5b6551038d6814e6099c6be119c250ec36ad48 100644
+index 93ff79432708c6e289f61ea1619fd56448131d12..5851cfd00b4a3132add7d05644f5ab84bfc9250e 100644
 --- a/apps/web/src/components/chat/useComposerSend.ts
 +++ b/apps/web/src/components/chat/useComposerSend.ts
 @@ -241,7 +241,7 @@ interface ComposerSendInput {
@@ -283,7 +283,7 @@ index 72e6f3bf792c0689675d9eb3edcca6a59bc53c69..bf5b6551038d6814e6099c6be119c250
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat,
-@@ -1395,7 +1395,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -1396,7 +1396,7 @@ export function useComposerSend(input: ComposerSendInput) {
              checkoutPullRequestUrl,
            );
          }
