@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 67638fc4e63ca035759c619bd888732238094231..8702115fd7b931ddd0ef785417597c2fb442ef5a 100644
+index fbec56205975c3b49766645c56eb6bf2e0f1c6b0..37aef4fae1b004637c3560494d0aa09de5b56685 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -340,7 +340,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
@@ -80,7 +80,7 @@ index 67638fc4e63ca035759c619bd888732238094231..8702115fd7b931ddd0ef785417597c2f
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const armFreshSessionStable = useStableCallback(() => armFreshSession(routeThreadKey));
    const handleRestoreThreadBranch = () => {
-@@ -2994,7 +2998,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2995,7 +2999,7 @@ export default function ChatView(props: ChatViewProps) {
      },
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -89,7 +89,7 @@ index 67638fc4e63ca035759c619bd888732238094231..8702115fd7b931ddd0ef785417597c2f
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat: sideChat.available ? sendSideChatStable : undefined,
-@@ -3690,7 +3694,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3691,7 +3695,12 @@ export default function ChatView(props: ChatViewProps) {
                                  }
                                  resumeCompactionTokens={resumeCompactionTokens}
                                  keepFullHistory={keepFullHistory}
@@ -262,10 +262,10 @@ index ff3edb8e66b93f981e1155341c867ef01c0bc297..0b1b4fdbbc931bb859a3f391b9137cd4
    if (typeof autoCompactThreshold === "number" && autoCompactThreshold > 0) {
      return `Compacts automatically at about ${autoCompactThreshold.toLocaleString("en-US")} tokens.`;
 diff --git a/apps/web/src/components/chat/useComposerSend.ts b/apps/web/src/components/chat/useComposerSend.ts
-index da3e2eaf20f8f28a66afaa482d847683be2f4735..78e7b3cdc397699fe972a84bf78de8c2fda8dffd 100644
+index 72e6f3bf792c0689675d9eb3edcca6a59bc53c69..bf5b6551038d6814e6099c6be119c250ec36ad48 100644
 --- a/apps/web/src/components/chat/useComposerSend.ts
 +++ b/apps/web/src/components/chat/useComposerSend.ts
-@@ -240,7 +240,7 @@ interface ComposerSendInput {
+@@ -241,7 +241,7 @@ interface ComposerSendInput {
      SetStateAction<Record<string, ReadonlyArray<CodexFeedbackSubmission>>>
    >;
    readonly setThreadError: ReturnType<typeof makeThreadErrorSetter>;
@@ -274,7 +274,7 @@ index da3e2eaf20f8f28a66afaa482d847683be2f4735..78e7b3cdc397699fe972a84bf78de8c2
    readonly anchorNewTurn: TimelineFollow["anchorNewTurn"];
    readonly acknowledgeActiveThreadWoke: () => void;
    /** Resolves true once the side chat started and got the prompt. */
-@@ -330,7 +330,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -332,7 +332,7 @@ export function useComposerSend(input: ComposerSendInput) {
      optimisticBlobPreviews,
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -283,7 +283,7 @@ index da3e2eaf20f8f28a66afaa482d847683be2f4735..78e7b3cdc397699fe972a84bf78de8c2
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat,
-@@ -1392,7 +1392,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -1395,7 +1395,7 @@ export function useComposerSend(input: ComposerSendInput) {
              checkoutPullRequestUrl,
            );
          }
