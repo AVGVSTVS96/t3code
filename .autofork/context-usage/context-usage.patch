@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index c0f8ff42f451ee0ea67ba63ef8a359110c57a4df..f4672863940c4049b4b51d2a976f52667de6fa26 100644
+index 1a50e7fdfa6b39ac15214ce451089c386731623e..2c96a529595b981f4a55239580d44d04c3882dcb 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -340,7 +340,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
@@ -46,7 +46,10 @@ index c0f8ff42f451ee0ea67ba63ef8a359110c57a4df..f4672863940c4049b4b51d2a976f5266
 -      : null;
 -  const [fullHistoryThreadKeys, setFullHistoryThreadKeys] = useState<ReadonlySet<string>>(
 -    () => new Set(),
--  );
++    });
++  const [compactChoices, setCompactChoices] = useState<ReadonlyMap<string, boolean>>(
++    () => new Map(),
+   );
 -  const keepFullHistory = fullHistoryThreadKeys.has(routeThreadKey);
 -  const setKeepFullHistory = (threadKey: string, keep: boolean) => {
 -    setFullHistoryThreadKeys((current) => {
@@ -54,10 +57,6 @@ index c0f8ff42f451ee0ea67ba63ef8a359110c57a4df..f4672863940c4049b4b51d2a976f5266
 -      const next = new Set(current);
 -      if (keep) next.add(threadKey);
 -      else next.delete(threadKey);
-+    });
-+  const [compactChoices, setCompactChoices] = useState<ReadonlyMap<string, boolean>>(
-+    () => new Map(),
-+  );
 +  const keepFullHistory = !(
 +    compactBeforeSendAvailable &&
 +    (compactChoices.get(routeThreadKey) ?? resumeCompactionOffered)
@@ -89,7 +88,7 @@ index c0f8ff42f451ee0ea67ba63ef8a359110c57a4df..f4672863940c4049b4b51d2a976f5266
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat: sideChat.available ? sendSideChatStable : undefined,
-@@ -3691,7 +3695,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3692,7 +3696,12 @@ export default function ChatView(props: ChatViewProps) {
                                  }
                                  resumeCompactionTokens={resumeCompactionTokens}
                                  keepFullHistory={keepFullHistory}
