@@ -106,7 +106,7 @@ index e69de418cd3ee402b91cbca5edad72fa374dfdc9..5047a1d6dbfce444d29cbcc44e94f482
                                  sideChatDisabledReason={sideChatDisabledReason}
                                  onFreshSession={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 3c2919c7606d27447f4f16b31943c36373e629d2..5cf4f2cb159ecf954416820e636d9f27ecd0f6f9 100644
+index fb4ed5eb0f626b2a63fe8cfc12387f125a52e14f..f3aeed75412bbb4d0ed6018c66082292b4424601 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
 @@ -392,7 +392,8 @@ export interface ChatComposerProps {
