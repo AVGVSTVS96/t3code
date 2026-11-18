@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 1a50e7fdfa6b39ac15214ce451089c386731623e..2c96a529595b981f4a55239580d44d04c3882dcb 100644
+index e69de418cd3ee402b91cbca5edad72fa374dfdc9..5047a1d6dbfce444d29cbcc44e94f482bb245d56 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -340,7 +340,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
+@@ -343,7 +343,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
  import { modelFallbackBannerItem } from "./chat/ComposerUsageLimits";
  import { ComposerSurface } from "./chat/ComposerSurface";
  import { resolveThreadSyncPhase } from "../threadSync";
@@ -11,7 +11,7 @@ index 1a50e7fdfa6b39ac15214ce451089c386731623e..2c96a529595b981f4a55239580d44d04
  import {
    deriveLatestContextWindowSnapshot,
    hasDismissedResumeCompaction,
-@@ -2524,37 +2524,41 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2538,37 +2538,41 @@ export default function ChatView(props: ChatViewProps) {
      pendingUserInputs.length > 0;
    const compactDisabled = compactThreadUnavailable;
    // The context window is the current conversation's, so a handoff destination never inherits it.
@@ -70,7 +70,7 @@ index 1a50e7fdfa6b39ac15214ce451089c386731623e..2c96a529595b981f4a55239580d44d04
        return next;
      });
    };
-@@ -2564,7 +2568,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2578,7 +2582,7 @@ export default function ChatView(props: ChatViewProps) {
    const freshSessionCommandAvailable =
      freshSessionAvailable && activePendingApproval === null && pendingUserInputs.length === 0;
    const freshSessionArmed = useFreshSessionArmed(routeThreadKey);
@@ -79,7 +79,7 @@ index 1a50e7fdfa6b39ac15214ce451089c386731623e..2c96a529595b981f4a55239580d44d04
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const armFreshSessionStable = useStableCallback(() => armFreshSession(routeThreadKey));
    const handleRestoreThreadBranch = () => {
-@@ -2995,7 +2999,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3022,7 +3026,7 @@ export default function ChatView(props: ChatViewProps) {
      },
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -88,7 +88,7 @@ index 1a50e7fdfa6b39ac15214ce451089c386731623e..2c96a529595b981f4a55239580d44d04
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat: sideChat.available ? sendSideChatStable : undefined,
-@@ -3692,7 +3696,12 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3731,7 +3735,15 @@ export default function ChatView(props: ChatViewProps) {
                                  }
                                  resumeCompactionTokens={resumeCompactionTokens}
                                  keepFullHistory={keepFullHistory}
@@ -98,15 +98,18 @@ index 1a50e7fdfa6b39ac15214ce451089c386731623e..2c96a529595b981f4a55239580d44d04
 +                                    ? toggleKeepFullHistoryStable
 +                                    : undefined
 +                                }
-+                                promptCacheStatus={describePromptCache(activeThreadLiveTokenUsage)}
++                                promptCacheStatus={describePromptCache(
++                                  activeThreadLiveTokenUsage,
++                                  messages,
++                                )}
                                  sideChatAvailable={sideChat.available}
                                  sideChatDisabledReason={sideChatDisabledReason}
                                  onFreshSession={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 69250e47b89c34076d66447a8355d86b19637ef1..a3f02c8a4868e1c4276b7488adf953f752995e7d 100644
+index 3c2919c7606d27447f4f16b31943c36373e629d2..5cf4f2cb159ecf954416820e636d9f27ecd0f6f9 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -390,7 +390,8 @@ export interface ChatComposerProps {
+@@ -392,7 +392,8 @@ export interface ChatComposerProps {
    bannerItems: readonly ComposerBannerStackItem[];
    resumeCompactionTokens: number | null;
    keepFullHistory: boolean;
@@ -116,7 +119,7 @@ index 69250e47b89c34076d66447a8355d86b19637ef1..a3f02c8a4868e1c4276b7488adf953f7
    onUsageLimitsCommand?: (() => void) | undefined;
    sideChatAvailable?: boolean;
    sideChatDisabledReason?: string | null;
-@@ -3846,6 +3847,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -3876,6 +3877,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      hideCompactToggle={dictationTakesFooter}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -125,10 +128,10 @@ index 69250e47b89c34076d66447a8355d86b19637ef1..a3f02c8a4868e1c4276b7488adf953f7
                      {speechInput.available ? (
                        <>
 diff --git a/apps/web/src/components/chat/ComposerFooterControls.tsx b/apps/web/src/components/chat/ComposerFooterControls.tsx
-index ff8ea79ebd31960de3b82c7ae27ba64a27ed4ae7..a9cca2156a0f37224467df557838e532ad4f1edb 100644
+index 1df9cdbd323355b3a144e270b3b61a2b9c5159e9..c89990b8f7bd3c064cc38177db74874508d5060d 100644
 --- a/apps/web/src/components/chat/ComposerFooterControls.tsx
 +++ b/apps/web/src/components/chat/ComposerFooterControls.tsx
-@@ -218,7 +218,8 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
+@@ -224,7 +224,8 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
    compactBeforeSendTokens: number | null;
    hideCompactToggle: boolean;
    keepFullHistory: boolean;
@@ -138,7 +141,7 @@ index ff8ea79ebd31960de3b82c7ae27ba64a27ed4ae7..a9cca2156a0f37224467df557838e532
  }) {
    return (
      <>
-@@ -249,6 +250,7 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
+@@ -255,6 +256,7 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
          hideCompactToggle={props.hideCompactToggle}
          keepFullHistory={props.keepFullHistory}
          onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -147,10 +150,10 @@ index ff8ea79ebd31960de3b82c7ae27ba64a27ed4ae7..a9cca2156a0f37224467df557838e532
          {props.children}
        </ComposerPrimaryActions>
 diff --git a/apps/web/src/components/chat/ComposerPrimaryActions.tsx b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
-index 41e5e3c77191f7de29d5b5be62db46c21e778a3e..2a6ee22c2d2e94f99ac2afbd6adde3de0436ddd2 100644
+index 256144a5cc93b0465ba3da3eea1989fc51edaa2c..8faff49d84f1104d153fbd44cfb15a4c3515c399 100644
 --- a/apps/web/src/components/chat/ComposerPrimaryActions.tsx
 +++ b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
-@@ -64,7 +64,8 @@ interface ComposerPrimaryActionsProps {
+@@ -66,7 +66,8 @@ interface ComposerPrimaryActionsProps {
    compactBeforeSendTokens?: number | null;
    hideCompactToggle?: boolean;
    keepFullHistory?: boolean;
@@ -159,16 +162,16 @@ index 41e5e3c77191f7de29d5b5be62db46c21e778a3e..2a6ee22c2d2e94f99ac2afbd6adde3de
 +  promptCacheStatus?: string | null;
  }
  
- const formatPendingPrimaryActionLabel = (input: {
-@@ -247,6 +248,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+ const formatPendingPrimaryActionLabel = (
+@@ -259,6 +260,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
    hideCompactToggle = false,
    keepFullHistory = false,
    onToggleKeepFullHistory,
 +  promptCacheStatus = null,
  }: ComposerPrimaryActionsProps) {
-   const [stopPhase, setStopPhase] = useStopPhase({ runId, canInterrupt, canOperateThread });
-   const pointerFocusProps = preserveComposerFocusOnPointerDown
-@@ -367,7 +369,8 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+   const gt = useGT();
+   const m = useMessages();
+@@ -384,7 +386,8 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
      compactBeforeSendTokens !== null && !showResume && !isEditingQueuedMessage
        ? formatContextWindowTokens(compactBeforeSendTokens)
        : null;
@@ -177,14 +180,16 @@ index 41e5e3c77191f7de29d5b5be62db46c21e778a3e..2a6ee22c2d2e94f99ac2afbd6adde3de
 +  const compactsBeforeSend = canToggleCompact && !keepFullHistory;
  
    const submitLabel = showResume
-     ? "Resume thread"
-@@ -477,26 +480,32 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+     ? gt("Resume thread")
+@@ -509,32 +512,36 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
                type="button"
                className="flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-(--control-radius) px-2 font-medium text-base text-foreground/80 tabular-nums outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-64 sm:text-sm aria-pressed:bg-accent/60 aria-pressed:text-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:text-muted-foreground"
                {...pointerFocusProps}
 -              aria-pressed={!keepFullHistory}
 +              aria-pressed={compactsBeforeSend}
-               aria-label={`Compact ${compactTokens} tokens of history before sending`}
+               aria-label={gt("Compact {tokens} tokens of history before sending", {
+                 tokens: compactTokens,
+               })}
 -              disabled={!canOperateThread}
 +              disabled={!canOperateThread || !canToggleCompact}
                onClick={onToggleKeepFullHistory}
@@ -193,47 +198,56 @@ index 41e5e3c77191f7de29d5b5be62db46c21e778a3e..2a6ee22c2d2e94f99ac2afbd6adde3de
          >
            <Minimize2Icon aria-hidden="true" />
 -          <span className="@max-[480px]/composer-surface:hidden">
--            {keepFullHistory ? "Keep" : "Compact"}
+-            {keepFullHistory
+-              ? gt("Keep", { $context: "keep full history instead of compacting" })
+-              : gt("Compact", { $context: "verb, compact history before sending" })}
 -          </span>
            <span className="text-muted-foreground">{compactTokens}</span>
          </TooltipTrigger>
          <TooltipPopup>
 -          <div>
 -            {keepFullHistory
--              ? `Next send keeps all ${compactTokens} tokens.`
--              : `Next send compacts ${compactTokens} tokens first.`}
+-              ? gt("Next send keeps all {tokens} tokens.", { tokens: compactTokens })
+-              : gt("Next send compacts {tokens} tokens first.", { tokens: compactTokens })}
 -          </div>
--          <div>{keepFullHistory ? "Click to compact first" : "Click to keep full history"}</div>
+-          <div>
+-            {keepFullHistory ? gt("Click to compact first") : gt("Click to keep full history")}
+-          </div>
 +          {canToggleCompact ? (
 +            <>
 +              <div>
 +                {compactsBeforeSend
-+                  ? `Next send compacts ${compactTokens} tokens first.`
-+                  : `Next send keeps all ${compactTokens} tokens.`}
++                  ? gt("Next send compacts {tokens} tokens first.", { tokens: compactTokens })
++                  : gt("Next send keeps all {tokens} tokens.", { tokens: compactTokens })}
 +              </div>
 +              <div>
-+                {compactsBeforeSend ? "Click to keep full history" : "Click to compact first"}
++                {compactsBeforeSend
++                  ? gt("Click to keep full history")
++                  : gt("Click to compact first")}
 +              </div>
 +            </>
 +          ) : (
-+            <div>{compactTokens} tokens in context</div>
++            <div>{gt("{tokens} tokens in context", { tokens: compactTokens })}</div>
 +          )}
 +          {promptCacheStatus ? <div>{promptCacheStatus}</div> : null}
          </TooltipPopup>
        </Tooltip>
        {children}
 diff --git a/apps/web/src/components/chat/compaction.logic.ts b/apps/web/src/components/chat/compaction.logic.ts
-index ff3edb8e66b93f981e1155341c867ef01c0bc297..0b1b4fdbbc931bb859a3f391b9137cd4812d34bd 100644
+index 706fde340c583d84ffbf949bcb921841cfc3c44d..3e83e0e6b5566d94d2984a559dd661f0c71a67a2 100644
 --- a/apps/web/src/components/chat/compaction.logic.ts
 +++ b/apps/web/src/components/chat/compaction.logic.ts
-@@ -1,8 +1,13 @@
+@@ -1,4 +1,8 @@
 -import type { ProviderDriverKind, ProviderInstanceId } from "@t3tools/contracts";
 +import type {
 +  OrchestrationV2ProviderTurnTokenUsage,
 +  ProviderDriverKind,
 +  ProviderInstanceId,
 +} from "@t3tools/contracts";
- import {
+ import { msg } from "gt-react";
+ 
+ import { getActiveLocale, m, type MessageResolver } from "../../i18n/messages";
+@@ -6,6 +10,7 @@ import {
    resolveSelectableProviderInstanceEntry,
    type ProviderInstanceEntry,
  } from "../../providerInstances";
@@ -241,30 +255,40 @@ index ff3edb8e66b93f981e1155341c867ef01c0bc297..0b1b4fdbbc931bb859a3f391b9137cd4
  
  function providerSupportsManualCompaction(
    provider: ProviderInstanceEntry | null | undefined,
-@@ -34,6 +39,18 @@ export function hasAvailableCompactionProvider(input: {
+@@ -37,6 +42,28 @@ export function hasAvailableCompactionProvider(input: {
    );
  }
  
 +export function describePromptCache(
 +  usage: Pick<OrchestrationV2ProviderTurnTokenUsage, "promptCacheTtlMs" | "updatedAt"> | null,
++  resolve: MessageResolver = m,
 +): string | null {
 +  if (usage?.promptCacheTtlMs === undefined) return null;
 +  const expiresAtMs = Date.parse(usage.updatedAt) + usage.promptCacheTtlMs;
 +  if (!Number.isFinite(expiresAtMs)) return null;
 +  const expiresAt = new Date(expiresAtMs).toISOString();
-+  return expiresAtMs > Date.now()
-+    ? `Prompt cache warm. ${formatExpiresInLabel(expiresAt)}`
-+    : `Prompt cache expired ${formatRelativeTimeLabel(expiresAt)}`;
++  const now = Date.now();
++  return expiresAtMs > now
++    ? resolve(
++        msg("Prompt cache warm. {expiresIn}", {
++          expiresIn: formatExpiresInLabel(expiresAt, now, resolve),
++        }),
++      )
++    : resolve(
++        msg("Prompt cache expired {ago}", {
++          ago: formatRelativeTimeLabel(expiresAt, now, resolve),
++        }),
++      );
 +}
 +
- export function formatContextWindowCompactionMessage(autoCompactThreshold?: number | null): string {
-   if (typeof autoCompactThreshold === "number" && autoCompactThreshold > 0) {
-     return `Compacts automatically at about ${autoCompactThreshold.toLocaleString("en-US")} tokens.`;
+ export function formatContextWindowCompactionMessage(
+   autoCompactThreshold?: number | null,
+   resolve: MessageResolver = m,
 diff --git a/apps/web/src/components/chat/useComposerSend.ts b/apps/web/src/components/chat/useComposerSend.ts
-index 93ff79432708c6e289f61ea1619fd56448131d12..5851cfd00b4a3132add7d05644f5ab84bfc9250e 100644
+index 19a524369cbf766b3bdb58acdf32d1ffbf6bdc98..b4ab8a6c0f5646a3ac01c3b12c6178391f6279cf 100644
 --- a/apps/web/src/components/chat/useComposerSend.ts
 +++ b/apps/web/src/components/chat/useComposerSend.ts
-@@ -241,7 +241,7 @@ interface ComposerSendInput {
+@@ -244,7 +244,7 @@ interface ComposerSendInput {
      SetStateAction<Record<string, ReadonlyArray<CodexFeedbackSubmission>>>
    >;
    readonly setThreadError: ReturnType<typeof makeThreadErrorSetter>;
@@ -273,7 +297,7 @@ index 93ff79432708c6e289f61ea1619fd56448131d12..5851cfd00b4a3132add7d05644f5ab84
    readonly anchorNewTurn: TimelineFollow["anchorNewTurn"];
    readonly acknowledgeActiveThreadWoke: () => void;
    /** Resolves true once the side chat started and got the prompt. */
-@@ -332,7 +332,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -335,7 +335,7 @@ export function useComposerSend(input: ComposerSendInput) {
      optimisticBlobPreviews,
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -282,7 +306,7 @@ index 93ff79432708c6e289f61ea1619fd56448131d12..5851cfd00b4a3132add7d05644f5ab84
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat,
-@@ -1396,7 +1396,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -1427,7 +1427,7 @@ export function useComposerSend(input: ComposerSendInput) {
              checkoutPullRequestUrl,
            );
          }
@@ -291,3 +315,293 @@ index 93ff79432708c6e289f61ea1619fd56448131d12..5851cfd00b4a3132add7d05644f5ab84
          if (freshArm !== undefined) disarmFreshSession(routeThreadKey, freshArm);
          clearUsageLimitsFor(routeThreadKey);
          if (turnUsesAttachmentUploads) {
+diff --git a/apps/web/src/i18n/translations/de.json b/apps/web/src/i18n/translations/de.json
+index 648fd58859dbef730b3b8b97e454bcdbd9dcc185..a3e0e26af37104de5d61e46b2cb8684b3ecf6842 100644
+--- a/apps/web/src/i18n/translations/de.json
++++ b/apps/web/src/i18n/translations/de.json
+@@ -3369,12 +3369,11 @@
+   "35e0b8f7418b4a86": "Klicken zum Einreihen, {modifier}-Klick zum Umlenken",
+   "eed080cf5eb25bfd": "{tokens} Tokens Verlauf zusammenfassen, dann senden",
+   "e4116d7f64a6f593": "{tokens} Tokens Verlauf vor dem Senden komprimieren",
+-  "d6143c122719b099": "Behalten",
+-  "7335dc479a68818e": "Komprimieren",
+-  "b2411ad43ce3b143": "Beim nächsten Senden bleiben alle {tokens} Tokens erhalten.",
+   "ab6720311ff3140d": "Beim nächsten Senden werden zuerst {tokens} Tokens komprimiert.",
+-  "1486a422ba77a084": "Klicken, um zuerst zu komprimieren",
++  "b2411ad43ce3b143": "Beim nächsten Senden bleiben alle {tokens} Tokens erhalten.",
+   "b971f881c5dc4fca": "Klicken, um den vollständigen Verlauf zu behalten",
++  "1486a422ba77a084": "Klicken, um zuerst zu komprimieren",
++  "401cfdba49d96e51": "{tokens} Tokens im Kontext",
+   "89426e9b039148d7": "Spracheingabe fehlgeschlagen",
+   "2220a0fbb5b6fa47": "Modell wird heruntergeladen {percent} %",
+   "5c05b24be2880672": "Aufnahme",
+@@ -4501,6 +4500,8 @@
+   "b6d2a7ac2a8eac1e": "Sie wurde möglicherweise entfernt. Der ausgewählte Text ist weiterhin in deinem Zitat gespeichert.",
+   "be69a90d3d68d0d6": "Das Zitat bezieht sich nicht auf eine Antwort des Assistenten",
+   "fc7d59b60c3b7d46": "Der ausgewählte Text ist weiterhin in deinem Zitat gespeichert.",
++  "ea468e8c9a3509d2": "Prompt-Cache warm. {expiresIn}",
++  "4ece1577635c6bcf": "Prompt-Cache abgelaufen {ago}",
+   "8520b1297f0efd9b": "Wird bei etwa {tokens} Tokens automatisch komprimiert.",
+   "e4b9b6e99d9b6da1": "Der Kontext wird bei Bedarf automatisch komprimiert.",
+   "57e30468577bb989": "Warte auf den Server, bevor Dateianhänge gesendet werden können",
+diff --git a/apps/web/src/i18n/translations/en.json b/apps/web/src/i18n/translations/en.json
+index 599944358b5bbf7d7e2e347b95f8e5f91d0558c3..b1bc034a64e779d4cc3c567b3002c2cac6ac66f4 100644
+--- a/apps/web/src/i18n/translations/en.json
++++ b/apps/web/src/i18n/translations/en.json
+@@ -3368,12 +3368,11 @@
+   "35e0b8f7418b4a86": "Click to queue, {modifier}-click to steer",
+   "eed080cf5eb25bfd": "Summarize {tokens} tokens of history, then send",
+   "e4116d7f64a6f593": "Compact {tokens} tokens of history before sending",
+-  "d6143c122719b099": "Keep",
+-  "7335dc479a68818e": "Compact",
+-  "b2411ad43ce3b143": "Next send keeps all {tokens} tokens.",
+   "ab6720311ff3140d": "Next send compacts {tokens} tokens first.",
+-  "1486a422ba77a084": "Click to compact first",
++  "b2411ad43ce3b143": "Next send keeps all {tokens} tokens.",
+   "b971f881c5dc4fca": "Click to keep full history",
++  "1486a422ba77a084": "Click to compact first",
++  "401cfdba49d96e51": "{tokens} tokens in context",
+   "89426e9b039148d7": "Voice input failed",
+   "2220a0fbb5b6fa47": "Downloading model {percent}%",
+   "5c05b24be2880672": "Recording",
+@@ -4500,6 +4499,8 @@
+   "b6d2a7ac2a8eac1e": "It may have been removed. The selected text is still saved in your citation.",
+   "be69a90d3d68d0d6": "The citation does not refer to an assistant response",
+   "fc7d59b60c3b7d46": "The selected text is still saved in your citation.",
++  "ea468e8c9a3509d2": "Prompt cache warm. {expiresIn}",
++  "4ece1577635c6bcf": "Prompt cache expired {ago}",
+   "8520b1297f0efd9b": "Compacts automatically at about {tokens} tokens.",
+   "e4b9b6e99d9b6da1": "Context compacts automatically when needed.",
+   "57e30468577bb989": "Waiting for the server before file attachments can send",
+diff --git a/apps/web/src/i18n/translations/es.json b/apps/web/src/i18n/translations/es.json
+index 956f4e17a96179f5362a747eb56ee1dfe74da09e..e2d0cce6f7170be1ea4ce4092c31a9902df4a60c 100644
+--- a/apps/web/src/i18n/translations/es.json
++++ b/apps/web/src/i18n/translations/es.json
+@@ -3368,12 +3368,11 @@
+   "35e0b8f7418b4a86": "Clic para poner en cola, {modifier}-clic para redirigir",
+   "eed080cf5eb25bfd": "Resumir {tokens} tokens del historial y enviar",
+   "e4116d7f64a6f593": "Compactar {tokens} tokens del historial antes de enviar",
+-  "d6143c122719b099": "Conservar",
+-  "7335dc479a68818e": "Compactar",
+-  "b2411ad43ce3b143": "El próximo envío conserva los {tokens} tokens.",
+   "ab6720311ff3140d": "El próximo envío compacta primero {tokens} tokens.",
+-  "1486a422ba77a084": "Clic para compactar primero",
++  "b2411ad43ce3b143": "El próximo envío conserva los {tokens} tokens.",
+   "b971f881c5dc4fca": "Clic para conservar todo el historial",
++  "1486a422ba77a084": "Clic para compactar primero",
++  "401cfdba49d96e51": "{tokens} tokens en el contexto",
+   "89426e9b039148d7": "Falló la entrada de voz",
+   "2220a0fbb5b6fa47": "Descargando el modelo {percent} %",
+   "5c05b24be2880672": "Grabando",
+@@ -4498,6 +4497,8 @@
+   "b6d2a7ac2a8eac1e": "Puede que se haya quitado. El texto seleccionado sigue guardado en tu cita.",
+   "be69a90d3d68d0d6": "La cita no hace referencia a una respuesta del asistente",
+   "fc7d59b60c3b7d46": "El texto seleccionado sigue guardado en tu cita.",
++  "ea468e8c9a3509d2": "Caché del prompt activa. {expiresIn}",
++  "4ece1577635c6bcf": "Caché del prompt caducó {ago}",
+   "8520b1297f0efd9b": "Se compacta automáticamente hacia los {tokens} tokens.",
+   "e4b9b6e99d9b6da1": "El contexto se compacta automáticamente cuando hace falta.",
+   "57e30468577bb989": "Esperando al servidor para poder enviar los archivos adjuntos",
+diff --git a/apps/web/src/i18n/translations/fr.json b/apps/web/src/i18n/translations/fr.json
+index 1c982cc6d6f58bcaae29b13f9887d1ad8630b94e..9c51e5b12f92fabaab20ca5e55a6d469c85be3c9 100644
+--- a/apps/web/src/i18n/translations/fr.json
++++ b/apps/web/src/i18n/translations/fr.json
+@@ -3368,12 +3368,11 @@
+   "35e0b8f7418b4a86": "Cliquez pour mettre en file d’attente, {modifier}-clic pour réorienter",
+   "eed080cf5eb25bfd": "Résumer {tokens} tokens d’historique, puis envoyer",
+   "e4116d7f64a6f593": "Compacter {tokens} tokens d’historique avant l’envoi",
+-  "d6143c122719b099": "Garder",
+-  "7335dc479a68818e": "Compacter",
+-  "b2411ad43ce3b143": "Le prochain envoi garde les {tokens} tokens.",
+   "ab6720311ff3140d": "Le prochain envoi compacte d’abord {tokens} tokens.",
+-  "1486a422ba77a084": "Cliquez pour compacter d’abord",
++  "b2411ad43ce3b143": "Le prochain envoi garde les {tokens} tokens.",
+   "b971f881c5dc4fca": "Cliquez pour garder tout l’historique",
++  "1486a422ba77a084": "Cliquez pour compacter d’abord",
++  "401cfdba49d96e51": "{tokens} jetons dans le contexte",
+   "89426e9b039148d7": "Échec de la saisie vocale",
+   "2220a0fbb5b6fa47": "Téléchargement du modèle {percent} %",
+   "5c05b24be2880672": "Enregistrement",
+@@ -4499,6 +4498,8 @@
+   "b6d2a7ac2a8eac1e": "Elle a peut-être été supprimée. Le texte sélectionné reste enregistré dans votre citation.",
+   "be69a90d3d68d0d6": "La citation ne renvoie pas à une réponse de l’assistant",
+   "fc7d59b60c3b7d46": "Le texte sélectionné reste enregistré dans votre citation.",
++  "ea468e8c9a3509d2": "Cache du prompt actif. {expiresIn}",
++  "4ece1577635c6bcf": "Cache du prompt expiré {ago}",
+   "8520b1297f0efd9b": "Compactage automatique vers {tokens} tokens.",
+   "e4b9b6e99d9b6da1": "Le contexte est compacté automatiquement si nécessaire.",
+   "57e30468577bb989": "En attente du serveur avant de pouvoir envoyer les pièces jointes",
+diff --git a/apps/web/src/i18n/translations/ja.json b/apps/web/src/i18n/translations/ja.json
+index 879531a396d2ac686a626c2b9a2508526ae64bd2..843ca380bcee4f3a44a6a23b05a173ba6176e8e4 100644
+--- a/apps/web/src/i18n/translations/ja.json
++++ b/apps/web/src/i18n/translations/ja.json
+@@ -3364,12 +3364,11 @@
+   "35e0b8f7418b4a86": "クリックでキューに追加、{modifier}+クリックで軌道修正",
+   "eed080cf5eb25bfd": "履歴の {tokens} トークンを要約してから送信",
+   "e4116d7f64a6f593": "送信前に履歴の {tokens} トークンを圧縮",
+-  "d6143c122719b099": "維持",
+-  "7335dc479a68818e": "圧縮",
+-  "b2411ad43ce3b143": "次の送信では {tokens} トークンすべてを維持します。",
+   "ab6720311ff3140d": "次の送信では先に {tokens} トークンを圧縮します。",
+-  "1486a422ba77a084": "クリックすると先に圧縮します",
++  "b2411ad43ce3b143": "次の送信では {tokens} トークンすべてを維持します。",
+   "b971f881c5dc4fca": "クリックすると完全な履歴を維持します",
++  "1486a422ba77a084": "クリックすると先に圧縮します",
++  "401cfdba49d96e51": "コンテキスト内に {tokens} トークン",
+   "89426e9b039148d7": "音声入力に失敗しました",
+   "2220a0fbb5b6fa47": "モデルをダウンロードしています {percent}%",
+   "5c05b24be2880672": "録音中",
+@@ -4488,6 +4487,8 @@
+   "b6d2a7ac2a8eac1e": "削除された可能性があります。選択したテキストは引用に保存されたままです。",
+   "be69a90d3d68d0d6": "この引用はアシスタントの応答を参照していません",
+   "fc7d59b60c3b7d46": "選択したテキストは引用に保存されたままです。",
++  "ea468e8c9a3509d2": "プロンプトキャッシュは有効です。{expiresIn}",
++  "4ece1577635c6bcf": "プロンプトキャッシュは期限切れです({ago})",
+   "8520b1297f0efd9b": "約 {tokens} トークンで自動的に圧縮されます。",
+   "e4b9b6e99d9b6da1": "コンテキストは必要に応じて自動的に圧縮されます。",
+   "57e30468577bb989": "ファイルの添付を送信できるようになるまでサーバーを待っています",
+diff --git a/apps/web/src/i18n/translations/ko.json b/apps/web/src/i18n/translations/ko.json
+index fae8ce2ec6fc4a01b395bd08c38a4d47e9825f55..f3e82e04c614a7ead9135259d10204f494f83b36 100644
+--- a/apps/web/src/i18n/translations/ko.json
++++ b/apps/web/src/i18n/translations/ko.json
+@@ -3364,12 +3364,11 @@
+   "35e0b8f7418b4a86": "클릭하면 대기열에 추가, {modifier}-클릭하면 방향 조정",
+   "eed080cf5eb25bfd": "기록의 토큰 {tokens}개를 요약한 후 보내기",
+   "e4116d7f64a6f593": "보내기 전에 기록의 토큰 {tokens}개 압축",
+-  "d6143c122719b099": "유지",
+-  "7335dc479a68818e": "압축",
+-  "b2411ad43ce3b143": "다음 전송 시 토큰 {tokens}개를 모두 유지합니다.",
+   "ab6720311ff3140d": "다음 전송 시 먼저 토큰 {tokens}개를 압축합니다.",
+-  "1486a422ba77a084": "클릭하면 먼저 압축",
++  "b2411ad43ce3b143": "다음 전송 시 토큰 {tokens}개를 모두 유지합니다.",
+   "b971f881c5dc4fca": "클릭하면 전체 기록 유지",
++  "1486a422ba77a084": "클릭하면 먼저 압축",
++  "401cfdba49d96e51": "컨텍스트에 토큰 {tokens}개",
+   "89426e9b039148d7": "음성 입력 실패",
+   "2220a0fbb5b6fa47": "모델 다운로드 중 {percent}%",
+   "5c05b24be2880672": "녹음 중",
+@@ -4485,6 +4484,8 @@
+   "b6d2a7ac2a8eac1e": "삭제되었을 수 있습니다. 선택한 텍스트는 인용에 그대로 저장되어 있습니다.",
+   "be69a90d3d68d0d6": "인용이 어시스턴트 응답을 가리키지 않습니다",
+   "fc7d59b60c3b7d46": "선택한 텍스트는 인용에 그대로 저장되어 있습니다.",
++  "ea468e8c9a3509d2": "프롬프트 캐시 활성. {expiresIn}",
++  "4ece1577635c6bcf": "프롬프트 캐시 만료 {ago}",
+   "8520b1297f0efd9b": "약 {tokens}토큰에서 자동으로 압축합니다.",
+   "e4b9b6e99d9b6da1": "필요할 때 컨텍스트를 자동으로 압축합니다.",
+   "57e30468577bb989": "파일 첨부를 보내기 전에 서버를 기다리는 중",
+diff --git a/apps/web/src/i18n/translations/pt-BR.json b/apps/web/src/i18n/translations/pt-BR.json
+index 7010bef288b16fa0510474b52259dff2cf25d404..9c693ef1295fc5f83c202ffb3688f7b9467832e9 100644
+--- a/apps/web/src/i18n/translations/pt-BR.json
++++ b/apps/web/src/i18n/translations/pt-BR.json
+@@ -3368,12 +3368,11 @@
+   "35e0b8f7418b4a86": "Clique para enfileirar, {modifier}-clique para direcionar",
+   "eed080cf5eb25bfd": "Resumir {tokens} tokens do histórico e enviar",
+   "e4116d7f64a6f593": "Compactar {tokens} tokens do histórico antes de enviar",
+-  "d6143c122719b099": "Manter",
+-  "7335dc479a68818e": "Compactar",
+-  "b2411ad43ce3b143": "O próximo envio mantém todos os {tokens} tokens.",
+   "ab6720311ff3140d": "O próximo envio compacta {tokens} tokens antes.",
+-  "1486a422ba77a084": "Clique para compactar antes",
++  "b2411ad43ce3b143": "O próximo envio mantém todos os {tokens} tokens.",
+   "b971f881c5dc4fca": "Clique para manter o histórico completo",
++  "1486a422ba77a084": "Clique para compactar antes",
++  "401cfdba49d96e51": "{tokens} tokens no contexto",
+   "89426e9b039148d7": "Falha na entrada de voz",
+   "2220a0fbb5b6fa47": "Baixando o modelo {percent}%",
+   "5c05b24be2880672": "Gravando",
+@@ -4498,6 +4497,8 @@
+   "b6d2a7ac2a8eac1e": "Ela pode ter sido removida. O texto selecionado continua salvo na sua citação.",
+   "be69a90d3d68d0d6": "A citação não se refere a uma resposta do assistente",
+   "fc7d59b60c3b7d46": "O texto selecionado continua salvo na sua citação.",
++  "ea468e8c9a3509d2": "Cache do prompt ativo. {expiresIn}",
++  "4ece1577635c6bcf": "Cache do prompt expirou {ago}",
+   "8520b1297f0efd9b": "Compacta automaticamente em cerca de {tokens} tokens.",
+   "e4b9b6e99d9b6da1": "O contexto é compactado automaticamente quando necessário.",
+   "57e30468577bb989": "Aguardando o servidor para poder enviar anexos de arquivo",
+diff --git a/apps/web/src/i18n/translations/ru.json b/apps/web/src/i18n/translations/ru.json
+index 0766d953dd02dd97601d9ddf60409713c19c9849..3c71338a0a316ab614b542a380351a378f193444 100644
+--- a/apps/web/src/i18n/translations/ru.json
++++ b/apps/web/src/i18n/translations/ru.json
+@@ -3368,12 +3368,11 @@
+   "35e0b8f7418b4a86": "Нажмите, чтобы поставить в очередь; {modifier}+нажатие — скорректировать",
+   "eed080cf5eb25bfd": "Свести историю ({tokens} токенов) и отправить",
+   "e4116d7f64a6f593": "Сжать историю ({tokens} токенов) перед отправкой",
+-  "d6143c122719b099": "Оставить",
+-  "7335dc479a68818e": "Сжать",
+-  "b2411ad43ce3b143": "Следующая отправка сохранит все токены ({tokens}).",
+   "ab6720311ff3140d": "Следующая отправка сначала сожмёт токены ({tokens}).",
+-  "1486a422ba77a084": "Нажмите, чтобы сначала сжать",
++  "b2411ad43ce3b143": "Следующая отправка сохранит все токены ({tokens}).",
+   "b971f881c5dc4fca": "Нажмите, чтобы сохранить всю историю",
++  "1486a422ba77a084": "Нажмите, чтобы сначала сжать",
++  "401cfdba49d96e51": "{tokens} токенов в контексте",
+   "89426e9b039148d7": "Ошибка голосового ввода",
+   "2220a0fbb5b6fa47": "Загрузка модели {percent}%",
+   "5c05b24be2880672": "Запись",
+@@ -4498,6 +4497,8 @@
+   "b6d2a7ac2a8eac1e": "Возможно, он удалён. Выделенный текст по-прежнему сохранён в цитате.",
+   "be69a90d3d68d0d6": "Цитата не ссылается на ответ ассистента",
+   "fc7d59b60c3b7d46": "Выделенный текст по-прежнему сохранён в цитате.",
++  "ea468e8c9a3509d2": "Кэш промпта активен. {expiresIn}",
++  "4ece1577635c6bcf": "Кэш промпта истёк {ago}",
+   "8520b1297f0efd9b": "Автоматическое сжатие примерно при {tokens} токенов.",
+   "e4b9b6e99d9b6da1": "Контекст сжимается автоматически по мере необходимости.",
+   "57e30468577bb989": "Ожидание сервера для отправки вложений",
+diff --git a/apps/web/src/i18n/translations/sv.json b/apps/web/src/i18n/translations/sv.json
+index 5e6d1607edf318a5f43ccaf05c132bce507b043d..62777dce4f1012add0e8be4200d803d4f7100d11 100644
+--- a/apps/web/src/i18n/translations/sv.json
++++ b/apps/web/src/i18n/translations/sv.json
+@@ -3368,12 +3368,11 @@
+   "35e0b8f7418b4a86": "Klicka för att köa, {modifier}-klicka för att styra om",
+   "eed080cf5eb25bfd": "Sammanfatta {tokens} token historik och skicka sedan",
+   "e4116d7f64a6f593": "Komprimera {tokens} token historik innan du skickar",
+-  "d6143c122719b099": "Behåll",
+-  "7335dc479a68818e": "Komprimera",
+-  "b2411ad43ce3b143": "Nästa sändning behåller alla {tokens} token.",
+   "ab6720311ff3140d": "Nästa sändning komprimerar {tokens} token först.",
+-  "1486a422ba77a084": "Klicka för att komprimera först",
++  "b2411ad43ce3b143": "Nästa sändning behåller alla {tokens} token.",
+   "b971f881c5dc4fca": "Klicka för att behålla hela historiken",
++  "1486a422ba77a084": "Klicka för att komprimera först",
++  "401cfdba49d96e51": "{tokens} tokens i kontexten",
+   "89426e9b039148d7": "Röstinmatningen misslyckades",
+   "2220a0fbb5b6fa47": "Laddar ned modell {percent} %",
+   "5c05b24be2880672": "Spelar in",
+@@ -4499,6 +4498,8 @@
+   "b6d2a7ac2a8eac1e": "Det kan ha tagits bort. Den markerade texten finns fortfarande sparad i ditt citat.",
+   "be69a90d3d68d0d6": "Citatet hänvisar inte till ett assistentsvar",
+   "fc7d59b60c3b7d46": "Den markerade texten finns fortfarande sparad i ditt citat.",
++  "ea468e8c9a3509d2": "Promptcachen är varm. {expiresIn}",
++  "4ece1577635c6bcf": "Promptcachen gick ut {ago}",
+   "8520b1297f0efd9b": "Komprimeras automatiskt vid cirka {tokens} token.",
+   "e4b9b6e99d9b6da1": "Kontexten komprimeras automatiskt vid behov.",
+   "57e30468577bb989": "Väntar på servern innan filbilagor kan skickas",
+diff --git a/apps/web/src/i18n/translations/zh.json b/apps/web/src/i18n/translations/zh.json
+index c86b9e6c55e410de5e47a6d67cec9e0eb90ff78f..b90136120ef9bb3a5c1fe262a816fe0a68968dc9 100644
+--- a/apps/web/src/i18n/translations/zh.json
++++ b/apps/web/src/i18n/translations/zh.json
+@@ -3373,12 +3373,11 @@
+   "35e0b8f7418b4a86": "点击以加入队列，{modifier}+点击以引导",
+   "eed080cf5eb25bfd": "先总结 {tokens} token 的历史记录，再发送",
+   "e4116d7f64a6f593": "发送前压缩 {tokens} token 的历史记录",
+-  "d6143c122719b099": "保留",
+-  "7335dc479a68818e": "压缩",
+-  "b2411ad43ce3b143": "下次发送时保留全部 {tokens} token。",
+   "ab6720311ff3140d": "下次发送前先压缩 {tokens} token。",
+-  "1486a422ba77a084": "点击以先压缩历史记录",
++  "b2411ad43ce3b143": "下次发送时保留全部 {tokens} token。",
+   "b971f881c5dc4fca": "点击以保留完整历史记录",
++  "1486a422ba77a084": "点击以先压缩历史记录",
++  "401cfdba49d96e51": "上下文中有 {tokens} 个 token",
+   "89426e9b039148d7": "语音输入失败",
+   "2220a0fbb5b6fa47": "正在下载模型 {percent}%",
+   "5c05b24be2880672": "正在录音",
+@@ -4505,6 +4504,8 @@
+   "b6d2a7ac2a8eac1e": "它可能已被删除。选中的文字仍保存在你的引用中。",
+   "be69a90d3d68d0d6": "这个引用指向的不是助手回复",
+   "fc7d59b60c3b7d46": "选中的文字仍保存在你的引用中。",
++  "ea468e8c9a3509d2": "提示缓存有效。{expiresIn}",
++  "4ece1577635c6bcf": "提示缓存已过期 {ago}",
+   "8520b1297f0efd9b": "大约 {tokens} token 时会自动压缩。",
+   "e4b9b6e99d9b6da1": "上下文会在需要时自动压缩。",
+   "57e30468577bb989": "正在等待服务器，之后才能发送文件附件",

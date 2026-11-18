@@ -1,8 +1,8 @@
 diff --git a/apps/desktop/package.json b/apps/desktop/package.json
-index 0daa6f14cf5c4ff1e6eac800727fdf16c08e57d2..0ddce2b1454ca8e210a244f32b206819c9f58aac 100644
+index d91a9ee5e4cfe282486753ebaf54eca69ce09651..7b9971e0ad3544549a5d55f19046e8850b348238 100644
 --- a/apps/desktop/package.json
 +++ b/apps/desktop/package.json
-@@ -41,5 +41,5 @@
+@@ -44,5 +44,5 @@
      "tailwindcss": "^4.0.0",
      "vite-plus": "catalog:"
    },
@@ -52,15 +52,16 @@ index 45887a928abb7f89b3c8f3c1425f814845658b27..9d79df53d85acace2639c3aec1dc8edc
          assert.include(
            identity.desktopEntry ?? "",
 diff --git a/apps/web/src/branding.logic.ts b/apps/web/src/branding.logic.ts
-index f53103d904ad0545fbd377ff9aab31a873554c72..33bf4c737618509caf47eea1758f520a8d24631e 100644
+index 3071a6c0956ee665b9b9ff0416f965c9731caed1..e31801094daa275fc348c6473d5996f4b7fa35cc 100644
 --- a/apps/web/src/branding.logic.ts
 +++ b/apps/web/src/branding.logic.ts
-@@ -22,7 +22,7 @@ export function resolveWebAppStageLabel(input: {
-   readonly development: boolean;
+@@ -24,7 +24,8 @@ export function resolveWebAppStageLabel(input: {
  }): string {
    return (
+     // oxlint-disable-next-line t3code/no-untranslated-copy -- release channel name, part of the product name
 -    resolveHostedAppChannelLabel(input.hostedAppChannel) ?? (input.development ? "Dev" : "Beta")
-+    resolveHostedAppChannelLabel(input.hostedAppChannel) ?? (input.development ? "Dev" : "Bassim's autofork")
++    resolveHostedAppChannelLabel(input.hostedAppChannel) ??
++    (input.development ? "Dev" : "Bassim's autofork")
    );
  }
  

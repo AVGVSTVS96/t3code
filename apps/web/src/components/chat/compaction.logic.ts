@@ -3,6 +3,9 @@ import type {
   ProviderDriverKind,
   ProviderInstanceId,
 } from "@t3tools/contracts";
+import { msg } from "gt-react";
+
+import { getActiveLocale, m, type MessageResolver } from "../../i18n/messages";
 import {
   resolveSelectableProviderInstanceEntry,
   type ProviderInstanceEntry,
@@ -41,19 +44,37 @@ export function hasAvailableCompactionProvider(input: {
 
 export function describePromptCache(
   usage: Pick<OrchestrationV2ProviderTurnTokenUsage, "promptCacheTtlMs" | "updatedAt"> | null,
+  resolve: MessageResolver = m,
 ): string | null {
   if (usage?.promptCacheTtlMs === undefined) return null;
   const expiresAtMs = Date.parse(usage.updatedAt) + usage.promptCacheTtlMs;
   if (!Number.isFinite(expiresAtMs)) return null;
   const expiresAt = new Date(expiresAtMs).toISOString();
-  return expiresAtMs > Date.now()
-    ? `Prompt cache warm. ${formatExpiresInLabel(expiresAt)}`
-    : `Prompt cache expired ${formatRelativeTimeLabel(expiresAt)}`;
+  const now = Date.now();
+  return expiresAtMs > now
+    ? resolve(
+        msg("Prompt cache warm. {expiresIn}", {
+          expiresIn: formatExpiresInLabel(expiresAt, now, resolve),
+        }),
+      )
+    : resolve(
+        msg("Prompt cache expired {ago}", {
+          ago: formatRelativeTimeLabel(expiresAt, now, resolve),
+        }),
+      );
 }
 
-export function formatContextWindowCompactionMessage(autoCompactThreshold?: number | null): string {
+export function formatContextWindowCompactionMessage(
+  autoCompactThreshold?: number | null,
+  resolve: MessageResolver = m,
+  locale: string = getActiveLocale(),
+): string {
   if (typeof autoCompactThreshold === "number" && autoCompactThreshold > 0) {
-    return `Compacts automatically at about ${autoCompactThreshold.toLocaleString("en-US")} tokens.`;
+    return resolve(
+      msg("Compacts automatically at about {tokens} tokens.", {
+        tokens: autoCompactThreshold.toLocaleString(locale),
+      }),
+    );
   }
-  return "Context compacts automatically when needed.";
+  return resolve(msg("Context compacts automatically when needed."));
 }
