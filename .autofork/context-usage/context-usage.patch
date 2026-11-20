@@ -318,10 +318,10 @@ index 43f2082e7b7e9c6fa5055bda1457c3104e0409c9..855df007d0cfbf668e4373eaa937e5fa
          clearUsageLimitsFor(routeThreadKey);
          if (turnUsesAttachmentUploads) {
 diff --git a/apps/web/src/i18n/translations/de.json b/apps/web/src/i18n/translations/de.json
-index 5439ee39688eade31897af144b50a5f5383f290e..664808271388debcd3b5aa9c545daf49decdeca3 100644
+index e8685533481d00c9c342b326759b71b4adc9bd08..d04c233706cd1001983480939464104a4d9fd9ac 100644
 --- a/apps/web/src/i18n/translations/de.json
 +++ b/apps/web/src/i18n/translations/de.json
-@@ -3440,12 +3440,11 @@
+@@ -3442,12 +3442,11 @@
    "35e0b8f7418b4a86": "Klicken zum Einreihen, {modifier}-Klick zum Umlenken",
    "eed080cf5eb25bfd": "{tokens} Tokens Verlauf zusammenfassen, dann senden",
    "e4116d7f64a6f593": "{tokens} Tokens Verlauf vor dem Senden komprimieren",
@@ -337,7 +337,7 @@ index 5439ee39688eade31897af144b50a5f5383f290e..664808271388debcd3b5aa9c545daf49
    "89426e9b039148d7": "Spracheingabe fehlgeschlagen",
    "2220a0fbb5b6fa47": "Modell wird heruntergeladen {percent} %",
    "5c05b24be2880672": "Aufnahme",
-@@ -4586,6 +4585,8 @@
+@@ -4588,6 +4587,8 @@
    "b6d2a7ac2a8eac1e": "Sie wurde möglicherweise entfernt. Der ausgewählte Text ist weiterhin in deinem Zitat gespeichert.",
    "be69a90d3d68d0d6": "Das Zitat bezieht sich nicht auf eine Antwort des Assistenten",
    "fc7d59b60c3b7d46": "Der ausgewählte Text ist weiterhin in deinem Zitat gespeichert.",
@@ -347,10 +347,10 @@ index 5439ee39688eade31897af144b50a5f5383f290e..664808271388debcd3b5aa9c545daf49
    "e4b9b6e99d9b6da1": "Der Kontext wird bei Bedarf automatisch komprimiert.",
    "57e30468577bb989": "Warte auf den Server, bevor Dateianhänge gesendet werden können",
 diff --git a/apps/web/src/i18n/translations/en.json b/apps/web/src/i18n/translations/en.json
-index c378e66342505d9a5fa15fb0767a74aad29325d5..63b9e69287ea242f6193e58738dcb6ea0574abd1 100644
+index 05b83efc41fc5b3d8e8559e9ebfac922ed1282ad..097f541e90e93a8aad3a8044cf2abc2cf9cf67cc 100644
 --- a/apps/web/src/i18n/translations/en.json
 +++ b/apps/web/src/i18n/translations/en.json
-@@ -3439,12 +3439,11 @@
+@@ -3441,12 +3441,11 @@
    "35e0b8f7418b4a86": "Click to queue, {modifier}-click to steer",
    "eed080cf5eb25bfd": "Summarize {tokens} tokens of history, then send",
    "e4116d7f64a6f593": "Compact {tokens} tokens of history before sending",
@@ -366,7 +366,7 @@ index c378e66342505d9a5fa15fb0767a74aad29325d5..63b9e69287ea242f6193e58738dcb6ea
    "89426e9b039148d7": "Voice input failed",
    "2220a0fbb5b6fa47": "Downloading model {percent}%",
    "5c05b24be2880672": "Recording",
-@@ -4585,6 +4584,8 @@
+@@ -4587,6 +4586,8 @@
    "b6d2a7ac2a8eac1e": "It may have been removed. The selected text is still saved in your citation.",
    "be69a90d3d68d0d6": "The citation does not refer to an assistant response",
    "fc7d59b60c3b7d46": "The selected text is still saved in your citation.",
@@ -376,10 +376,10 @@ index c378e66342505d9a5fa15fb0767a74aad29325d5..63b9e69287ea242f6193e58738dcb6ea
    "e4b9b6e99d9b6da1": "Context compacts automatically when needed.",
    "57e30468577bb989": "Waiting for the server before file attachments can send",
 diff --git a/apps/web/src/i18n/translations/es.json b/apps/web/src/i18n/translations/es.json
-index 1538850527718730a5137e340ce7f8f44d40e643..797fc3228c18015787001c089e328770022238f0 100644
+index 05ee7b77c7d7feee11d883dd4d808e24260c4466..03b69c6ada7ab5a3d561191d5db04e79f4c66551 100644
 --- a/apps/web/src/i18n/translations/es.json
 +++ b/apps/web/src/i18n/translations/es.json
-@@ -3439,12 +3439,11 @@
+@@ -3441,12 +3441,11 @@
    "35e0b8f7418b4a86": "Clic para poner en cola, {modifier}-clic para redirigir",
    "eed080cf5eb25bfd": "Resumir {tokens} tokens del historial y enviar",
    "e4116d7f64a6f593": "Compactar {tokens} tokens del historial antes de enviar",
@@ -395,7 +395,7 @@ index 1538850527718730a5137e340ce7f8f44d40e643..797fc3228c18015787001c089e328770
    "89426e9b039148d7": "Falló la entrada de voz",
    "2220a0fbb5b6fa47": "Descargando el modelo {percent} %",
    "5c05b24be2880672": "Grabando",
-@@ -4583,6 +4582,8 @@
+@@ -4585,6 +4584,8 @@
    "b6d2a7ac2a8eac1e": "Puede que se haya quitado. El texto seleccionado sigue guardado en tu cita.",
    "be69a90d3d68d0d6": "La cita no hace referencia a una respuesta del asistente",
    "fc7d59b60c3b7d46": "El texto seleccionado sigue guardado en tu cita.",
@@ -405,10 +405,10 @@ index 1538850527718730a5137e340ce7f8f44d40e643..797fc3228c18015787001c089e328770
    "e4b9b6e99d9b6da1": "El contexto se compacta automáticamente cuando hace falta.",
    "57e30468577bb989": "Esperando al servidor para poder enviar los archivos adjuntos",
 diff --git a/apps/web/src/i18n/translations/fr.json b/apps/web/src/i18n/translations/fr.json
-index b9166940ccf6600d3a91ab869aa0279f7c05258a..f80c63ddc6d6257d0c88499de99d8cd296c0c9ca 100644
+index ada03eb7f10a66eb70d9157ce33ef66077c68bb9..46fe78f03e03bffaca0a8c986125d6eb81cff855 100644
 --- a/apps/web/src/i18n/translations/fr.json
 +++ b/apps/web/src/i18n/translations/fr.json
-@@ -3439,12 +3439,11 @@
+@@ -3441,12 +3441,11 @@
    "35e0b8f7418b4a86": "Cliquez pour mettre en file d’attente, {modifier}-clic pour réorienter",
    "eed080cf5eb25bfd": "Résumer {tokens} tokens d’historique, puis envoyer",
    "e4116d7f64a6f593": "Compacter {tokens} tokens d’historique avant l’envoi",
@@ -424,7 +424,7 @@ index b9166940ccf6600d3a91ab869aa0279f7c05258a..f80c63ddc6d6257d0c88499de99d8cd2
    "89426e9b039148d7": "Échec de la saisie vocale",
    "2220a0fbb5b6fa47": "Téléchargement du modèle {percent} %",
    "5c05b24be2880672": "Enregistrement",
-@@ -4584,6 +4583,8 @@
+@@ -4586,6 +4585,8 @@
    "b6d2a7ac2a8eac1e": "Elle a peut-être été supprimée. Le texte sélectionné reste enregistré dans votre citation.",
    "be69a90d3d68d0d6": "La citation ne renvoie pas à une réponse de l’assistant",
    "fc7d59b60c3b7d46": "Le texte sélectionné reste enregistré dans votre citation.",
@@ -434,10 +434,10 @@ index b9166940ccf6600d3a91ab869aa0279f7c05258a..f80c63ddc6d6257d0c88499de99d8cd2
    "e4b9b6e99d9b6da1": "Le contexte est compacté automatiquement si nécessaire.",
    "57e30468577bb989": "En attente du serveur avant de pouvoir envoyer les pièces jointes",
 diff --git a/apps/web/src/i18n/translations/ja.json b/apps/web/src/i18n/translations/ja.json
-index da6a34749df883d48fa5ec7db9008751c412cd09..dfff1fab782c8f368834ca4838ec949192cd1081 100644
+index 9d743e7e0a7f01fc933b53973dbbc1cdb30ef1e2..482adacf3ea392d50bc96609c5ccd6dd82a3802b 100644
 --- a/apps/web/src/i18n/translations/ja.json
 +++ b/apps/web/src/i18n/translations/ja.json
-@@ -3435,12 +3435,11 @@
+@@ -3437,12 +3437,11 @@
    "35e0b8f7418b4a86": "クリックでキューに追加、{modifier}+クリックで軌道修正",
    "eed080cf5eb25bfd": "履歴の {tokens} トークンを要約してから送信",
    "e4116d7f64a6f593": "送信前に履歴の {tokens} トークンを圧縮",
@@ -453,7 +453,7 @@ index da6a34749df883d48fa5ec7db9008751c412cd09..dfff1fab782c8f368834ca4838ec9491
    "89426e9b039148d7": "音声入力に失敗しました",
    "2220a0fbb5b6fa47": "モデルをダウンロードしています {percent}%",
    "5c05b24be2880672": "録音中",
-@@ -4573,6 +4572,8 @@
+@@ -4575,6 +4574,8 @@
    "b6d2a7ac2a8eac1e": "削除された可能性があります。選択したテキストは引用に保存されたままです。",
    "be69a90d3d68d0d6": "この引用はアシスタントの応答を参照していません",
    "fc7d59b60c3b7d46": "選択したテキストは引用に保存されたままです。",
@@ -463,10 +463,10 @@ index da6a34749df883d48fa5ec7db9008751c412cd09..dfff1fab782c8f368834ca4838ec9491
    "e4b9b6e99d9b6da1": "コンテキストは必要に応じて自動的に圧縮されます。",
    "57e30468577bb989": "ファイルの添付を送信できるようになるまでサーバーを待っています",
 diff --git a/apps/web/src/i18n/translations/ko.json b/apps/web/src/i18n/translations/ko.json
-index f38e81a9b93989d17c0eda0dedd40d6c3a7ef3d3..e1b3c131c21ecd5a2fcbb210d9b7ed01ac36e5aa 100644
+index 943c383b7cef3c20d502bc46e26970fb97afa9b6..cd805ff8a90f7e64ef97f6c14e2d19a1bd2e3eb2 100644
 --- a/apps/web/src/i18n/translations/ko.json
 +++ b/apps/web/src/i18n/translations/ko.json
-@@ -3435,12 +3435,11 @@
+@@ -3437,12 +3437,11 @@
    "35e0b8f7418b4a86": "클릭하면 대기열에 추가, {modifier}-클릭하면 방향 조정",
    "eed080cf5eb25bfd": "기록의 토큰 {tokens}개를 요약한 후 보내기",
    "e4116d7f64a6f593": "보내기 전에 기록의 토큰 {tokens}개 압축",
@@ -482,7 +482,7 @@ index f38e81a9b93989d17c0eda0dedd40d6c3a7ef3d3..e1b3c131c21ecd5a2fcbb210d9b7ed01
    "89426e9b039148d7": "음성 입력 실패",
    "2220a0fbb5b6fa47": "모델 다운로드 중 {percent}%",
    "5c05b24be2880672": "녹음 중",
-@@ -4570,6 +4569,8 @@
+@@ -4572,6 +4571,8 @@
    "b6d2a7ac2a8eac1e": "삭제되었을 수 있습니다. 선택한 텍스트는 인용에 그대로 저장되어 있습니다.",
    "be69a90d3d68d0d6": "인용이 어시스턴트 응답을 가리키지 않습니다",
    "fc7d59b60c3b7d46": "선택한 텍스트는 인용에 그대로 저장되어 있습니다.",
@@ -492,10 +492,10 @@ index f38e81a9b93989d17c0eda0dedd40d6c3a7ef3d3..e1b3c131c21ecd5a2fcbb210d9b7ed01
    "e4b9b6e99d9b6da1": "필요할 때 컨텍스트를 자동으로 압축합니다.",
    "57e30468577bb989": "파일 첨부를 보내기 전에 서버를 기다리는 중",
 diff --git a/apps/web/src/i18n/translations/pt-BR.json b/apps/web/src/i18n/translations/pt-BR.json
-index 24ce6764ab312c0d95c39c915b54103a0fd9ab21..d0f5bc4ed806729d72e5e24d682ff706ccb53e95 100644
+index 9f2f697d054c062d06a0ea208008a475fb5f3296..2340942783a5ab91726332ea37933aaeb94d80b8 100644
 --- a/apps/web/src/i18n/translations/pt-BR.json
 +++ b/apps/web/src/i18n/translations/pt-BR.json
-@@ -3439,12 +3439,11 @@
+@@ -3441,12 +3441,11 @@
    "35e0b8f7418b4a86": "Clique para enfileirar, {modifier}-clique para direcionar",
    "eed080cf5eb25bfd": "Resumir {tokens} tokens do histórico e enviar",
    "e4116d7f64a6f593": "Compactar {tokens} tokens do histórico antes de enviar",
@@ -511,7 +511,7 @@ index 24ce6764ab312c0d95c39c915b54103a0fd9ab21..d0f5bc4ed806729d72e5e24d682ff706
    "89426e9b039148d7": "Falha na entrada de voz",
    "2220a0fbb5b6fa47": "Baixando o modelo {percent}%",
    "5c05b24be2880672": "Gravando",
-@@ -4583,6 +4582,8 @@
+@@ -4585,6 +4584,8 @@
    "b6d2a7ac2a8eac1e": "Ela pode ter sido removida. O texto selecionado continua salvo na sua citação.",
    "be69a90d3d68d0d6": "A citação não se refere a uma resposta do assistente",
    "fc7d59b60c3b7d46": "O texto selecionado continua salvo na sua citação.",
@@ -521,10 +521,10 @@ index 24ce6764ab312c0d95c39c915b54103a0fd9ab21..d0f5bc4ed806729d72e5e24d682ff706
    "e4b9b6e99d9b6da1": "O contexto é compactado automaticamente quando necessário.",
    "57e30468577bb989": "Aguardando o servidor para poder enviar anexos de arquivo",
 diff --git a/apps/web/src/i18n/translations/ru.json b/apps/web/src/i18n/translations/ru.json
-index a5f0c249e2ffc2be56462b457778a176924b8c9b..55a4d5cf996b03c6fbe9eb9956a5bb0fab37a891 100644
+index 758380a4956820da11ec6270cad446ba6b88e765..8aa1a802d9fbecd5f19ac591888640e1d40cfa10 100644
 --- a/apps/web/src/i18n/translations/ru.json
 +++ b/apps/web/src/i18n/translations/ru.json
-@@ -3439,12 +3439,11 @@
+@@ -3441,12 +3441,11 @@
    "35e0b8f7418b4a86": "Нажмите, чтобы поставить в очередь; {modifier}+нажатие — скорректировать",
    "eed080cf5eb25bfd": "Свести историю ({tokens} токенов) и отправить",
    "e4116d7f64a6f593": "Сжать историю ({tokens} токенов) перед отправкой",
@@ -540,7 +540,7 @@ index a5f0c249e2ffc2be56462b457778a176924b8c9b..55a4d5cf996b03c6fbe9eb9956a5bb0f
    "89426e9b039148d7": "Ошибка голосового ввода",
    "2220a0fbb5b6fa47": "Загрузка модели {percent}%",
    "5c05b24be2880672": "Запись",
-@@ -4583,6 +4582,8 @@
+@@ -4585,6 +4584,8 @@
    "b6d2a7ac2a8eac1e": "Возможно, он удалён. Выделенный текст по-прежнему сохранён в цитате.",
    "be69a90d3d68d0d6": "Цитата не ссылается на ответ ассистента",
    "fc7d59b60c3b7d46": "Выделенный текст по-прежнему сохранён в цитате.",
@@ -550,10 +550,10 @@ index a5f0c249e2ffc2be56462b457778a176924b8c9b..55a4d5cf996b03c6fbe9eb9956a5bb0f
    "e4b9b6e99d9b6da1": "Контекст сжимается автоматически по мере необходимости.",
    "57e30468577bb989": "Ожидание сервера для отправки вложений",
 diff --git a/apps/web/src/i18n/translations/sv.json b/apps/web/src/i18n/translations/sv.json
-index 353df28a8a9aa036f0fc25eb10340f3a03156f99..8f297d0eefb6fd241fba91da8f20e66f5bbd43a5 100644
+index 5aa630e1a6853b58ff43633be9bdfdf7808e1243..3091c74544be4222c0af699397c42f8f0b167b96 100644
 --- a/apps/web/src/i18n/translations/sv.json
 +++ b/apps/web/src/i18n/translations/sv.json
-@@ -3439,12 +3439,11 @@
+@@ -3441,12 +3441,11 @@
    "35e0b8f7418b4a86": "Klicka för att köa, {modifier}-klicka för att styra om",
    "eed080cf5eb25bfd": "Sammanfatta {tokens} token historik och skicka sedan",
    "e4116d7f64a6f593": "Komprimera {tokens} token historik innan du skickar",
@@ -569,7 +569,7 @@ index 353df28a8a9aa036f0fc25eb10340f3a03156f99..8f297d0eefb6fd241fba91da8f20e66f
    "89426e9b039148d7": "Röstinmatningen misslyckades",
    "2220a0fbb5b6fa47": "Laddar ned modell {percent} %",
    "5c05b24be2880672": "Spelar in",
-@@ -4584,6 +4583,8 @@
+@@ -4586,6 +4585,8 @@
    "b6d2a7ac2a8eac1e": "Det kan ha tagits bort. Den markerade texten finns fortfarande sparad i ditt citat.",
    "be69a90d3d68d0d6": "Citatet hänvisar inte till ett assistentsvar",
    "fc7d59b60c3b7d46": "Den markerade texten finns fortfarande sparad i ditt citat.",
@@ -579,10 +579,10 @@ index 353df28a8a9aa036f0fc25eb10340f3a03156f99..8f297d0eefb6fd241fba91da8f20e66f
    "e4b9b6e99d9b6da1": "Kontexten komprimeras automatiskt vid behov.",
    "57e30468577bb989": "Väntar på servern innan filbilagor kan skickas",
 diff --git a/apps/web/src/i18n/translations/zh.json b/apps/web/src/i18n/translations/zh.json
-index 4acdfc14e2cb43a8480093dcafb4de404d8cfc85..c435374f777ab2ad5a674c3f3cc4b71044564a8a 100644
+index 366a21392f806d7cc4f623015a471218675aed76..065e549fa95d24373546d57c7267360e27995f46 100644
 --- a/apps/web/src/i18n/translations/zh.json
 +++ b/apps/web/src/i18n/translations/zh.json
-@@ -3444,12 +3444,11 @@
+@@ -3446,12 +3446,11 @@
    "35e0b8f7418b4a86": "点击以加入队列，{modifier}+点击以引导",
    "eed080cf5eb25bfd": "先总结 {tokens} token 的历史记录，再发送",
    "e4116d7f64a6f593": "发送前压缩 {tokens} token 的历史记录",
@@ -598,7 +598,7 @@ index 4acdfc14e2cb43a8480093dcafb4de404d8cfc85..c435374f777ab2ad5a674c3f3cc4b710
    "89426e9b039148d7": "语音输入失败",
    "2220a0fbb5b6fa47": "正在下载模型 {percent}%",
    "5c05b24be2880672": "正在录音",
-@@ -4590,6 +4589,8 @@
+@@ -4592,6 +4591,8 @@
    "b6d2a7ac2a8eac1e": "它可能已被删除。选中的文字仍保存在你的引用中。",
    "be69a90d3d68d0d6": "这个引用指向的不是助手回复",
    "fc7d59b60c3b7d46": "选中的文字仍保存在你的引用中。",
