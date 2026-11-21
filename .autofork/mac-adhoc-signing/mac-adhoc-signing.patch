@@ -29,10 +29,10 @@ index c9180ec3d3ae63cc35e80c368765424a5f23b5c1..80957caa291051e2b90227e62cd2abc4
      Effect.gen(function* () {
        const signedWinConfig = (hostPlatform: string) =>
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index c978d9ff52d8431b0c41dde8d4d66d0ed5dea26d..a0f08b29a589e57e18065723ecef44fba563fb5d 100644
+index 62f92e40aa229e1609efa6e823a3ab1d7a5f05cb..ebfcbb29ef1cecd0a4ed128189812b1ec8b61dae 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
-@@ -2877,7 +2877,8 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
+@@ -2910,7 +2910,8 @@ export const createBuildConfig = Effect.fn("createBuildConfig")(function* (
            role: "Viewer",
          },
        ],

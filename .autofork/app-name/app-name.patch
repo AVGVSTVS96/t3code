@@ -66,10 +66,10 @@ index 3071a6c0956ee665b9b9ff0416f965c9731caed1..e31801094daa275fc348c6473d5996f4
  }
  
 diff --git a/scripts/build-desktop-artifact.ts b/scripts/build-desktop-artifact.ts
-index 9d34e2412b327f03f20f88385ee835209ffa3b6b..c978d9ff52d8431b0c41dde8d4d66d0ed5dea26d 100644
+index 746ac826005b3383c8cb359c6613a7e16f99cadd..62f92e40aa229e1609efa6e823a3ab1d7a5f05cb 100644
 --- a/scripts/build-desktop-artifact.ts
 +++ b/scripts/build-desktop-artifact.ts
-@@ -2765,10 +2765,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
+@@ -2795,10 +2795,8 @@ export function resolvePackageManagerUserAgent(packageManager: string): string {
    return `${trimmed.slice(0, versionSeparator)}/${trimmed.slice(versionSeparator + 1)}`;
  }
  
