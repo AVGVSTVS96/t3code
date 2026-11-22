@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 77c47d668daf46357876eaa42e686f9792bd5cb8..a4ff099ace3c56f9d21a06ef1ab2e663240ece55 100644
+index ea16d027fcfe91d581d5781a6808dd3d63aa8334..03c95025c0dbbb7be6511ca726c210429db9cda3 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -353,7 +353,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
@@ -108,7 +108,7 @@ index 77c47d668daf46357876eaa42e686f9792bd5cb8..a4ff099ace3c56f9d21a06ef1ab2e663
                                  sideChatDisabledReason={sideChatDisabledReason}
                                  onFreshSession={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 9038e6717ba0ed7ee32344a1161338aee399bc71..7b18f5a4a4942e96515337809bf8a3d4cc9c6172 100644
+index 2c3bc34529ffdcdfac76811699e162c19a265440..48a1271d7ba57bb0ad6d8df55122a70a81764f11 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
 @@ -393,7 +393,8 @@ export interface ChatComposerProps {
@@ -121,7 +121,7 @@ index 9038e6717ba0ed7ee32344a1161338aee399bc71..7b18f5a4a4942e96515337809bf8a3d4
    onUsageLimitsCommand?: (() => void) | undefined;
    sideChatAvailable?: boolean;
    sideChatDisabledReason?: string | null;
-@@ -3893,6 +3894,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -3974,6 +3975,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      hideCompactToggle={dictationTakesFooter}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -287,7 +287,7 @@ index 706fde340c583d84ffbf949bcb921841cfc3c44d..3e83e0e6b5566d94d2984a559dd661f0
    autoCompactThreshold?: number | null,
    resolve: MessageResolver = m,
 diff --git a/apps/web/src/components/chat/useComposerSend.ts b/apps/web/src/components/chat/useComposerSend.ts
-index 45c135bce1a1b8d857268cab8437d50ce328e2c1..3b0a3579becf3810e3776c5f54343ccb1542a55d 100644
+index d89a9d79febc675d593ffdf1ff6d9e31d7a31f21..6b67f941cca1b799c7b7a2224cfd5748efd1b17c 100644
 --- a/apps/web/src/components/chat/useComposerSend.ts
 +++ b/apps/web/src/components/chat/useComposerSend.ts
 @@ -273,7 +273,7 @@ interface ComposerSendInput {
@@ -308,7 +308,7 @@ index 45c135bce1a1b8d857268cab8437d50ce328e2c1..3b0a3579becf3810e3776c5f54343ccb
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat,
-@@ -1544,7 +1544,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -1572,7 +1572,7 @@ export function useComposerSend(input: ComposerSendInput) {
              checkoutPullRequestUrl,
            );
          }
