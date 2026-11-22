@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index d17af4f620755b4f0c6bcb05d362cf1c91386884..b8f2860165391b2c983a36414e378e86e63e2f74 100644
+index 229ac99e3a756abd7beca111d54a984ccc26f183..f97c47d2dfcb43f93310b54b4c88e3e01b45e981 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -355,7 +355,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
@@ -11,7 +11,7 @@ index d17af4f620755b4f0c6bcb05d362cf1c91386884..b8f2860165391b2c983a36414e378e86
  import {
    deriveLatestContextWindowSnapshot,
    hasDismissedResumeCompaction,
-@@ -2620,38 +2620,44 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2625,38 +2625,44 @@ export default function ChatView(props: ChatViewProps) {
    const freshSessionPending = freshSessionAvailable && freshSessionArmed;
    // The context window is the current conversation's, so neither a handoff destination nor
    // the fresh session armed by /clear inherits it.
@@ -73,7 +73,7 @@ index d17af4f620755b4f0c6bcb05d362cf1c91386884..b8f2860165391b2c983a36414e378e86
        return next;
      });
    };
-@@ -2666,7 +2672,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2671,7 +2677,7 @@ export default function ChatView(props: ChatViewProps) {
    });
    const toggleKeepFullHistory = () => {
      cancelHeldComposerSend(composerDraftTargetKey);
@@ -82,7 +82,7 @@ index d17af4f620755b4f0c6bcb05d362cf1c91386884..b8f2860165391b2c983a36414e378e86
    };
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const armFreshSessionStable = useStableCallback(() => armFreshSession(routeThreadKey));
-@@ -3142,7 +3148,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3147,7 +3153,7 @@ export default function ChatView(props: ChatViewProps) {
      },
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -91,7 +91,7 @@ index d17af4f620755b4f0c6bcb05d362cf1c91386884..b8f2860165391b2c983a36414e378e86
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat: sideChat.available ? sendSideChatStable : undefined,
-@@ -3853,7 +3859,15 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3859,7 +3865,15 @@ export default function ChatView(props: ChatViewProps) {
                                  }
                                  resumeCompactionTokens={resumeCompactionTokens}
                                  keepFullHistory={keepFullHistory}
@@ -109,10 +109,10 @@ index d17af4f620755b4f0c6bcb05d362cf1c91386884..b8f2860165391b2c983a36414e378e86
                                  sideChatDisabledReason={sideChatDisabledReason}
                                  onFreshSession={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 6fb651c3471f6ebb569c91168db6c773702bef44..7b0ced3d5f8420322b02508525031d11a5187a03 100644
+index 85a7f6173bf9642eb037a2c769aa435935cf1f26..0015fe37efaf7a4595ebc156939d68f1069bf7fe 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -398,7 +398,8 @@ export interface ChatComposerProps {
+@@ -402,7 +402,8 @@ export interface ChatComposerProps {
    bannerItems: readonly ComposerBannerStackItem[];
    resumeCompactionTokens: number | null;
    keepFullHistory: boolean;
@@ -122,7 +122,7 @@ index 6fb651c3471f6ebb569c91168db6c773702bef44..7b0ced3d5f8420322b02508525031d11
    onUsageLimitsCommand?: (() => void) | undefined;
    sideChatAvailable?: boolean;
    sideChatDisabledReason?: string | null;
-@@ -4035,6 +4036,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -4106,6 +4107,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      hideCompactToggle={dictationTakesFooter}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -319,7 +319,7 @@ index bc38e5001dde1782e00c207d39b1d334b84deac4..38d51a4c80c92b4f10206c27496c8f7a
          clearUsageLimitsFor(routeThreadKey);
          if (turnUsesAttachmentUploads) {
 diff --git a/apps/web/src/i18n/translations/de.json b/apps/web/src/i18n/translations/de.json
-index 0db2fb8989ce27bfce516744f5322749e6b6fe5a..7bb643ed3f09c5072deee465da4f8ca0e26550e9 100644
+index c9aebc46cd49df4563c4cd9b121b111404a6c56b..548d3ec4105f8024d16098b30987da44b4f6422f 100644
 --- a/apps/web/src/i18n/translations/de.json
 +++ b/apps/web/src/i18n/translations/de.json
 @@ -3505,12 +3505,11 @@
@@ -348,7 +348,7 @@ index 0db2fb8989ce27bfce516744f5322749e6b6fe5a..7bb643ed3f09c5072deee465da4f8ca0
    "e4b9b6e99d9b6da1": "Der Kontext wird bei Bedarf automatisch komprimiert.",
    "57e30468577bb989": "Warte auf den Server, bevor Dateianhänge gesendet werden können",
 diff --git a/apps/web/src/i18n/translations/en.json b/apps/web/src/i18n/translations/en.json
-index 3aa61a18f6b2b679eb5dfa11cbd2054fa3f0fbf3..2e951ea17a8ba7d0a821a9ea022e338972424ae1 100644
+index 0808df7eab79b97fcc37051c14044f27023ffc61..fe2a7a3db182d693cf102e5c4ce6f0319ba37f2c 100644
 --- a/apps/web/src/i18n/translations/en.json
 +++ b/apps/web/src/i18n/translations/en.json
 @@ -3504,12 +3504,11 @@
@@ -377,7 +377,7 @@ index 3aa61a18f6b2b679eb5dfa11cbd2054fa3f0fbf3..2e951ea17a8ba7d0a821a9ea022e3389
    "e4b9b6e99d9b6da1": "Context compacts automatically when needed.",
    "57e30468577bb989": "Waiting for the server before file attachments can send",
 diff --git a/apps/web/src/i18n/translations/es.json b/apps/web/src/i18n/translations/es.json
-index 60ddca69b570fd294525257a59b5a7aafa846f56..931cbf2242b4fbf55b48b2eebe7f0713196e06fe 100644
+index 88f660710fce2d392cb5925b78c2ee00890b9d71..760084f48816a16ebaa84eeb043f3b8abb026801 100644
 --- a/apps/web/src/i18n/translations/es.json
 +++ b/apps/web/src/i18n/translations/es.json
 @@ -3504,12 +3504,11 @@
@@ -406,7 +406,7 @@ index 60ddca69b570fd294525257a59b5a7aafa846f56..931cbf2242b4fbf55b48b2eebe7f0713
    "e4b9b6e99d9b6da1": "El contexto se compacta automáticamente cuando hace falta.",
    "57e30468577bb989": "Esperando al servidor para poder enviar los archivos adjuntos",
 diff --git a/apps/web/src/i18n/translations/fr.json b/apps/web/src/i18n/translations/fr.json
-index fdcba31a1032fdafa224a725eb02b6016d35f368..830ee5d5c88c3e0c0251c5b71fcba0cfaadd24c8 100644
+index 114dd21e96fd425800da1edd083f306c95fffc8e..cc7a2e996960c9a5fc31853801487aa2e720d510 100644
 --- a/apps/web/src/i18n/translations/fr.json
 +++ b/apps/web/src/i18n/translations/fr.json
 @@ -3504,12 +3504,11 @@
@@ -435,7 +435,7 @@ index fdcba31a1032fdafa224a725eb02b6016d35f368..830ee5d5c88c3e0c0251c5b71fcba0cf
    "e4b9b6e99d9b6da1": "Le contexte est compacté automatiquement si nécessaire.",
    "57e30468577bb989": "En attente du serveur avant de pouvoir envoyer les pièces jointes",
 diff --git a/apps/web/src/i18n/translations/ja.json b/apps/web/src/i18n/translations/ja.json
-index 13379225ecf2633e417c797632e05bd9e4965ca1..78fe18b4632d38f6fa925f1327e88e3ef5a7c2c0 100644
+index e207333046ee318ac4f44dce0606d0573b91d83e..0069f5b2b87fd2ca5349f65f88414122e7e8b0a9 100644
 --- a/apps/web/src/i18n/translations/ja.json
 +++ b/apps/web/src/i18n/translations/ja.json
 @@ -3500,12 +3500,11 @@
@@ -464,7 +464,7 @@ index 13379225ecf2633e417c797632e05bd9e4965ca1..78fe18b4632d38f6fa925f1327e88e3e
    "e4b9b6e99d9b6da1": "コンテキストは必要に応じて自動的に圧縮されます。",
    "57e30468577bb989": "ファイルの添付を送信できるようになるまでサーバーを待っています",
 diff --git a/apps/web/src/i18n/translations/ko.json b/apps/web/src/i18n/translations/ko.json
-index cc8261d7681ff65bbfb966523dfbb2a49b9ff85f..624cab12b9abd09512d9d0ff86b58757944361d4 100644
+index d0c34a39635f77886206e31719f3152371b654f5..f3569124ecb118abd4c5f3ea386a5ee4a2df172e 100644
 --- a/apps/web/src/i18n/translations/ko.json
 +++ b/apps/web/src/i18n/translations/ko.json
 @@ -3500,12 +3500,11 @@
@@ -493,7 +493,7 @@ index cc8261d7681ff65bbfb966523dfbb2a49b9ff85f..624cab12b9abd09512d9d0ff86b58757
    "e4b9b6e99d9b6da1": "필요할 때 컨텍스트를 자동으로 압축합니다.",
    "57e30468577bb989": "파일 첨부를 보내기 전에 서버를 기다리는 중",
 diff --git a/apps/web/src/i18n/translations/pt-BR.json b/apps/web/src/i18n/translations/pt-BR.json
-index a9ce3832a0b9f851a8956df10909e7402eff2edc..b0c4e664cdd52380dd65a0fdf864d6433069d6d5 100644
+index d32f4d0a45121a7e284bb470e43259dbec7d0540..d81d72d3e9f6c81873e81046b4ebc04e01aa76bc 100644
 --- a/apps/web/src/i18n/translations/pt-BR.json
 +++ b/apps/web/src/i18n/translations/pt-BR.json
 @@ -3504,12 +3504,11 @@
@@ -522,7 +522,7 @@ index a9ce3832a0b9f851a8956df10909e7402eff2edc..b0c4e664cdd52380dd65a0fdf864d643
    "e4b9b6e99d9b6da1": "O contexto é compactado automaticamente quando necessário.",
    "57e30468577bb989": "Aguardando o servidor para poder enviar anexos de arquivo",
 diff --git a/apps/web/src/i18n/translations/ru.json b/apps/web/src/i18n/translations/ru.json
-index ee0fe30aa4f396aaa552ee747f7aa74c060b866b..892420066363dd3637dee2d7402ccb4fbec79f52 100644
+index c000355e830818a378edb9289f87ca679a073337..b29b4cb6a95365dcb08f5be56368f7ed895e241a 100644
 --- a/apps/web/src/i18n/translations/ru.json
 +++ b/apps/web/src/i18n/translations/ru.json
 @@ -3504,12 +3504,11 @@
@@ -551,7 +551,7 @@ index ee0fe30aa4f396aaa552ee747f7aa74c060b866b..892420066363dd3637dee2d7402ccb4f
    "e4b9b6e99d9b6da1": "Контекст сжимается автоматически по мере необходимости.",
    "57e30468577bb989": "Ожидание сервера для отправки вложений",
 diff --git a/apps/web/src/i18n/translations/sv.json b/apps/web/src/i18n/translations/sv.json
-index fb02753220b1402ca629d487c1dde26786013d07..11d36fa1c046a2145fb1457a83eb7c7a78563f40 100644
+index a9bfc4cecbe7e5357e2c93e23a5b9a9ac6f42232..2dcb0da53adeb8de098087a417463892ebfd5083 100644
 --- a/apps/web/src/i18n/translations/sv.json
 +++ b/apps/web/src/i18n/translations/sv.json
 @@ -3504,12 +3504,11 @@
@@ -580,7 +580,7 @@ index fb02753220b1402ca629d487c1dde26786013d07..11d36fa1c046a2145fb1457a83eb7c7a
    "e4b9b6e99d9b6da1": "Kontexten komprimeras automatiskt vid behov.",
    "57e30468577bb989": "Väntar på servern innan filbilagor kan skickas",
 diff --git a/apps/web/src/i18n/translations/zh.json b/apps/web/src/i18n/translations/zh.json
-index 04044302284b735ed3bf053f87099282bdc45b27..d992171e176ac0514204d82caba6d1d5bb6ff620 100644
+index 2169040ad1c515a68a0077f562882a043d626227..fd64c0ef9870428ff7ad6ee2400f5fe937c02247 100644
 --- a/apps/web/src/i18n/translations/zh.json
 +++ b/apps/web/src/i18n/translations/zh.json
 @@ -3509,12 +3509,11 @@
