@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index ea16d027fcfe91d581d5781a6808dd3d63aa8334..03c95025c0dbbb7be6511ca726c210429db9cda3 100644
+index 254bbd4eb9e427b6e9e822b3cf49cdd76afd1ae4..f3fde75e68e585de5b69e7da0fb535b6544420f9 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -353,7 +353,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
+@@ -356,7 +356,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
  import { modelFallbackBannerItem } from "./chat/ComposerUsageLimits";
  import { ComposerSurface } from "./chat/ComposerSurface";
  import { resolveThreadSyncPhase } from "../threadSync";
@@ -11,7 +11,7 @@ index ea16d027fcfe91d581d5781a6808dd3d63aa8334..03c95025c0dbbb7be6511ca726c21042
  import {
    deriveLatestContextWindowSnapshot,
    hasDismissedResumeCompaction,
-@@ -2620,45 +2620,51 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2623,38 +2623,44 @@ export default function ChatView(props: ChatViewProps) {
    const freshSessionPending = freshSessionAvailable && freshSessionArmed;
    // The context window is the current conversation's, so neither a handoff destination nor
    // the fresh session armed by /clear inherits it.
@@ -73,15 +73,16 @@ index ea16d027fcfe91d581d5781a6808dd3d63aa8334..03c95025c0dbbb7be6511ca726c21042
        return next;
      });
    };
-   // While a question or approval owns the composer, its text answers that, not the agent.
-   const freshSessionCommandAvailable =
-     freshSessionAvailable && activePendingApproval === null && pendingUserInputs.length === 0;
--  const toggleKeepFullHistory = () => setKeepFullHistory(routeThreadKey, !keepFullHistory);
-+  const toggleKeepFullHistory = () => setCompactChoice(routeThreadKey, keepFullHistory);
+@@ -2669,7 +2675,7 @@ export default function ChatView(props: ChatViewProps) {
+   });
+   const toggleKeepFullHistory = () => {
+     cancelHeldComposerSend(composerDraftTargetKey);
+-    setKeepFullHistory(routeThreadKey, !keepFullHistory);
++    setCompactChoice(routeThreadKey, keepFullHistory);
+   };
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const armFreshSessionStable = useStableCallback(() => armFreshSession(routeThreadKey));
-   const handleRestoreThreadBranch = () => {
-@@ -3123,7 +3129,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3145,7 +3151,7 @@ export default function ChatView(props: ChatViewProps) {
      },
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -90,7 +91,7 @@ index ea16d027fcfe91d581d5781a6808dd3d63aa8334..03c95025c0dbbb7be6511ca726c21042
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat: sideChat.available ? sendSideChatStable : undefined,
-@@ -3834,7 +3840,15 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3856,7 +3862,15 @@ export default function ChatView(props: ChatViewProps) {
                                  }
                                  resumeCompactionTokens={resumeCompactionTokens}
                                  keepFullHistory={keepFullHistory}
@@ -108,10 +109,10 @@ index ea16d027fcfe91d581d5781a6808dd3d63aa8334..03c95025c0dbbb7be6511ca726c21042
                                  sideChatDisabledReason={sideChatDisabledReason}
                                  onFreshSession={
 diff --git a/apps/web/src/components/chat/ChatComposer.tsx b/apps/web/src/components/chat/ChatComposer.tsx
-index 2c3bc34529ffdcdfac76811699e162c19a265440..48a1271d7ba57bb0ad6d8df55122a70a81764f11 100644
+index 6fb651c3471f6ebb569c91168db6c773702bef44..7b0ced3d5f8420322b02508525031d11a5187a03 100644
 --- a/apps/web/src/components/chat/ChatComposer.tsx
 +++ b/apps/web/src/components/chat/ChatComposer.tsx
-@@ -393,7 +393,8 @@ export interface ChatComposerProps {
+@@ -398,7 +398,8 @@ export interface ChatComposerProps {
    bannerItems: readonly ComposerBannerStackItem[];
    resumeCompactionTokens: number | null;
    keepFullHistory: boolean;
@@ -121,7 +122,7 @@ index 2c3bc34529ffdcdfac76811699e162c19a265440..48a1271d7ba57bb0ad6d8df55122a70a
    onUsageLimitsCommand?: (() => void) | undefined;
    sideChatAvailable?: boolean;
    sideChatDisabledReason?: string | null;
-@@ -3974,6 +3975,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
+@@ -4035,6 +4036,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                      hideCompactToggle={dictationTakesFooter}
                      keepFullHistory={props.keepFullHistory}
                      onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -130,10 +131,10 @@ index 2c3bc34529ffdcdfac76811699e162c19a265440..48a1271d7ba57bb0ad6d8df55122a70a
                      {speechInput.available ? (
                        <>
 diff --git a/apps/web/src/components/chat/ComposerFooterControls.tsx b/apps/web/src/components/chat/ComposerFooterControls.tsx
-index 1df9cdbd323355b3a144e270b3b61a2b9c5159e9..c89990b8f7bd3c064cc38177db74874508d5060d 100644
+index e8cd9134e2a9ae0fed3ec36a9e8b972598f92601..238568a80070234041aaa39c4c22877eac8b1453 100644
 --- a/apps/web/src/components/chat/ComposerFooterControls.tsx
 +++ b/apps/web/src/components/chat/ComposerFooterControls.tsx
-@@ -224,7 +224,8 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
+@@ -225,7 +225,8 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
    compactBeforeSendTokens: number | null;
    hideCompactToggle: boolean;
    keepFullHistory: boolean;
@@ -143,7 +144,7 @@ index 1df9cdbd323355b3a144e270b3b61a2b9c5159e9..c89990b8f7bd3c064cc38177db748745
  }) {
    return (
      <>
-@@ -255,6 +256,7 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
+@@ -257,6 +258,7 @@ export const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryA
          hideCompactToggle={props.hideCompactToggle}
          keepFullHistory={props.keepFullHistory}
          onToggleKeepFullHistory={props.onToggleKeepFullHistory}
@@ -152,10 +153,10 @@ index 1df9cdbd323355b3a144e270b3b61a2b9c5159e9..c89990b8f7bd3c064cc38177db748745
          {props.children}
        </ComposerPrimaryActions>
 diff --git a/apps/web/src/components/chat/ComposerPrimaryActions.tsx b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
-index 256144a5cc93b0465ba3da3eea1989fc51edaa2c..8faff49d84f1104d153fbd44cfb15a4c3515c399 100644
+index 20a2166676fc922fee0c6b6c3702941d5acb2390..051f30b1c67720be859d129ae30462f80bff4f1b 100644
 --- a/apps/web/src/components/chat/ComposerPrimaryActions.tsx
 +++ b/apps/web/src/components/chat/ComposerPrimaryActions.tsx
-@@ -66,7 +66,8 @@ interface ComposerPrimaryActionsProps {
+@@ -68,7 +68,8 @@ interface ComposerPrimaryActionsProps {
    compactBeforeSendTokens?: number | null;
    hideCompactToggle?: boolean;
    keepFullHistory?: boolean;
@@ -165,7 +166,7 @@ index 256144a5cc93b0465ba3da3eea1989fc51edaa2c..8faff49d84f1104d153fbd44cfb15a4c
  }
  
  const formatPendingPrimaryActionLabel = (
-@@ -259,6 +260,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -262,6 +263,7 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
    hideCompactToggle = false,
    keepFullHistory = false,
    onToggleKeepFullHistory,
@@ -173,7 +174,7 @@ index 256144a5cc93b0465ba3da3eea1989fc51edaa2c..8faff49d84f1104d153fbd44cfb15a4c
  }: ComposerPrimaryActionsProps) {
    const gt = useGT();
    const m = useMessages();
-@@ -384,7 +386,8 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -388,7 +390,8 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
      compactBeforeSendTokens !== null && !showResume && !isEditingQueuedMessage
        ? formatContextWindowTokens(compactBeforeSendTokens)
        : null;
@@ -183,7 +184,7 @@ index 256144a5cc93b0465ba3da3eea1989fc51edaa2c..8faff49d84f1104d153fbd44cfb15a4c
  
    const submitLabel = showResume
      ? gt("Resume thread")
-@@ -509,32 +512,36 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
+@@ -517,32 +520,36 @@ export const ComposerPrimaryActions = memo(function ComposerPrimaryActions({
                type="button"
                className="flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-(--control-radius) px-2 font-medium text-base text-foreground/80 tabular-nums outline-none hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-64 sm:text-sm aria-pressed:bg-accent/60 aria-pressed:text-foreground [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:text-muted-foreground"
                {...pointerFocusProps}
@@ -287,10 +288,10 @@ index 706fde340c583d84ffbf949bcb921841cfc3c44d..3e83e0e6b5566d94d2984a559dd661f0
    autoCompactThreshold?: number | null,
    resolve: MessageResolver = m,
 diff --git a/apps/web/src/components/chat/useComposerSend.ts b/apps/web/src/components/chat/useComposerSend.ts
-index d89a9d79febc675d593ffdf1ff6d9e31d7a31f21..6b67f941cca1b799c7b7a2224cfd5748efd1b17c 100644
+index bc38e5001dde1782e00c207d39b1d334b84deac4..38d51a4c80c92b4f10206c27496c8f7ac5af2385 100644
 --- a/apps/web/src/components/chat/useComposerSend.ts
 +++ b/apps/web/src/components/chat/useComposerSend.ts
-@@ -273,7 +273,7 @@ interface ComposerSendInput {
+@@ -275,7 +275,7 @@ interface ComposerSendInput {
      SetStateAction<Record<string, ReadonlyArray<CodexFeedbackSubmission>>>
    >;
    readonly setThreadError: ReturnType<typeof makeThreadErrorSetter>;
@@ -299,7 +300,7 @@ index d89a9d79febc675d593ffdf1ff6d9e31d7a31f21..6b67f941cca1b799c7b7a2224cfd5748
    readonly anchorNewTurn: TimelineFollow["anchorNewTurn"];
    readonly acknowledgeActiveThreadWoke: () => void;
    /** Resolves true once the side chat started and got the message. */
-@@ -365,7 +365,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -367,7 +367,7 @@ export function useComposerSend(input: ComposerSendInput) {
      optimisticBlobPreviews,
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -308,7 +309,7 @@ index d89a9d79febc675d593ffdf1ff6d9e31d7a31f21..6b67f941cca1b799c7b7a2224cfd5748
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat,
-@@ -1572,7 +1572,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -1598,7 +1598,7 @@ export function useComposerSend(input: ComposerSendInput) {
              checkoutPullRequestUrl,
            );
          }
@@ -318,10 +319,10 @@ index d89a9d79febc675d593ffdf1ff6d9e31d7a31f21..6b67f941cca1b799c7b7a2224cfd5748
          clearUsageLimitsFor(routeThreadKey);
          if (turnUsesAttachmentUploads) {
 diff --git a/apps/web/src/i18n/translations/de.json b/apps/web/src/i18n/translations/de.json
-index c7095b85364695fa79c59bf0bddfc7ace91313f2..50bb23dbcf7eda0b87af438e2b9b219ee3df1c16 100644
+index e51a89a3548722a03c741d30501eabde221daf10..8acc42b1ae633443a2e64f1572d5b3b99424e0a6 100644
 --- a/apps/web/src/i18n/translations/de.json
 +++ b/apps/web/src/i18n/translations/de.json
-@@ -3500,12 +3500,11 @@
+@@ -3504,12 +3504,11 @@
    "35e0b8f7418b4a86": "Klicken zum Einreihen, {modifier}-Klick zum Umlenken",
    "eed080cf5eb25bfd": "{tokens} Tokens Verlauf zusammenfassen, dann senden",
    "e4116d7f64a6f593": "{tokens} Tokens Verlauf vor dem Senden komprimieren",
@@ -337,7 +338,7 @@ index c7095b85364695fa79c59bf0bddfc7ace91313f2..50bb23dbcf7eda0b87af438e2b9b219e
    "89426e9b039148d7": "Spracheingabe fehlgeschlagen",
    "2220a0fbb5b6fa47": "Modell wird heruntergeladen {percent} %",
    "5c05b24be2880672": "Aufnahme",
-@@ -4700,6 +4699,8 @@
+@@ -4701,6 +4700,8 @@
    "b6d2a7ac2a8eac1e": "Sie wurde möglicherweise entfernt. Der ausgewählte Text ist weiterhin in deinem Zitat gespeichert.",
    "be69a90d3d68d0d6": "Das Zitat bezieht sich nicht auf eine Antwort des Assistenten",
    "fc7d59b60c3b7d46": "Der ausgewählte Text ist weiterhin in deinem Zitat gespeichert.",
@@ -347,10 +348,10 @@ index c7095b85364695fa79c59bf0bddfc7ace91313f2..50bb23dbcf7eda0b87af438e2b9b219e
    "e4b9b6e99d9b6da1": "Der Kontext wird bei Bedarf automatisch komprimiert.",
    "57e30468577bb989": "Warte auf den Server, bevor Dateianhänge gesendet werden können",
 diff --git a/apps/web/src/i18n/translations/en.json b/apps/web/src/i18n/translations/en.json
-index 2ff8148bb73299e0b2702d77484eecd19c4dab21..de6f188af163c61c613d585280e5413c3bbbc746 100644
+index e031e60d6cb39a217fbee7ef1afb1b9e1eb02753..3dc1f6e5d0183c4bafbb21b88cc97452f6fc9c8d 100644
 --- a/apps/web/src/i18n/translations/en.json
 +++ b/apps/web/src/i18n/translations/en.json
-@@ -3499,12 +3499,11 @@
+@@ -3503,12 +3503,11 @@
    "35e0b8f7418b4a86": "Click to queue, {modifier}-click to steer",
    "eed080cf5eb25bfd": "Summarize {tokens} tokens of history, then send",
    "e4116d7f64a6f593": "Compact {tokens} tokens of history before sending",
@@ -366,7 +367,7 @@ index 2ff8148bb73299e0b2702d77484eecd19c4dab21..de6f188af163c61c613d585280e5413c
    "89426e9b039148d7": "Voice input failed",
    "2220a0fbb5b6fa47": "Downloading model {percent}%",
    "5c05b24be2880672": "Recording",
-@@ -4699,6 +4698,8 @@
+@@ -4700,6 +4699,8 @@
    "b6d2a7ac2a8eac1e": "It may have been removed. The selected text is still saved in your citation.",
    "be69a90d3d68d0d6": "The citation does not refer to an assistant response",
    "fc7d59b60c3b7d46": "The selected text is still saved in your citation.",
@@ -376,10 +377,10 @@ index 2ff8148bb73299e0b2702d77484eecd19c4dab21..de6f188af163c61c613d585280e5413c
    "e4b9b6e99d9b6da1": "Context compacts automatically when needed.",
    "57e30468577bb989": "Waiting for the server before file attachments can send",
 diff --git a/apps/web/src/i18n/translations/es.json b/apps/web/src/i18n/translations/es.json
-index 78c68c4c0dc2fd4d3743cf91a25305802259a01c..a415dac765dd21b7d3d79736b621a50806e6136c 100644
+index fa1c37710e4b46c1fdc0ac66766a2988804e0512..f5d0f4509dca3277c3ab41cfd4351fab79c6f2ed 100644
 --- a/apps/web/src/i18n/translations/es.json
 +++ b/apps/web/src/i18n/translations/es.json
-@@ -3499,12 +3499,11 @@
+@@ -3503,12 +3503,11 @@
    "35e0b8f7418b4a86": "Clic para poner en cola, {modifier}-clic para redirigir",
    "eed080cf5eb25bfd": "Resumir {tokens} tokens del historial y enviar",
    "e4116d7f64a6f593": "Compactar {tokens} tokens del historial antes de enviar",
@@ -395,7 +396,7 @@ index 78c68c4c0dc2fd4d3743cf91a25305802259a01c..a415dac765dd21b7d3d79736b621a508
    "89426e9b039148d7": "Falló la entrada de voz",
    "2220a0fbb5b6fa47": "Descargando el modelo {percent} %",
    "5c05b24be2880672": "Grabando",
-@@ -4697,6 +4696,8 @@
+@@ -4698,6 +4697,8 @@
    "b6d2a7ac2a8eac1e": "Puede que se haya quitado. El texto seleccionado sigue guardado en tu cita.",
    "be69a90d3d68d0d6": "La cita no hace referencia a una respuesta del asistente",
    "fc7d59b60c3b7d46": "El texto seleccionado sigue guardado en tu cita.",
@@ -405,10 +406,10 @@ index 78c68c4c0dc2fd4d3743cf91a25305802259a01c..a415dac765dd21b7d3d79736b621a508
    "e4b9b6e99d9b6da1": "El contexto se compacta automáticamente cuando hace falta.",
    "57e30468577bb989": "Esperando al servidor para poder enviar los archivos adjuntos",
 diff --git a/apps/web/src/i18n/translations/fr.json b/apps/web/src/i18n/translations/fr.json
-index 873767a296ba5ad753f12f04a5829b22d60d3c66..60fd7b33a9cc248033d0227228d2221ebbaf7483 100644
+index 9875a1a164c252f97e93cf9a13b1f26be960ba2d..1da709971a1db62dd77a1e82847e4c1bb43ed57a 100644
 --- a/apps/web/src/i18n/translations/fr.json
 +++ b/apps/web/src/i18n/translations/fr.json
-@@ -3499,12 +3499,11 @@
+@@ -3503,12 +3503,11 @@
    "35e0b8f7418b4a86": "Cliquez pour mettre en file d’attente, {modifier}-clic pour réorienter",
    "eed080cf5eb25bfd": "Résumer {tokens} tokens d’historique, puis envoyer",
    "e4116d7f64a6f593": "Compacter {tokens} tokens d’historique avant l’envoi",
@@ -424,7 +425,7 @@ index 873767a296ba5ad753f12f04a5829b22d60d3c66..60fd7b33a9cc248033d0227228d2221e
    "89426e9b039148d7": "Échec de la saisie vocale",
    "2220a0fbb5b6fa47": "Téléchargement du modèle {percent} %",
    "5c05b24be2880672": "Enregistrement",
-@@ -4698,6 +4697,8 @@
+@@ -4699,6 +4698,8 @@
    "b6d2a7ac2a8eac1e": "Elle a peut-être été supprimée. Le texte sélectionné reste enregistré dans votre citation.",
    "be69a90d3d68d0d6": "La citation ne renvoie pas à une réponse de l’assistant",
    "fc7d59b60c3b7d46": "Le texte sélectionné reste enregistré dans votre citation.",
@@ -434,10 +435,10 @@ index 873767a296ba5ad753f12f04a5829b22d60d3c66..60fd7b33a9cc248033d0227228d2221e
    "e4b9b6e99d9b6da1": "Le contexte est compacté automatiquement si nécessaire.",
    "57e30468577bb989": "En attente du serveur avant de pouvoir envoyer les pièces jointes",
 diff --git a/apps/web/src/i18n/translations/ja.json b/apps/web/src/i18n/translations/ja.json
-index 69ac82ad8a247e2cd926c06e90a07f3c2867af9a..bfcc542ffc4d08ec86c5e16363c98f06dc073d03 100644
+index 2ceac512434cdc3bd2a258124a83edc4f1a313bc..801303bef391b0bea9f4280316c0735a7d966114 100644
 --- a/apps/web/src/i18n/translations/ja.json
 +++ b/apps/web/src/i18n/translations/ja.json
-@@ -3495,12 +3495,11 @@
+@@ -3499,12 +3499,11 @@
    "35e0b8f7418b4a86": "クリックでキューに追加、{modifier}+クリックで軌道修正",
    "eed080cf5eb25bfd": "履歴の {tokens} トークンを要約してから送信",
    "e4116d7f64a6f593": "送信前に履歴の {tokens} トークンを圧縮",
@@ -453,7 +454,7 @@ index 69ac82ad8a247e2cd926c06e90a07f3c2867af9a..bfcc542ffc4d08ec86c5e16363c98f06
    "89426e9b039148d7": "音声入力に失敗しました",
    "2220a0fbb5b6fa47": "モデルをダウンロードしています {percent}%",
    "5c05b24be2880672": "録音中",
-@@ -4687,6 +4686,8 @@
+@@ -4688,6 +4687,8 @@
    "b6d2a7ac2a8eac1e": "削除された可能性があります。選択したテキストは引用に保存されたままです。",
    "be69a90d3d68d0d6": "この引用はアシスタントの応答を参照していません",
    "fc7d59b60c3b7d46": "選択したテキストは引用に保存されたままです。",
@@ -463,10 +464,10 @@ index 69ac82ad8a247e2cd926c06e90a07f3c2867af9a..bfcc542ffc4d08ec86c5e16363c98f06
    "e4b9b6e99d9b6da1": "コンテキストは必要に応じて自動的に圧縮されます。",
    "57e30468577bb989": "ファイルの添付を送信できるようになるまでサーバーを待っています",
 diff --git a/apps/web/src/i18n/translations/ko.json b/apps/web/src/i18n/translations/ko.json
-index 10782b2ca6166743f9bde2e3ca1fe70d3d618b2f..d4e763052fab59810983d80032ff2a24ca823fbe 100644
+index 2428cd83c985377884265cb1876bac1494044f8d..131305746a99e11faf578c2d342563a80199f590 100644
 --- a/apps/web/src/i18n/translations/ko.json
 +++ b/apps/web/src/i18n/translations/ko.json
-@@ -3495,12 +3495,11 @@
+@@ -3499,12 +3499,11 @@
    "35e0b8f7418b4a86": "클릭하면 대기열에 추가, {modifier}-클릭하면 방향 조정",
    "eed080cf5eb25bfd": "기록의 토큰 {tokens}개를 요약한 후 보내기",
    "e4116d7f64a6f593": "보내기 전에 기록의 토큰 {tokens}개 압축",
@@ -482,7 +483,7 @@ index 10782b2ca6166743f9bde2e3ca1fe70d3d618b2f..d4e763052fab59810983d80032ff2a24
    "89426e9b039148d7": "음성 입력 실패",
    "2220a0fbb5b6fa47": "모델 다운로드 중 {percent}%",
    "5c05b24be2880672": "녹음 중",
-@@ -4684,6 +4683,8 @@
+@@ -4685,6 +4684,8 @@
    "b6d2a7ac2a8eac1e": "삭제되었을 수 있습니다. 선택한 텍스트는 인용에 그대로 저장되어 있습니다.",
    "be69a90d3d68d0d6": "인용이 어시스턴트 응답을 가리키지 않습니다",
    "fc7d59b60c3b7d46": "선택한 텍스트는 인용에 그대로 저장되어 있습니다.",
@@ -492,10 +493,10 @@ index 10782b2ca6166743f9bde2e3ca1fe70d3d618b2f..d4e763052fab59810983d80032ff2a24
    "e4b9b6e99d9b6da1": "필요할 때 컨텍스트를 자동으로 압축합니다.",
    "57e30468577bb989": "파일 첨부를 보내기 전에 서버를 기다리는 중",
 diff --git a/apps/web/src/i18n/translations/pt-BR.json b/apps/web/src/i18n/translations/pt-BR.json
-index 5b2b9e2b9b381a08494453c70a681380ffc4d7de..3e6ae8780aa65d253e5bd0cf352dc2ce35bc9277 100644
+index ff919e4204d34ba9f5537a618aa7f01038bd18a9..58cd55a7aa490d86704d889403b28278d89c2b4b 100644
 --- a/apps/web/src/i18n/translations/pt-BR.json
 +++ b/apps/web/src/i18n/translations/pt-BR.json
-@@ -3499,12 +3499,11 @@
+@@ -3503,12 +3503,11 @@
    "35e0b8f7418b4a86": "Clique para enfileirar, {modifier}-clique para direcionar",
    "eed080cf5eb25bfd": "Resumir {tokens} tokens do histórico e enviar",
    "e4116d7f64a6f593": "Compactar {tokens} tokens do histórico antes de enviar",
@@ -511,7 +512,7 @@ index 5b2b9e2b9b381a08494453c70a681380ffc4d7de..3e6ae8780aa65d253e5bd0cf352dc2ce
    "89426e9b039148d7": "Falha na entrada de voz",
    "2220a0fbb5b6fa47": "Baixando o modelo {percent}%",
    "5c05b24be2880672": "Gravando",
-@@ -4697,6 +4696,8 @@
+@@ -4698,6 +4697,8 @@
    "b6d2a7ac2a8eac1e": "Ela pode ter sido removida. O texto selecionado continua salvo na sua citação.",
    "be69a90d3d68d0d6": "A citação não se refere a uma resposta do assistente",
    "fc7d59b60c3b7d46": "O texto selecionado continua salvo na sua citação.",
@@ -521,10 +522,10 @@ index 5b2b9e2b9b381a08494453c70a681380ffc4d7de..3e6ae8780aa65d253e5bd0cf352dc2ce
    "e4b9b6e99d9b6da1": "O contexto é compactado automaticamente quando necessário.",
    "57e30468577bb989": "Aguardando o servidor para poder enviar anexos de arquivo",
 diff --git a/apps/web/src/i18n/translations/ru.json b/apps/web/src/i18n/translations/ru.json
-index 0ecadaba9ded1ba66bd8b197a627c1a5b759d29b..be521283bf9e2af0210f8624270f63af74af598b 100644
+index 2111b5531e37c638645c764de062a2f2f3699718..e25b70f0af8876e20ef02dc66533b88a650e53bd 100644
 --- a/apps/web/src/i18n/translations/ru.json
 +++ b/apps/web/src/i18n/translations/ru.json
-@@ -3499,12 +3499,11 @@
+@@ -3503,12 +3503,11 @@
    "35e0b8f7418b4a86": "Нажмите, чтобы поставить в очередь; {modifier}+нажатие — скорректировать",
    "eed080cf5eb25bfd": "Свести историю ({tokens} токенов) и отправить",
    "e4116d7f64a6f593": "Сжать историю ({tokens} токенов) перед отправкой",
@@ -540,7 +541,7 @@ index 0ecadaba9ded1ba66bd8b197a627c1a5b759d29b..be521283bf9e2af0210f8624270f63af
    "89426e9b039148d7": "Ошибка голосового ввода",
    "2220a0fbb5b6fa47": "Загрузка модели {percent}%",
    "5c05b24be2880672": "Запись",
-@@ -4697,6 +4696,8 @@
+@@ -4698,6 +4697,8 @@
    "b6d2a7ac2a8eac1e": "Возможно, он удалён. Выделенный текст по-прежнему сохранён в цитате.",
    "be69a90d3d68d0d6": "Цитата не ссылается на ответ ассистента",
    "fc7d59b60c3b7d46": "Выделенный текст по-прежнему сохранён в цитате.",
@@ -550,10 +551,10 @@ index 0ecadaba9ded1ba66bd8b197a627c1a5b759d29b..be521283bf9e2af0210f8624270f63af
    "e4b9b6e99d9b6da1": "Контекст сжимается автоматически по мере необходимости.",
    "57e30468577bb989": "Ожидание сервера для отправки вложений",
 diff --git a/apps/web/src/i18n/translations/sv.json b/apps/web/src/i18n/translations/sv.json
-index 1c01b1112768f25a02b3a236b8d6bfab01719ee0..e3969c7b7e217fe13e6708226c5e72c9dc967ffc 100644
+index ce010afe09e2f7491b6d6da0c56e4a51a9588c10..84dae5df8b78a48fdd277d86874a89483b730b60 100644
 --- a/apps/web/src/i18n/translations/sv.json
 +++ b/apps/web/src/i18n/translations/sv.json
-@@ -3499,12 +3499,11 @@
+@@ -3503,12 +3503,11 @@
    "35e0b8f7418b4a86": "Klicka för att köa, {modifier}-klicka för att styra om",
    "eed080cf5eb25bfd": "Sammanfatta {tokens} token historik och skicka sedan",
    "e4116d7f64a6f593": "Komprimera {tokens} token historik innan du skickar",
@@ -569,7 +570,7 @@ index 1c01b1112768f25a02b3a236b8d6bfab01719ee0..e3969c7b7e217fe13e6708226c5e72c9
    "89426e9b039148d7": "Röstinmatningen misslyckades",
    "2220a0fbb5b6fa47": "Laddar ned modell {percent} %",
    "5c05b24be2880672": "Spelar in",
-@@ -4698,6 +4697,8 @@
+@@ -4699,6 +4698,8 @@
    "b6d2a7ac2a8eac1e": "Det kan ha tagits bort. Den markerade texten finns fortfarande sparad i ditt citat.",
    "be69a90d3d68d0d6": "Citatet hänvisar inte till ett assistentsvar",
    "fc7d59b60c3b7d46": "Den markerade texten finns fortfarande sparad i ditt citat.",
@@ -579,10 +580,10 @@ index 1c01b1112768f25a02b3a236b8d6bfab01719ee0..e3969c7b7e217fe13e6708226c5e72c9
    "e4b9b6e99d9b6da1": "Kontexten komprimeras automatiskt vid behov.",
    "57e30468577bb989": "Väntar på servern innan filbilagor kan skickas",
 diff --git a/apps/web/src/i18n/translations/zh.json b/apps/web/src/i18n/translations/zh.json
-index 43790340d1167735c7e9acbb729bc851a25e1882..23fa141a614bfee97e21c8b6bdd911a4ebf9780a 100644
+index 35a1898b6e4e909ff194a1e051bcd4419911db11..2d4b3b2c773a28ff5ed4b29387e049db595ede26 100644
 --- a/apps/web/src/i18n/translations/zh.json
 +++ b/apps/web/src/i18n/translations/zh.json
-@@ -3504,12 +3504,11 @@
+@@ -3508,12 +3508,11 @@
    "35e0b8f7418b4a86": "点击以加入队列，{modifier}+点击以引导",
    "eed080cf5eb25bfd": "先总结 {tokens} token 的历史记录，再发送",
    "e4116d7f64a6f593": "发送前压缩 {tokens} token 的历史记录",
@@ -598,7 +599,7 @@ index 43790340d1167735c7e9acbb729bc851a25e1882..23fa141a614bfee97e21c8b6bdd911a4
    "89426e9b039148d7": "语音输入失败",
    "2220a0fbb5b6fa47": "正在下载模型 {percent}%",
    "5c05b24be2880672": "正在录音",
-@@ -4704,6 +4703,8 @@
+@@ -4705,6 +4704,8 @@
    "b6d2a7ac2a8eac1e": "它可能已被删除。选中的文字仍保存在你的引用中。",
    "be69a90d3d68d0d6": "这个引用指向的不是助手回复",
    "fc7d59b60c3b7d46": "选中的文字仍保存在你的引用中。",
