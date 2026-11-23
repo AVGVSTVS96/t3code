@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/chat/ChatHeader.tsx b/apps/web/src/components/chat/ChatHeader.tsx
-index 133c80f304d0aa058c39a2d003409ba7c5c570d5..06b0fad9af518355cd540de93b41c06b21aca110 100644
+index 2a7d337d8e8b6294f9d4b6bd4821341af7fe4ce7..917a490d5b30480b2bae855a673d08376a2af150 100644
 --- a/apps/web/src/components/chat/ChatHeader.tsx
 +++ b/apps/web/src/components/chat/ChatHeader.tsx
-@@ -87,6 +87,15 @@ export const ChatHeader = memo(function ChatHeader({
+@@ -88,6 +88,15 @@ export const ChatHeader = memo(function ChatHeader({
    const gt = useGT();
    const activeProjectName = activeProject?.isScratch ? gt("No project") : activeProject?.title;
    const activeProjectCwd = activeProject?.workspaceRoot ?? null;
