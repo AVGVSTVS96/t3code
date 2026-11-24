@@ -319,7 +319,7 @@ index 04e9b0f3ed4d37fd88929296b1e5dd7388217f4e..70006f202fe5a87cb147dbbdd8a9db66
          clearUsageLimitsFor(routeThreadKey);
          if (turnUsesAttachmentUploads) {
 diff --git a/apps/web/src/i18n/translations/de.json b/apps/web/src/i18n/translations/de.json
-index 7d903a581492e4908272d640d0fbdf3f198f3614..96d6a17bc8d952f63ab4546dd28c202e067c66b0 100644
+index eb75d9e4bd34c45d1949d58fe2adab2e67f61789..d5ab4a81b2c2eded05993bb929a119c14cafcdde 100644
 --- a/apps/web/src/i18n/translations/de.json
 +++ b/apps/web/src/i18n/translations/de.json
 @@ -3560,12 +3560,11 @@
@@ -348,7 +348,7 @@ index 7d903a581492e4908272d640d0fbdf3f198f3614..96d6a17bc8d952f63ab4546dd28c202e
    "e4b9b6e99d9b6da1": "Der Kontext wird bei Bedarf automatisch komprimiert.",
    "57e30468577bb989": "Warte auf den Server, bevor Dateianhänge gesendet werden können",
 diff --git a/apps/web/src/i18n/translations/en.json b/apps/web/src/i18n/translations/en.json
-index c609141292e67cbc611bfe4e85b06118f18111aa..9ab49ba63c774177e9c8359944333d6b9c0df3fd 100644
+index 980eaadce7d588cd9fdda9355d078681b4eda9df..e15a552dab7178bef9a77b6aa4dc10affc296fa5 100644
 --- a/apps/web/src/i18n/translations/en.json
 +++ b/apps/web/src/i18n/translations/en.json
 @@ -3559,12 +3559,11 @@
@@ -377,7 +377,7 @@ index c609141292e67cbc611bfe4e85b06118f18111aa..9ab49ba63c774177e9c8359944333d6b
    "e4b9b6e99d9b6da1": "Context compacts automatically when needed.",
    "57e30468577bb989": "Waiting for the server before file attachments can send",
 diff --git a/apps/web/src/i18n/translations/es.json b/apps/web/src/i18n/translations/es.json
-index c28e0a00113e5ab4d28e9ee59cac06584110322a..f1d962f6f7a6e5c58749f3c85e1e0843d7ad7559 100644
+index 75ce6a003e605b21481606791bb7141433734a33..23fdcefd25b24434f93d97766c9a171ce7089fd9 100644
 --- a/apps/web/src/i18n/translations/es.json
 +++ b/apps/web/src/i18n/translations/es.json
 @@ -3559,12 +3559,11 @@
@@ -406,7 +406,7 @@ index c28e0a00113e5ab4d28e9ee59cac06584110322a..f1d962f6f7a6e5c58749f3c85e1e0843
    "e4b9b6e99d9b6da1": "El contexto se compacta automáticamente cuando hace falta.",
    "57e30468577bb989": "Esperando al servidor para poder enviar los archivos adjuntos",
 diff --git a/apps/web/src/i18n/translations/fr.json b/apps/web/src/i18n/translations/fr.json
-index f69f2088ad4e920ed67f89a5b7def29c0ad1ee44..f5e7cc6de8fb53a9aded70a269352a93f3a8c016 100644
+index 033958ed7f8bf5915cc5c4aac073a7fa5637a455..d7aa83a3ae2e8e1e5c26de679eaee171906fbfe0 100644
 --- a/apps/web/src/i18n/translations/fr.json
 +++ b/apps/web/src/i18n/translations/fr.json
 @@ -3559,12 +3559,11 @@
@@ -435,7 +435,7 @@ index f69f2088ad4e920ed67f89a5b7def29c0ad1ee44..f5e7cc6de8fb53a9aded70a269352a93
    "e4b9b6e99d9b6da1": "Le contexte est compacté automatiquement si nécessaire.",
    "57e30468577bb989": "En attente du serveur avant de pouvoir envoyer les pièces jointes",
 diff --git a/apps/web/src/i18n/translations/ja.json b/apps/web/src/i18n/translations/ja.json
-index 906b547f9cb8e7af4ddb8a6c6f1def7634a2fb1f..0b9748be88c750116ff15efbf3d032a6539b4d4c 100644
+index 54ca4ad545186e9b2dc9a38330843d0a2d3282fa..e33f8e74e0423a05b1f39b42890f673fc753bf4b 100644
 --- a/apps/web/src/i18n/translations/ja.json
 +++ b/apps/web/src/i18n/translations/ja.json
 @@ -3555,12 +3555,11 @@
@@ -464,7 +464,7 @@ index 906b547f9cb8e7af4ddb8a6c6f1def7634a2fb1f..0b9748be88c750116ff15efbf3d032a6
    "e4b9b6e99d9b6da1": "コンテキストは必要に応じて自動的に圧縮されます。",
    "57e30468577bb989": "ファイルの添付を送信できるようになるまでサーバーを待っています",
 diff --git a/apps/web/src/i18n/translations/ko.json b/apps/web/src/i18n/translations/ko.json
-index 2977aa726c15ee04f5a2212a724cb77ce02078d2..367dc2d8e91cdae0a65fcbe0f51993c229d3b640 100644
+index d5dcbf9645f4e094cbdc26c6988f0be1ee0fe357..2b3233f9bd22507c474647d0685a6820aa1b7939 100644
 --- a/apps/web/src/i18n/translations/ko.json
 +++ b/apps/web/src/i18n/translations/ko.json
 @@ -3555,12 +3555,11 @@
@@ -493,7 +493,7 @@ index 2977aa726c15ee04f5a2212a724cb77ce02078d2..367dc2d8e91cdae0a65fcbe0f51993c2
    "e4b9b6e99d9b6da1": "필요할 때 컨텍스트를 자동으로 압축합니다.",
    "57e30468577bb989": "파일 첨부를 보내기 전에 서버를 기다리는 중",
 diff --git a/apps/web/src/i18n/translations/pt-BR.json b/apps/web/src/i18n/translations/pt-BR.json
-index 755323271364a8963db8f29effd46577adabc976..adaa5e29110904e4e308a879c1c47199c04f7b14 100644
+index 49c2561cda0d8330172d576c4dad86fba23910c7..c747888ef3f32672c8bcaa526f48bc7494bcc735 100644
 --- a/apps/web/src/i18n/translations/pt-BR.json
 +++ b/apps/web/src/i18n/translations/pt-BR.json
 @@ -3559,12 +3559,11 @@
@@ -522,7 +522,7 @@ index 755323271364a8963db8f29effd46577adabc976..adaa5e29110904e4e308a879c1c47199
    "e4b9b6e99d9b6da1": "O contexto é compactado automaticamente quando necessário.",
    "57e30468577bb989": "Aguardando o servidor para poder enviar anexos de arquivo",
 diff --git a/apps/web/src/i18n/translations/ru.json b/apps/web/src/i18n/translations/ru.json
-index 8078f6e84fc54b5be9e65702634f7c271d66b1a8..5b22d7d5fc2b2621cbd5548f7081780103daceca 100644
+index d6aaa129fd2c54c115098589734d285f75d7701c..7a14fd2a15d20d04fb0655d6b65008d5fe042650 100644
 --- a/apps/web/src/i18n/translations/ru.json
 +++ b/apps/web/src/i18n/translations/ru.json
 @@ -3559,12 +3559,11 @@
@@ -551,7 +551,7 @@ index 8078f6e84fc54b5be9e65702634f7c271d66b1a8..5b22d7d5fc2b2621cbd5548f70817801
    "e4b9b6e99d9b6da1": "Контекст сжимается автоматически по мере необходимости.",
    "57e30468577bb989": "Ожидание сервера для отправки вложений",
 diff --git a/apps/web/src/i18n/translations/sv.json b/apps/web/src/i18n/translations/sv.json
-index b05d725b77b4cc936068de213225acacbdaad3a2..1b21cd04177dca3ee46f5bdd12affda4a6e4745a 100644
+index 698b439fd90e0e07cbaacf6a45ddc2e857252be6..58b458fc70e93d8522c35110d84c88b1923cd66d 100644
 --- a/apps/web/src/i18n/translations/sv.json
 +++ b/apps/web/src/i18n/translations/sv.json
 @@ -3559,12 +3559,11 @@
@@ -580,7 +580,7 @@ index b05d725b77b4cc936068de213225acacbdaad3a2..1b21cd04177dca3ee46f5bdd12affda4
    "e4b9b6e99d9b6da1": "Kontexten komprimeras automatiskt vid behov.",
    "57e30468577bb989": "Väntar på servern innan filbilagor kan skickas",
 diff --git a/apps/web/src/i18n/translations/zh.json b/apps/web/src/i18n/translations/zh.json
-index 458df6d5a345f334067164e3eee0b11705feeaef..508b01548b6096207957a13d80df6e01ce0cb68d 100644
+index 4ac495aa27eaabd52a285ce806c56969935b3869..11ae5d7de7668b52b9c037b6d2d8704cdd56e914 100644
 --- a/apps/web/src/i18n/translations/zh.json
 +++ b/apps/web/src/i18n/translations/zh.json
 @@ -3564,12 +3564,11 @@
