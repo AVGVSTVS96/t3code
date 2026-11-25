@@ -1,8 +1,8 @@
 diff --git a/scripts/build-desktop-artifact.test.ts b/scripts/build-desktop-artifact.test.ts
-index 43e89846bded00d933f000d7074873ce98e99c9f..2d7720d3568200e6a7dc5b60d261aa3d0cb75348 100644
+index e5a0cc3c6e4f41607e66708f649b67c0dca6ccfd..5409d81cdc482d30c7a6e5a53610a271451bf319 100644
 --- a/scripts/build-desktop-artifact.test.ts
 +++ b/scripts/build-desktop-artifact.test.ts
-@@ -1739,6 +1739,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
+@@ -1741,6 +1741,25 @@ it.layer(NodeServices.layer)("build-desktop-artifact", (it) => {
      assert.notInclude(error.message, secret);
    });
  
