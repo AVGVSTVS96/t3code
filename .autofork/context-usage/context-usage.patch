@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 357439cbdf0d640cc131315eabce5ad2731a44ea..0efa5d9bcc5c298fa6b305d2f1ebfa92fb881339 100644
+index b720e53e828d0628f8643484370107b9013950b6..927109942bb335a165356696570d48f2496631ae 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -358,7 +358,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
+@@ -359,7 +359,7 @@ import { ComposerBannerStack, type ComposerBannerStackItem } from "./chat/Compos
  import { modelFallbackBannerItem } from "./chat/ComposerUsageLimits";
  import { ComposerSurface } from "./chat/ComposerSurface";
  import { resolveThreadSyncPhase } from "../threadSync";
@@ -11,7 +11,7 @@ index 357439cbdf0d640cc131315eabce5ad2731a44ea..0efa5d9bcc5c298fa6b305d2f1ebfa92
  import {
    deriveLatestContextWindowSnapshot,
    hasDismissedResumeCompaction,
-@@ -2672,38 +2672,44 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2673,38 +2673,44 @@ export default function ChatView(props: ChatViewProps) {
    const freshSessionPending = freshSessionAvailable && freshSessionArmed;
    // The context window is the current conversation's, so neither a handoff destination nor
    // the fresh session armed by /clear inherits it.
@@ -73,7 +73,7 @@ index 357439cbdf0d640cc131315eabce5ad2731a44ea..0efa5d9bcc5c298fa6b305d2f1ebfa92
        return next;
      });
    };
-@@ -2718,7 +2724,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -2719,7 +2725,7 @@ export default function ChatView(props: ChatViewProps) {
    });
    const toggleKeepFullHistory = () => {
      cancelHeldComposerSend(composerDraftTargetKey);
@@ -82,7 +82,7 @@ index 357439cbdf0d640cc131315eabce5ad2731a44ea..0efa5d9bcc5c298fa6b305d2f1ebfa92
    };
    const toggleKeepFullHistoryStable = useStableCallback(toggleKeepFullHistory);
    const armFreshSessionStable = useStableCallback(() => armFreshSession(routeThreadKey));
-@@ -3194,7 +3200,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3195,7 +3201,7 @@ export default function ChatView(props: ChatViewProps) {
      },
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -91,7 +91,7 @@ index 357439cbdf0d640cc131315eabce5ad2731a44ea..0efa5d9bcc5c298fa6b305d2f1ebfa92
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat: sideChat.available ? sendSideChatStable : undefined,
-@@ -3909,7 +3915,15 @@ export default function ChatView(props: ChatViewProps) {
+@@ -3915,7 +3921,15 @@ export default function ChatView(props: ChatViewProps) {
                                  }
                                  resumeCompactionTokens={resumeCompactionTokens}
                                  keepFullHistory={keepFullHistory}
@@ -288,10 +288,10 @@ index 706fde340c583d84ffbf949bcb921841cfc3c44d..3e83e0e6b5566d94d2984a559dd661f0
    autoCompactThreshold?: number | null,
    resolve: MessageResolver = m,
 diff --git a/apps/web/src/components/chat/useComposerSend.ts b/apps/web/src/components/chat/useComposerSend.ts
-index 04e9b0f3ed4d37fd88929296b1e5dd7388217f4e..70006f202fe5a87cb147dbbdd8a9db66f3766255 100644
+index b5183faa1ebe56edfeb766320daa10bb47804e32..5dacccaa0af11ed9e68f78a8ae77d46127e4e012 100644
 --- a/apps/web/src/components/chat/useComposerSend.ts
 +++ b/apps/web/src/components/chat/useComposerSend.ts
-@@ -275,7 +275,7 @@ interface ComposerSendInput {
+@@ -276,7 +276,7 @@ interface ComposerSendInput {
      SetStateAction<Record<string, ReadonlyArray<CodexFeedbackSubmission>>>
    >;
    readonly setThreadError: ReturnType<typeof makeThreadErrorSetter>;
@@ -300,7 +300,7 @@ index 04e9b0f3ed4d37fd88929296b1e5dd7388217f4e..70006f202fe5a87cb147dbbdd8a9db66
    readonly anchorNewTurn: TimelineFollow["anchorNewTurn"];
    readonly acknowledgeActiveThreadWoke: () => void;
    /** Resolves true once the side chat started and got the message. */
-@@ -367,7 +367,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -368,7 +368,7 @@ export function useComposerSend(input: ComposerSendInput) {
      optimisticBlobPreviews,
      setFeedbackSubmissionsByThreadKey,
      setThreadError,
@@ -309,7 +309,7 @@ index 04e9b0f3ed4d37fd88929296b1e5dd7388217f4e..70006f202fe5a87cb147dbbdd8a9db66
      anchorNewTurn,
      acknowledgeActiveThreadWoke,
      onSideChat,
-@@ -1599,7 +1599,7 @@ export function useComposerSend(input: ComposerSendInput) {
+@@ -1633,7 +1633,7 @@ export function useComposerSend(input: ComposerSendInput) {
              checkoutPullRequestUrl,
            );
          }
@@ -319,7 +319,7 @@ index 04e9b0f3ed4d37fd88929296b1e5dd7388217f4e..70006f202fe5a87cb147dbbdd8a9db66
          clearUsageLimitsFor(routeThreadKey);
          if (turnUsesAttachmentUploads) {
 diff --git a/apps/web/src/i18n/translations/de.json b/apps/web/src/i18n/translations/de.json
-index eb75d9e4bd34c45d1949d58fe2adab2e67f61789..d5ab4a81b2c2eded05993bb929a119c14cafcdde 100644
+index 0e3737e5557e101c55c0fcacd06e8736bb7ffcd2..dfff9d1ceacef29b156db03cd17afc04a0f50142 100644
 --- a/apps/web/src/i18n/translations/de.json
 +++ b/apps/web/src/i18n/translations/de.json
 @@ -3560,12 +3560,11 @@
@@ -338,7 +338,7 @@ index eb75d9e4bd34c45d1949d58fe2adab2e67f61789..d5ab4a81b2c2eded05993bb929a119c1
    "89426e9b039148d7": "Spracheingabe fehlgeschlagen",
    "2220a0fbb5b6fa47": "Modell wird heruntergeladen {percent} %",
    "5c05b24be2880672": "Aufnahme",
-@@ -4763,6 +4762,8 @@
+@@ -4779,6 +4778,8 @@
    "b6d2a7ac2a8eac1e": "Sie wurde möglicherweise entfernt. Der ausgewählte Text ist weiterhin in deinem Zitat gespeichert.",
    "be69a90d3d68d0d6": "Das Zitat bezieht sich nicht auf eine Antwort des Assistenten",
    "fc7d59b60c3b7d46": "Der ausgewählte Text ist weiterhin in deinem Zitat gespeichert.",
@@ -348,7 +348,7 @@ index eb75d9e4bd34c45d1949d58fe2adab2e67f61789..d5ab4a81b2c2eded05993bb929a119c1
    "e4b9b6e99d9b6da1": "Der Kontext wird bei Bedarf automatisch komprimiert.",
    "57e30468577bb989": "Warte auf den Server, bevor Dateianhänge gesendet werden können",
 diff --git a/apps/web/src/i18n/translations/en.json b/apps/web/src/i18n/translations/en.json
-index 980eaadce7d588cd9fdda9355d078681b4eda9df..e15a552dab7178bef9a77b6aa4dc10affc296fa5 100644
+index 9d05f0917d041f4255ed6d0c577b7ee33b2ed763..5aa3785e506e00a8b2d149b310d7aec06e525d68 100644
 --- a/apps/web/src/i18n/translations/en.json
 +++ b/apps/web/src/i18n/translations/en.json
 @@ -3559,12 +3559,11 @@
@@ -367,7 +367,7 @@ index 980eaadce7d588cd9fdda9355d078681b4eda9df..e15a552dab7178bef9a77b6aa4dc10af
    "89426e9b039148d7": "Voice input failed",
    "2220a0fbb5b6fa47": "Downloading model {percent}%",
    "5c05b24be2880672": "Recording",
-@@ -4762,6 +4761,8 @@
+@@ -4778,6 +4777,8 @@
    "b6d2a7ac2a8eac1e": "It may have been removed. The selected text is still saved in your citation.",
    "be69a90d3d68d0d6": "The citation does not refer to an assistant response",
    "fc7d59b60c3b7d46": "The selected text is still saved in your citation.",
@@ -377,7 +377,7 @@ index 980eaadce7d588cd9fdda9355d078681b4eda9df..e15a552dab7178bef9a77b6aa4dc10af
    "e4b9b6e99d9b6da1": "Context compacts automatically when needed.",
    "57e30468577bb989": "Waiting for the server before file attachments can send",
 diff --git a/apps/web/src/i18n/translations/es.json b/apps/web/src/i18n/translations/es.json
-index 75ce6a003e605b21481606791bb7141433734a33..23fdcefd25b24434f93d97766c9a171ce7089fd9 100644
+index 3fb73c031f7fbff215c84e70aba28eb4a156dd45..2ce28245b7656b972bb7db05adb8ea115d042baa 100644
 --- a/apps/web/src/i18n/translations/es.json
 +++ b/apps/web/src/i18n/translations/es.json
 @@ -3559,12 +3559,11 @@
@@ -396,7 +396,7 @@ index 75ce6a003e605b21481606791bb7141433734a33..23fdcefd25b24434f93d97766c9a171c
    "89426e9b039148d7": "Falló la entrada de voz",
    "2220a0fbb5b6fa47": "Descargando el modelo {percent} %",
    "5c05b24be2880672": "Grabando",
-@@ -4760,6 +4759,8 @@
+@@ -4776,6 +4775,8 @@
    "b6d2a7ac2a8eac1e": "Puede que se haya quitado. El texto seleccionado sigue guardado en tu cita.",
    "be69a90d3d68d0d6": "La cita no hace referencia a una respuesta del asistente",
    "fc7d59b60c3b7d46": "El texto seleccionado sigue guardado en tu cita.",
@@ -406,7 +406,7 @@ index 75ce6a003e605b21481606791bb7141433734a33..23fdcefd25b24434f93d97766c9a171c
    "e4b9b6e99d9b6da1": "El contexto se compacta automáticamente cuando hace falta.",
    "57e30468577bb989": "Esperando al servidor para poder enviar los archivos adjuntos",
 diff --git a/apps/web/src/i18n/translations/fr.json b/apps/web/src/i18n/translations/fr.json
-index 033958ed7f8bf5915cc5c4aac073a7fa5637a455..d7aa83a3ae2e8e1e5c26de679eaee171906fbfe0 100644
+index bd204fdf2aadb363fa1ee27308d6169b0f6dc0ce..f62ddb5a462aa5a42ace534a2aae5f0d95463569 100644
 --- a/apps/web/src/i18n/translations/fr.json
 +++ b/apps/web/src/i18n/translations/fr.json
 @@ -3559,12 +3559,11 @@
@@ -425,7 +425,7 @@ index 033958ed7f8bf5915cc5c4aac073a7fa5637a455..d7aa83a3ae2e8e1e5c26de679eaee171
    "89426e9b039148d7": "Échec de la saisie vocale",
    "2220a0fbb5b6fa47": "Téléchargement du modèle {percent} %",
    "5c05b24be2880672": "Enregistrement",
-@@ -4761,6 +4760,8 @@
+@@ -4777,6 +4776,8 @@
    "b6d2a7ac2a8eac1e": "Elle a peut-être été supprimée. Le texte sélectionné reste enregistré dans votre citation.",
    "be69a90d3d68d0d6": "La citation ne renvoie pas à une réponse de l’assistant",
    "fc7d59b60c3b7d46": "Le texte sélectionné reste enregistré dans votre citation.",
@@ -435,7 +435,7 @@ index 033958ed7f8bf5915cc5c4aac073a7fa5637a455..d7aa83a3ae2e8e1e5c26de679eaee171
    "e4b9b6e99d9b6da1": "Le contexte est compacté automatiquement si nécessaire.",
    "57e30468577bb989": "En attente du serveur avant de pouvoir envoyer les pièces jointes",
 diff --git a/apps/web/src/i18n/translations/ja.json b/apps/web/src/i18n/translations/ja.json
-index 54ca4ad545186e9b2dc9a38330843d0a2d3282fa..e33f8e74e0423a05b1f39b42890f673fc753bf4b 100644
+index c3fb60f3c016da303909cbbb6af56e2d1478e9ef..1e8019f4fdf598560a6972b6ade5ef39e1a3f012 100644
 --- a/apps/web/src/i18n/translations/ja.json
 +++ b/apps/web/src/i18n/translations/ja.json
 @@ -3555,12 +3555,11 @@
@@ -454,7 +454,7 @@ index 54ca4ad545186e9b2dc9a38330843d0a2d3282fa..e33f8e74e0423a05b1f39b42890f673f
    "89426e9b039148d7": "音声入力に失敗しました",
    "2220a0fbb5b6fa47": "モデルをダウンロードしています {percent}%",
    "5c05b24be2880672": "録音中",
-@@ -4750,6 +4749,8 @@
+@@ -4765,6 +4764,8 @@
    "b6d2a7ac2a8eac1e": "削除された可能性があります。選択したテキストは引用に保存されたままです。",
    "be69a90d3d68d0d6": "この引用はアシスタントの応答を参照していません",
    "fc7d59b60c3b7d46": "選択したテキストは引用に保存されたままです。",
@@ -464,7 +464,7 @@ index 54ca4ad545186e9b2dc9a38330843d0a2d3282fa..e33f8e74e0423a05b1f39b42890f673f
    "e4b9b6e99d9b6da1": "コンテキストは必要に応じて自動的に圧縮されます。",
    "57e30468577bb989": "ファイルの添付を送信できるようになるまでサーバーを待っています",
 diff --git a/apps/web/src/i18n/translations/ko.json b/apps/web/src/i18n/translations/ko.json
-index d5dcbf9645f4e094cbdc26c6988f0be1ee0fe357..2b3233f9bd22507c474647d0685a6820aa1b7939 100644
+index 361c5992b474b12bd8d6f4b188405c7ddd76fe1a..3d1e2870daa7ae6c9d89ad62701023f081325a21 100644
 --- a/apps/web/src/i18n/translations/ko.json
 +++ b/apps/web/src/i18n/translations/ko.json
 @@ -3555,12 +3555,11 @@
@@ -483,7 +483,7 @@ index d5dcbf9645f4e094cbdc26c6988f0be1ee0fe357..2b3233f9bd22507c474647d0685a6820
    "89426e9b039148d7": "음성 입력 실패",
    "2220a0fbb5b6fa47": "모델 다운로드 중 {percent}%",
    "5c05b24be2880672": "녹음 중",
-@@ -4747,6 +4746,8 @@
+@@ -4762,6 +4761,8 @@
    "b6d2a7ac2a8eac1e": "삭제되었을 수 있습니다. 선택한 텍스트는 인용에 그대로 저장되어 있습니다.",
    "be69a90d3d68d0d6": "인용이 어시스턴트 응답을 가리키지 않습니다",
    "fc7d59b60c3b7d46": "선택한 텍스트는 인용에 그대로 저장되어 있습니다.",
@@ -493,7 +493,7 @@ index d5dcbf9645f4e094cbdc26c6988f0be1ee0fe357..2b3233f9bd22507c474647d0685a6820
    "e4b9b6e99d9b6da1": "필요할 때 컨텍스트를 자동으로 압축합니다.",
    "57e30468577bb989": "파일 첨부를 보내기 전에 서버를 기다리는 중",
 diff --git a/apps/web/src/i18n/translations/pt-BR.json b/apps/web/src/i18n/translations/pt-BR.json
-index 49c2561cda0d8330172d576c4dad86fba23910c7..c747888ef3f32672c8bcaa526f48bc7494bcc735 100644
+index 9f5f888acff3f638abd94e189f7665b390fbbf3d..05ab1a5d23f43c0352a7eb2a9f6a3f72e0ab7ee9 100644
 --- a/apps/web/src/i18n/translations/pt-BR.json
 +++ b/apps/web/src/i18n/translations/pt-BR.json
 @@ -3559,12 +3559,11 @@
@@ -512,7 +512,7 @@ index 49c2561cda0d8330172d576c4dad86fba23910c7..c747888ef3f32672c8bcaa526f48bc74
    "89426e9b039148d7": "Falha na entrada de voz",
    "2220a0fbb5b6fa47": "Baixando o modelo {percent}%",
    "5c05b24be2880672": "Gravando",
-@@ -4760,6 +4759,8 @@
+@@ -4776,6 +4775,8 @@
    "b6d2a7ac2a8eac1e": "Ela pode ter sido removida. O texto selecionado continua salvo na sua citação.",
    "be69a90d3d68d0d6": "A citação não se refere a uma resposta do assistente",
    "fc7d59b60c3b7d46": "O texto selecionado continua salvo na sua citação.",
@@ -522,7 +522,7 @@ index 49c2561cda0d8330172d576c4dad86fba23910c7..c747888ef3f32672c8bcaa526f48bc74
    "e4b9b6e99d9b6da1": "O contexto é compactado automaticamente quando necessário.",
    "57e30468577bb989": "Aguardando o servidor para poder enviar anexos de arquivo",
 diff --git a/apps/web/src/i18n/translations/ru.json b/apps/web/src/i18n/translations/ru.json
-index d6aaa129fd2c54c115098589734d285f75d7701c..7a14fd2a15d20d04fb0655d6b65008d5fe042650 100644
+index 3bcd27f93a513b00ad887cf151e40fea75806c0e..f7baf7e5b9482c354058f3a498e7ba0217a603c3 100644
 --- a/apps/web/src/i18n/translations/ru.json
 +++ b/apps/web/src/i18n/translations/ru.json
 @@ -3559,12 +3559,11 @@
@@ -541,7 +541,7 @@ index d6aaa129fd2c54c115098589734d285f75d7701c..7a14fd2a15d20d04fb0655d6b65008d5
    "89426e9b039148d7": "Ошибка голосового ввода",
    "2220a0fbb5b6fa47": "Загрузка модели {percent}%",
    "5c05b24be2880672": "Запись",
-@@ -4760,6 +4759,8 @@
+@@ -4776,6 +4775,8 @@
    "b6d2a7ac2a8eac1e": "Возможно, он удалён. Выделенный текст по-прежнему сохранён в цитате.",
    "be69a90d3d68d0d6": "Цитата не ссылается на ответ ассистента",
    "fc7d59b60c3b7d46": "Выделенный текст по-прежнему сохранён в цитате.",
@@ -551,7 +551,7 @@ index d6aaa129fd2c54c115098589734d285f75d7701c..7a14fd2a15d20d04fb0655d6b65008d5
    "e4b9b6e99d9b6da1": "Контекст сжимается автоматически по мере необходимости.",
    "57e30468577bb989": "Ожидание сервера для отправки вложений",
 diff --git a/apps/web/src/i18n/translations/sv.json b/apps/web/src/i18n/translations/sv.json
-index 698b439fd90e0e07cbaacf6a45ddc2e857252be6..58b458fc70e93d8522c35110d84c88b1923cd66d 100644
+index b457b6d2a219fa254f349da4fafd1bf6a26a92d9..420daa00f2e8ee34b66b2310d6b2ca7177bb9749 100644
 --- a/apps/web/src/i18n/translations/sv.json
 +++ b/apps/web/src/i18n/translations/sv.json
 @@ -3559,12 +3559,11 @@
@@ -570,7 +570,7 @@ index 698b439fd90e0e07cbaacf6a45ddc2e857252be6..58b458fc70e93d8522c35110d84c88b1
    "89426e9b039148d7": "Röstinmatningen misslyckades",
    "2220a0fbb5b6fa47": "Laddar ned modell {percent} %",
    "5c05b24be2880672": "Spelar in",
-@@ -4761,6 +4760,8 @@
+@@ -4777,6 +4776,8 @@
    "b6d2a7ac2a8eac1e": "Det kan ha tagits bort. Den markerade texten finns fortfarande sparad i ditt citat.",
    "be69a90d3d68d0d6": "Citatet hänvisar inte till ett assistentsvar",
    "fc7d59b60c3b7d46": "Den markerade texten finns fortfarande sparad i ditt citat.",
@@ -580,7 +580,7 @@ index 698b439fd90e0e07cbaacf6a45ddc2e857252be6..58b458fc70e93d8522c35110d84c88b1
    "e4b9b6e99d9b6da1": "Kontexten komprimeras automatiskt vid behov.",
    "57e30468577bb989": "Väntar på servern innan filbilagor kan skickas",
 diff --git a/apps/web/src/i18n/translations/zh.json b/apps/web/src/i18n/translations/zh.json
-index 4ac495aa27eaabd52a285ce806c56969935b3869..11ae5d7de7668b52b9c037b6d2d8704cdd56e914 100644
+index c10b0f530a54a1251e19a776bcb769a0e9511ef0..4531192de0e7b356e7d6da7e78d11ce4884b9de4 100644
 --- a/apps/web/src/i18n/translations/zh.json
 +++ b/apps/web/src/i18n/translations/zh.json
 @@ -3564,12 +3564,11 @@
@@ -599,7 +599,7 @@ index 4ac495aa27eaabd52a285ce806c56969935b3869..11ae5d7de7668b52b9c037b6d2d8704c
    "89426e9b039148d7": "语音输入失败",
    "2220a0fbb5b6fa47": "正在下载模型 {percent}%",
    "5c05b24be2880672": "正在录音",
-@@ -4767,6 +4766,8 @@
+@@ -4782,6 +4781,8 @@
    "b6d2a7ac2a8eac1e": "它可能已被删除。选中的文字仍保存在你的引用中。",
    "be69a90d3d68d0d6": "这个引用指向的不是助手回复",
    "fc7d59b60c3b7d46": "选中的文字仍保存在你的引用中。",
